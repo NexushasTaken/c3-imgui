@@ -1,0 +1,5 @@
+[submodule "cimgui"]
+  path = cimgui
+  url = https://github.com/cimgui/cimgui
+  branch = docking_inter
+  shallow = 1
