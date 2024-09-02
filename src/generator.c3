@@ -324,7 +324,11 @@ fn String clean_type(DString* buffer, String orig_type) {
     orig_type = orig_type.trim();
     if (orig_type.starts_with("const char*")) {
       buffer.append_chars("ZString");
+      if (orig_type.ends_with("[]")) {
+        buffer.append_chars("[]");
+      }
     } else {
+      assert(!orig_type.contains("[]"));
       orig_type = orig_type.strip("const ");
 
       if (try type = type_map.get(orig_type)) {

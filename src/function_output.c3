@@ -70,9 +70,23 @@ fn void output_imgui_func(List(<Object*>) funcs) {
   foreach (func : funcs) {
     DString func_name_buffer;
     func_name_buffer.temp_init();
-    String extern_func_name = func.get_string("ov_cimguiname")!!;
+    DString func_params_buffer;
+    func_params_buffer.temp_init();
+    DString func_ret_buffer;
+    func_ret_buffer.temp_init();
+    List(<String>) callbacks;
+
+    String func_extern_name = func.get_string("ov_cimguiname")!!;
     String func_name = to_snake_case(&func_name_buffer, func.get_string("ov_cimguiname")!!.strip("ig"));
-    io::printfn("%s -> %s", func_name, extern_func_name);
+    String func_ret = clean_type(&func_ret_buffer, func.get_string("ret")!!);
+    String func_params = clean_params_list(&func_params_buffer, func, &callbacks, func_name);
+
+    io::printf("//%s%s %s -> %s\n", func_extern_name, func.get_string("args")!!, func_name, func_ret);
+    io::printf("fn %s %s(%s) @extern(\"%s\");\n", func_ret, func_name, func_params, func_extern_name);
+    foreach (cb : callbacks) {
+      io::printf("%s\n", cb);
+    }
+    io::printf("\n");
   }
 }
 
@@ -81,5 +95,87 @@ fn void output_struct_func(List(<Object*>) funcs) {
 
   foreach (func : funcs) {
     io::printfn("%s", func.get_string("cimguiname")!!);
+  }
+}
+
+fn String clean_params_list(DString* buffer, Object* func, List(<String>)* callbacks, String func_name) {
+  foreach (i, param : func.get("argsT")!!.array) {
+    if (i != 0) {
+      buffer.append_chars(", ");
+    }
+    if (try ret = param.get_string("ret")) {
+      DString param_buffer;
+      param_buffer.temp_init();
+      DString ret_buffer;
+      ret_buffer.temp_init();
+      DString cb_buffer;
+      cb_buffer.temp_init();
+      DString cb_name_buffer;
+      cb_name_buffer.temp_init();
+
+      String ret_type = clean_type(&ret_buffer, ret);
+      String params = clean_params(&param_buffer, param.get_string("signature")!!);
+      cb_buffer.appendf("fn %s%s", ret_type, params);
+
+      to_pascal_case(&cb_name_buffer, func_name);
+      cb_name_buffer.append_chars("Callback");
+
+      callbacks.push(string::new_format("def %s = %s;", cb_name_buffer.str_view(), cb_buffer.str_view()));
+      buffer.appendf("%s %s", cb_name_buffer.str_view(), param.get_string("name")!!);
+    } else {
+      DString type_buffer;
+      type_buffer.temp_init();
+
+      buffer.appendf("%s %s", clean_type(&type_buffer, param.get_string("type")!!), param.get_string("name")!!);
+
+      func.get("defaults")!!.map.@each(; String param_name, Object* default_value) {
+        if (param_name == param.get_string("name")!!) {
+          clean_value(buffer, default_value.s);
+        }
+      };
+    }
+  }
+  return buffer.str_view();
+}
+
+fn void clean_value(DString* buffer, String s) {
+  // TODO: move this to string_utils?
+  if (s == "NULL") {
+    buffer.append_chars(" = null");
+  } else if (s == "true" || s == "false") {
+    buffer.appendf(" = %s", s);
+  } else if (s.starts_with("sizeof")) {
+    buffer.appendf(" = %s.sizeof", s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1]);
+  } else if (s.starts_with("ImVec")) {
+    buffer.appendf(" = {");
+    foreach (idx, v : s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1].split(",")) {
+      if (idx != 0) {
+        buffer.appendf(", ");
+      }
+      DString v_buf;
+      v_buf.temp_init();
+      v_buf.appendf("%s", v.trim());
+      // TODO: just directly replace 'buffer'?
+      v_buf.replace("FLT_MIN", "float.min");
+      v_buf.replace("FLT_MAX", "float.max");
+      buffer.appendf("%s", v_buf.str_view());
+    }
+    buffer.appendf("}");
+  } else if (s.starts_with("%")) {
+    buffer.appendf(" = %%%s", s);
+  } else if (s.ends_with("f")) {
+    buffer.appendf(" = %s", s);
+  } else if (try value = s.to_long()) { // TODO: is long is enough?. make sure it doesn't convert floating point
+    buffer.appendf(" = %d", value);
+  } else if (try value = s.to_double()) {
+    buffer.appendf(" = %f", value);
+  } else {
+    DString v_buf;
+    v_buf.temp_init();
+    v_buf.appendf("%s", s);
+    // TODO: just directly replace 'buffer'?
+    v_buf.replace("FLT_MIN", "float.min");
+    v_buf.replace("FLT_MAX", "float.max");
+    buffer.appendf(" = %s", v_buf.str_view());
   }
 }
