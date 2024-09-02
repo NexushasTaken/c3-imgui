@@ -9,8 +9,6 @@ HashMap(<String, int>) blacklist_structs;
 HashMap(<String, int>) blacklist_typedefs;
 HashMap(<String, String>) opaque_structs;
 
-HashMap(<String, String>) struct_name_map;
-HashMap(<String, String>) enum_values_map; // 'value' is allocated
 HashMap(<String, String>) distinct_enum_map;
 
 HashMap(<String, String>) typedef_names_map;
@@ -20,7 +18,7 @@ HashMap(<String, String>) enum_map;
 HashMap(<String, String>) enum_value_map; // 'value' is allocated
 
 macro String! find_enum_starts_with(String needle) {
-  enum_list.@each(; String type, String alt) {
+  enum_map.@each(; String type, String alt) {
     if (needle.starts_with(type)) {
       return type;
     }
@@ -28,9 +26,9 @@ macro String! find_enum_starts_with(String needle) {
   return SearchResult.MISSING?;
 }
 
-macro String! find_struct_starts_with(String needle) {
-  struct_list.@each(; String type, String alt) {
-    if (needle.starts_with(type)) {
+macro String! find_struct_starts_with(String needle, bool use_alt = false) {
+  struct_map.@each(; String type, String alt) {
+    if (needle.starts_with(use_alt ? alt : type)) {
       return type;
     }
   };
@@ -47,6 +45,7 @@ macro String! find_type_starts_with(String needle) {
 }
 
 fn void init_type_map() @init {
+  type_map.set("void"          , "void");
   type_map.set("char"          , "char"); // TODO: C char as C3 char?
   type_map.set("signed char"   , "ichar"); 
   type_map.set("unsigned char" , "char"); 
@@ -118,8 +117,10 @@ fn void init_type_map() @init {
   type_map.set("ImGuiIO", "ImIO");
   type_map.set("ImGuiID", "ImID");
 
+  // Opaque Structs
   type_map.set("ImGuiContext*", "void*");
   type_map.set("ImFontBuilderIO*", "void*");
+  type_map.set("ImDrawListSharedData*", "void*");
 }
 
 fn void init_blacklist_typedefs() @init {
@@ -138,11 +139,12 @@ fn void init_blacklist_structs() @init {
 
 fn void init_opaque_structs() @init {
   //opaque_structs.set("ImGuiContext*", "void*");
+  //opaque_structs.set("DrawListSharedData*", "void*");
 }
 
-fn void init_struct_name_map() @init {
-  struct_name_map.set("ImGuiIO", "ImIO");
-  struct_name_map.set("ImGuiID", "ImID");
+fn void init_struct_map() @init {
+  struct_map.set("ImGuiIO", "ImIO");
+  struct_map.set("ImGuiID", "ImID");
 }
 
 fn void init_typedef_names_map() @init {

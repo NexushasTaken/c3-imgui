@@ -40,7 +40,9 @@ fn int main(String[] args) {
 
 fn void digest_types(Object* json_obj) {
   json_obj.get("structs")!!.map.@each(; String name, Object* members) {
-    struct_map.set(name, struct_name_map.get(name) ?? clean_imgui(name));
+    if (!struct_map.has_key(name)) {
+      struct_map.set(name, clean_imgui(name));
+    }
   };
   json_obj.get("enums")!!.map.@each(; String name, Object* members) {
     enum_map.set(name, clean_enum(name));
@@ -48,7 +50,9 @@ fn void digest_types(Object* json_obj) {
   json_obj.get("enums")!!.map.@each(; String name, Object* values) {
     foreach (value : values.array) {
       DString value_name;
-      enum_value_map.set(value.get_string("name")!!, to_constant_case(&value_name, clean_imgui(value.get_string("name")!!)).copy());
+      to_constant_case(&value_name, clean_imgui(value.get_string("name")!!));
+      assert(value_name.str_view());
+      enum_value_map.set(value.get_string("name")!!, value_name.copy_str());
     }
   };
 }
@@ -77,26 +81,19 @@ fn void output_enums(Object* json_obj, String output_path) {
       (void)io::fprintf(&output, "distinct %s = int;\n", enum_map.get(name)!!);
     }
 
-    List(<Tuple(<DString, DString>)>) cleaned_values;
+    List(<Tuple(<String, DString>)>) cleaned_values;
 
     assert(values.is_array());
     { // Gather
       foreach (value : values.array) {
-        DString value_name;
         DString value_value;
-        value_name.clear();
-        value_value.clear();
-
-        to_constant_case(&value_name, clean_imgui(value.get_string("name")!!));
-        assert(is_valid_constant(value_name.str_view()));
 
         if (try value.get_string("value")!!.index_of_char('|')) {
           foreach (i, v : value.get_string("value")!!.split("|")) {
             if (i != 0) {
               value_value.appendf(" | ");
             }
-            value_value.appendf("%s", to_constant_case(&buffer, clean_imgui(v.trim())));
-            assert(is_valid_constant(buffer.str_view()));
+            value_value.appendf("%s", enum_value_map.get(v.trim())!!);
           }
         } else {
           if (try value.get_string("value")!!.to_uint()) {
@@ -110,23 +107,21 @@ fn void output_enums(Object* json_obj, String output_path) {
           }
         }
 
-        cleaned_values.push({ value_name, value_value });
-        enum_values_map.set(value.get_string("name")!!, value_name.copy_str());
+        cleaned_values.push({ enum_value_map.get(value.get_string("name")!!)!!, value_value });
         distinct_enum_map.set(name.strip_end("_"), clean_enum(name));
       }
     }
 
     { // Output
-      usz max_len = cleaned_values[0].first.len();
+      usz max_len = cleaned_values[0].first.len;
       foreach (entry : cleaned_values) {
-        max_len = math::max(entry.first.len(), max_len);
+        max_len = math::max(entry.first.len, max_len);
       }
       foreach (entry : cleaned_values) {
         (void)io::fprintf(&output, "const %s %s", clean_enum(name), entry.first);
-        (void)fpad(&output, " ", max_len - entry.first.len());
+        (void)fpad(&output, " ", max_len - entry.first.len);
         (void)io::fprintf(&output, " = %s;\n", entry.second);
 
-        entry.first.free();
         entry.second.free();
       }
       (void)io::fprintf(&output, "\n");
@@ -174,13 +169,10 @@ fn void output_structs(Object* json_obj, String output_path) {
 
   io::printf("module %s;\n", IMGUI_MODULE_NAME);
 
-  List(<String>) pointer_structs;
   json_obj.get("structs")!!.map.@each(; String name, Object* members) {
     if (try loc = json_obj.get("locations")!!.get(name) && !loc.s.starts_with("imgui_internal") && !loc.s.starts_with("imstb_textedit")) {
       io::printf("// %s\n", name);
-      String struct_name = struct_name_map.get(name) ?? clean_imgui(name);
-      io::printf("struct %s {\n", struct_name);
-      struct_name_map.set(name, struct_name);
+      io::printf("struct %s {\n", struct_map.get(name)!!);
 
       List(<DString>) callbacks;
       assert(members.is_array());
@@ -191,8 +183,8 @@ fn void output_structs(Object* json_obj, String output_path) {
 
         if (try s = member.get_string("name")!!.index_of_char('[') && try e = member.get_string("name")!!.index_of_char(']')) {
           String key = member.get_string("name")!![s+1..e-1];
-          if (try value = enum_values_map.get(key)) {
-            io::printf("  %s[(usz)(%s)] %s;\n", member_type, value, to_snake_case(&buffer, member.get_string("name")!![..s-1]));
+          if (try value = enum_value_map.get(key)) {
+            io::printf("  %s[(usz)%s] %s;\n", member_type, value, to_snake_case(&buffer, member.get_string("name")!![..s-1]));
           } else {
             io::printf("  %s[(usz)(%s)] %s;\n", member_type, key, to_snake_case(&buffer, member.get_string("name")!![..s-1]));
           }
@@ -209,11 +201,7 @@ fn void output_structs(Object* json_obj, String output_path) {
           } else if (member_type.starts_with("union")) {
             io::printf("  %s\n", member_type);
           } else {
-            if (try pointer_structs.index_of(member_type)) {
-              io::printf("  void* %s;\n", to_snake_case(&buffer, member.get_string("name")!!));
-            } else {
-              io::printf("  %s %s;\n", member_type, to_snake_case(&buffer, member.get_string("name")!!));
-            }
+            io::printf("  %s %s;\n", member_type, to_snake_case(&buffer, member.get_string("name")!!));
           }
         }
       }
