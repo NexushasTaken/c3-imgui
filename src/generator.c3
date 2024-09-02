@@ -7,6 +7,7 @@ import std::collections::map;
 import std::collections::list;
 import std::collections::tuple;
 import std::sort;
+import std::math;
 
 const IMGUI_MODULE_NAME = "imgui";
 
@@ -28,12 +29,28 @@ fn int main(String[] args) {
   //Object* functions_json = get_file_json(DEFINITIONS_JSON);
 
   assert(types_json.is_map());
+  digest_types(types_json);
   output_enums(types_json, "enums.c3");
   output_structs(types_json, "structs.c3");
-  output_templated_structs(types_json, "structs.c3");
+  output_templated_structs(types_json, "templated_structs.c3");
   output_typedefs(typedefs_json, "typedefs.c3");
 
   return 0;
+}
+
+fn void digest_types(Object* json_obj) {
+  json_obj.get("structs")!!.map.@each(; String name, Object* members) {
+    struct_map.set(name, struct_name_map.get(name) ?? clean_imgui(name));
+  };
+  json_obj.get("enums")!!.map.@each(; String name, Object* members) {
+    enum_map.set(name, clean_enum(name));
+  };
+  json_obj.get("enums")!!.map.@each(; String name, Object* values) {
+    foreach (value : values.array) {
+      DString value_name;
+      enum_value_map.set(value.get_string("name")!!, to_constant_case(&value_name, clean_imgui(value.get_string("name")!!)).copy());
+    }
+  };
 }
 
 fn void output_enums(Object* json_obj, String output_path) {
@@ -45,69 +62,72 @@ fn void output_enums(Object* json_obj, String output_path) {
   DString buffer;
   buffer.temp_init();
 
-  json_obj.get("enums")!!.map.@each(; String name, Object* values) {
-    if (try loc = json_obj.get("locations")!!.get(name) && !loc.s.starts_with("imgui_internal")) {
-      (void)io::fprintf(&output, "// %s\n", name);
-      (void)io::fprintf(&output, "module %s::", IMGUI_MODULE_NAME);
-      (void)io::fprintf(&output, "%s;\n", to_snake_case(&buffer, clean_enum(name)));
-      if (try type = enum_types.get(name)) {
-        (void)io::fprintf(&output, "distinct %s = %s;\n", clean_enum(name), type);
-      } else if (try ctype = json_obj.get("enumtypes")!!.get_string(name)) {
-        if (try type = type_map.get(ctype)) {
-          (void)io::fprintf(&output, "distinct %s = %s;\n", clean_enum(name), type);
-        } else {
-          unreachable("[output_enums] unknown type: %s", ctype);
-        }
-      } else {
-        (void)io::fprintf(&output, "distinct %s = uint;\n", clean_enum(name));
-      }
+  (void)io::fprintf(&output, "module %s;\n", IMGUI_MODULE_NAME);
 
-      assert(values.is_array());
+  json_obj.get("enums")!!.map.@each(; String name, Object* values) {
+    (void)io::fprintf(&output, "// %s\n", name);
+
+    if (try ctype = json_obj.get("enumtypes")!!.get_string(name)) { // typed enum
+      if (try type = type_map.get(ctype)) { // convert ctype
+        (void)io::fprintf(&output, "distinct %s = %s;\n", enum_map.get(name)!!, type);
+      } else {
+        unreachable("[output_enums] unknown type: %s", ctype);
+      }
+    } else {
+      (void)io::fprintf(&output, "distinct %s = int;\n", enum_map.get(name)!!);
+    }
+
+    List(<Tuple(<DString, DString>)>) cleaned_values;
+
+    assert(values.is_array());
+    { // Gather
       foreach (value : values.array) {
-        (void)io::fprintf(&output, "const %s ", clean_enum(name));
         DString value_name;
-        value_name.temp_init();
-        if (!is_valid_constant(to_constant_case(&buffer, clean_field(value.get_string("name")!!, name)))) {
-          value_name.appendf("%s_", to_constant_case(&buffer, clean_enum(name)));
-        }
-        value_name.appendf("%s", to_constant_case(&buffer, clean_field(value.get_string("name")!!, name)));
-        (void)io::fprintf(&output, "%s = ", value_name);
+        DString value_value;
+        value_name.clear();
+        value_value.clear();
+
+        to_constant_case(&value_name, clean_imgui(value.get_string("name")!!));
+        assert(is_valid_constant(value_name.str_view()));
 
         if (try value.get_string("value")!!.index_of_char('|')) {
           foreach (i, v : value.get_string("value")!!.split("|")) {
             if (i != 0) {
-              (void)io::fprintf(&output, " | ");
+              value_value.appendf(" | ");
             }
-            String val = to_constant_case(&buffer, clean_field(v, name));
-            (void)io::fprintf(&output, "%s", val);
-            if (!is_valid_constant(val)) {
-              (void)io::fprintf(&output, val);
-              unreachable(val);
-            }
+            value_value.appendf("%s", to_constant_case(&buffer, clean_imgui(v.trim())));
+            assert(is_valid_constant(buffer.str_view()));
           }
-          (void)io::fprintf(&output, ";\n");
         } else {
           if (try value.get_string("value")!!.to_uint()) {
-            (void)io::fprintf(&output, "%s;\n", value.get_string("value")!!);
-          } else if (value.get_string("value")!!.contains("<<")) { // TODO: fix this branch duplication
-            (void)io::fprintf(&output, "%s;\n", value.get_string("value")!!);
+            value_value.appendf("%s", value.get_string("value")!!);
+          } else if (value.get_string("value")!!.contains("<<")) { // TODO: remove this branch duplication
+            value_value.appendf("%s", value.get_string("value")!!);
           } else if (value.get_string("value")!!.contains("-")) {
-            (void)io::fprintf(&output, "%d;\n", value.get_long("calc_value")!!);
+            value_value.appendf("%d", value.get_long("calc_value")!!);
           } else {
-            (void)io::fprintf(&output, "%s;\n", to_constant_case(&buffer, clean_field(value.get_string("value")!!, name)));
+            value_value.appendf("%s", to_constant_case(&buffer, clean_imgui(value.get_string("value")!!)));
           }
         }
 
-        {
-          DString enum_map_buf;
-          enum_map_buf.temp_init();
-          enum_map_buf.appendf("%s::%s", to_snake_case(&buffer, clean_enum(name)), value_name.str_view());
-          enum_values_map.set(value.get_string("name")!!, enum_map_buf.copy_str());
+        cleaned_values.push({ value_name, value_value });
+        enum_values_map.set(value.get_string("name")!!, value_name.copy_str());
+        distinct_enum_map.set(name.strip_end("_"), clean_enum(name));
+      }
+    }
 
-          enum_map_buf.clear();
-          enum_map_buf.appendf("%s::%s", to_snake_case(&buffer, clean_enum(name)), clean_enum(name));
-          enum_types_map.set(name.strip_end("_"), enum_map_buf.copy_str());
-        }
+    { // Output
+      usz max_len = cleaned_values[0].first.len();
+      foreach (entry : cleaned_values) {
+        max_len = math::max(entry.first.len(), max_len);
+      }
+      foreach (entry : cleaned_values) {
+        (void)io::fprintf(&output, "const %s %s", clean_enum(name), entry.first);
+        (void)fpad(&output, " ", max_len - entry.first.len());
+        (void)io::fprintf(&output, " = %s;\n", entry.second);
+
+        entry.first.free();
+        entry.second.free();
       }
       (void)io::fprintf(&output, "\n");
     }
@@ -127,14 +147,14 @@ fn void output_templated_structs(Object* json_obj, String output_path) {
       String typename = json_obj.get("typenames")!!.get_string(name)!!;
       assert(typename == "T");
 
-      (void)io::printf("module %s(<Type>);\n", IMGUI_MODULE_NAME);
+      (void)io::printf("module %s::%s(<Type>);\n", IMGUI_MODULE_NAME, to_snake_case(&buffer, clean_imgui(name)));
       (void)io::printf("// %s\n", name);
-      (void)io::printf("struct %s {\n", name);
+      (void)io::printf("struct %s {\n", clean_imgui(name));
 
       assert(members.is_array());
       foreach (member : members.array) {
         if (member.get_string("type")!!.starts_with(typename)) {
-          (void)io::printf("  Type %s;\n", to_snake_case(&buffer, member.get_string("name")!!));
+          (void)io::printf("  Type%s %s;\n", member.get_string("type")!!.strip(typename), to_snake_case(&buffer, member.get_string("name")!!));
         } else {
           (void)io::printf("  %s %s;\n", member.get_string("type")!!, to_snake_case(&buffer, member.get_string("name")!!));
         }
@@ -153,15 +173,14 @@ fn void output_structs(Object* json_obj, String output_path) {
   buffer.temp_init();
 
   io::printf("module %s;\n", IMGUI_MODULE_NAME);
+
+  List(<String>) pointer_structs;
   json_obj.get("structs")!!.map.@each(; String name, Object* members) {
     if (try loc = json_obj.get("locations")!!.get(name) && !loc.s.starts_with("imgui_internal") && !loc.s.starts_with("imstb_textedit")) {
       io::printf("// %s\n", name);
-      if (try alt = struct_name_map.get(name)) {
-        io::printf("struct %s {\n", alt);
-      } else {
-        io::printf("struct %s {\n", clean_imgui(name));
-        struct_name_map.set(name, clean_imgui(name));
-      }
+      String struct_name = struct_name_map.get(name) ?? clean_imgui(name);
+      io::printf("struct %s {\n", struct_name);
+      struct_name_map.set(name, struct_name);
 
       List(<DString>) callbacks;
       assert(members.is_array());
@@ -185,12 +204,16 @@ fn void output_structs(Object* json_obj, String output_path) {
             io::printf("  %sCallback %s;\n", type, to_snake_case(&buffer, member.get_string("name")!!));
 
             DString func_def_buffer;
-            func_def_buffer.appendf("def %s = %s;", type, member_type);
+            func_def_buffer.appendf("def %sCallback = %s;", type, member_type);
             callbacks.push(func_def_buffer);
           } else if (member_type.starts_with("union")) {
             io::printf("  %s\n", member_type);
           } else {
-            io::printf("  %s %s;\n", member_type, to_snake_case(&buffer, member.get_string("name")!!));
+            if (try pointer_structs.index_of(member_type)) {
+              io::printf("  void* %s;\n", to_snake_case(&buffer, member.get_string("name")!!));
+            } else {
+              io::printf("  %s %s;\n", member_type, to_snake_case(&buffer, member.get_string("name")!!));
+            }
           }
         }
       }
@@ -224,29 +247,51 @@ fn void output_typedefs(Object* json_obj, String output_path) {
     }
   };
 
+  sort::quicksort(
+    typedefs,
+    fn int(Tuple(<String, String>) a, Tuple(<String, String>) b) {
+      return get_typedef_order(a) - get_typedef_order(b);
+    }
+  );
+
   io::printf("module %s;\n", IMGUI_MODULE_NAME);
 
   foreach (typedef : typedefs) {
-    if (catch blacklist_typedefs.get(typedef.first)) {
-      if (try typedef.second.index_of("(*)")) {
-        io::printf("def %s = %s;\n", typedef.first, clean_callback(&buffer, typedef.second[..^2]));
+    if (try typedef.second.index_of("(*)")) {
+      io::printf("def %sCallback = %s;\n", clean_imgui(typedef.first).strip_end("Callback"), clean_callback(&buffer, typedef.second[..^2]));
+    } else {
+      if (try type = distinct_enum_map.get(typedef.first)) {
+        io::printf("def %s = %s;\n", typedef.first, type);
       } else {
-        if (try type = enum_types_map.get(typedef.first)) {
-          io::printf("def %s = %s;\n", typedef.first, type);
-        } else if (try type = typedef_names_map.get(typedef.first)) {
-          if (try value = typedef_names_map.get(typedef.second)) {
-            io::printf("def %s = %s;\n", type, value);
-          } else if (try def_type = type_map.get(typedef.second)) {
-            io::printf("def %s = %s;\n", type, def_type);
-          } else {
-            io::printf("def %s = %s;\n", type, typedef.second);
-          }
+        String type_name = typedef_names_map.get(typedef.first) ?? clean_imgui(typedef.first);
+        if (try value = typedef_names_map.get(typedef.second)) {
+          io::printf("def %s = %s;\n", type_name, value);
+        } else if (try def_type = type_map.get(typedef.second)) {
+          io::printf("def %s = %s;\n", type_name, def_type);
         } else {
-          unreachable("[output_typedefs] unknown typedef: %s", typedef.first);
+          io::printf("def %s = %s;\n", type_name, clean_imgui(typedef.second));
         }
       }
     }
   };
+}
+
+fn int get_typedef_order(Tuple(<String, String>) typedef) {
+  if (try typedef.second.index_of("(*)")) {
+    return 1;
+  } else {
+    if (try type = distinct_enum_map.get(typedef.first)) {
+      return 2;
+    } else {
+      if (try value = typedef_names_map.get(typedef.second)) {
+        return 3;
+      } else if (try def_type = type_map.get(typedef.second)) {
+        return 4;
+      } else {
+        return 5;
+      }
+    }
+  }
 }
 
 fn String clean_callback(DString* buffer, String cb) {
@@ -270,7 +315,7 @@ fn String clean_callback(DString* buffer, String cb) {
 }
 
 fn String clean_enum(String name) {
-  return clean_imgui(name.trim()).strip_end("_");
+  return clean_imgui(name).trim().strip_end("_");
 }
 
 fn String clean_type(DString* buffer, String orig_type) {

@@ -2,18 +2,40 @@ module generator;
 import std::io;
 import std::ascii;
 import std::collections::map;
+import std::collections::list;
 
 HashMap(<String, String>) type_map;
-HashMap(<String, String>) enum_types;
 HashMap(<String, int>) blacklist_structs;
 HashMap(<String, int>) blacklist_typedefs;
 HashMap(<String, String>) opaque_structs;
 
 HashMap(<String, String>) struct_name_map;
-HashMap(<String, String>) enum_values_map;
-HashMap(<String, String>) enum_types_map;
+HashMap(<String, String>) enum_values_map; // 'value' is allocated
+HashMap(<String, String>) distinct_enum_map;
 
 HashMap(<String, String>) typedef_names_map;
+
+HashMap(<String, String>) struct_map;
+HashMap(<String, String>) enum_map;
+HashMap(<String, String>) enum_value_map; // 'value' is allocated
+
+macro String! find_enum_starts_with(String needle) {
+  enum_list.@each(; String type, String alt) {
+    if (needle.starts_with(type)) {
+      return type;
+    }
+  };
+  return SearchResult.MISSING?;
+}
+
+macro String! find_struct_starts_with(String needle) {
+  struct_list.@each(; String type, String alt) {
+    if (needle.starts_with(type)) {
+      return type;
+    }
+  };
+  return SearchResult.MISSING?;
+}
 
 macro String! find_type_starts_with(String needle) {
   type_map.@each(; String type, String alt) {
@@ -52,64 +74,52 @@ fn void init_type_map() @init {
   //type_map.set("ImS64", "long");
   //type_map.set("ImU64", "ulong");
 
-  type_map.set("ImS8" , "imgui::ImU8");
-  type_map.set("ImU8" , "imgui::ImU8");
-  type_map.set("ImS16", "imgui::ImU16");
-  type_map.set("ImU16", "imgui::ImU16");
-  type_map.set("ImS32", "imgui::ImU32");
-  type_map.set("ImU32", "imgui::ImU32");
-  type_map.set("ImS64", "imgui::ImU64");
-  type_map.set("ImU64", "imgui::ImU64");
-//def ImDrawIdx = unsigned short;
-//def ImTextureID = void*;
-//def ImWchar32 = unsigned int;
-//def ImGuiID = unsigned int;
-//def ImWchar = ImWchar16;
-//def ImGuiSelectionUserData = ImS64;
-//def ImGuiKeyChord = int;
-//def ImWchar16 = unsigned short;
-
+  type_map.set("ImS8" , "ImU8");
+  type_map.set("ImU8" , "ImU8");
+  type_map.set("ImS16", "ImU16");
+  type_map.set("ImU16", "ImU16");
+  type_map.set("ImS32", "ImU32");
+  type_map.set("ImU32", "ImU32");
+  type_map.set("ImS64", "ImU64");
+  type_map.set("ImU64", "ImU64");
 
   type_map.set("ImChunkStream_ImGuiWindowSettings", "ImChunkStream(<WindowSettings>)"); 
 
   type_map.set("ImPool_ImGuiTabBar", "ImPool(<TabBar>)"); 
 
-  type_map.set("ImVector_ImGuiSettingsHandler" , "ImVector(<SettingsHandler>)"); 
   //type_map.set("ImVector_ImGuiWindowPtr"       , "ImVector(<ImWindow*>)"); 
-  type_map.set("ImVector_ImGuiID"              , "ImVector(<ImID>)"); 
   //type_map.set("ImVector_ImGuiPtrOrIndex"      , "ImVector(<PtrOrIndex>)"); 
-  type_map.set("ImVector_ImGuiItemFlags"       , "ImVector(<ItemFlags>)"); 
-  type_map.set("ImVector_ImDrawListPtr"        , "ImVector(<DrawList*>)"); 
-  type_map.set("ImVector_ImTextureID"          , "ImVector(<TextureID>)"); 
-  type_map.set("ImVector_ImWchar"              , "ImVector(<Wchar>)"); 
-  type_map.set("ImVector_ImVec2"               , "ImVector(<Vec2>)"); 
-  type_map.set("ImVector_ImVec4"               , "ImVector(<Vec4>)"); 
-  type_map.set("ImVector_ImGuiTextRange"       , "ImVector(<TextRange>)"); 
-  type_map.set("ImVector_ImGuiStoragePair"     , "ImVector(<StoragePair>)"); 
-  type_map.set("ImVector_ImFontConfig"         , "ImVector(<FontConfig>)"); 
-  type_map.set("ImVector_ImFontAtlasCustomRect", "ImVector(<FontAtlasCustomRect>)"); 
-  type_map.set("ImVector_ImFontPtr"            , "ImVector(<Font*>)"); 
-  type_map.set("ImVector_ImFontGlyph"          , "ImVector(<FontGlyph>)"); 
-  type_map.set("ImVector_ImDrawChannel"        , "ImVector(<DrawChannel>)"); 
-  type_map.set("ImVector_ImDrawCmd"            , "ImVector(<DrawCmd>)"); 
-  type_map.set("ImVector_ImDrawIdx"            , "ImVector(<DrawIdx>)"); 
-  type_map.set("ImVector_ImDrawVert"           , "ImVector(<DrawVert>)"); 
-  type_map.set("ImVector_ImGuiViewportPtr"     , "ImVector(<Viewport*>)"); 
-  type_map.set("ImVector_ImGuiPlatformMonitor" , "ImVector(<PlatformMonitor>)"); 
-  type_map.set("ImVector_ImGuiSelectionRequest", "ImVector(<SelectionRequest>)"); 
-  type_map.set("ImVector_ImU32"                , "ImVector(<uint>)"); 
-  type_map.set("ImVector_float"                , "ImVector(<float>)"); 
-  type_map.set("ImVector_char"                 , "ImVector(<char>)"); 
-  type_map.set("ImVector_unsigned_char"        , "ImVector(<char>)"); 
+  type_map.set("ImVector_ImGuiSettingsHandler" , "vector::Vector(<SettingsHandler>)"); 
+  type_map.set("ImVector_ImGuiID"              , "vector::Vector(<ImID>)"); 
+  type_map.set("ImVector_ImGuiItemFlags"       , "vector::Vector(<ItemFlags>)"); 
+  type_map.set("ImVector_ImDrawListPtr"        , "vector::Vector(<DrawList*>)"); 
+  type_map.set("ImVector_ImTextureID"          , "vector::Vector(<TextureID>)"); 
+  type_map.set("ImVector_ImWchar"              , "vector::Vector(<Wchar>)"); 
+  type_map.set("ImVector_ImVec2"               , "vector::Vector(<Vec2>)"); 
+  type_map.set("ImVector_ImVec4"               , "vector::Vector(<Vec4>)"); 
+  type_map.set("ImVector_ImGuiTextRange"       , "vector::Vector(<TextRange>)"); 
+  type_map.set("ImVector_ImGuiStoragePair"     , "vector::Vector(<StoragePair>)"); 
+  type_map.set("ImVector_ImFontConfig"         , "vector::Vector(<FontConfig>)"); 
+  type_map.set("ImVector_ImFontAtlasCustomRect", "vector::Vector(<FontAtlasCustomRect>)"); 
+  type_map.set("ImVector_ImFontPtr"            , "vector::Vector(<Font*>)"); 
+  type_map.set("ImVector_ImFontGlyph"          , "vector::Vector(<FontGlyph>)"); 
+  type_map.set("ImVector_ImDrawChannel"        , "vector::Vector(<DrawChannel>)"); 
+  type_map.set("ImVector_ImDrawCmd"            , "vector::Vector(<DrawCmd>)"); 
+  type_map.set("ImVector_ImDrawIdx"            , "vector::Vector(<DrawIdx>)"); 
+  type_map.set("ImVector_ImDrawVert"           , "vector::Vector(<DrawVert>)"); 
+  type_map.set("ImVector_ImGuiViewportPtr"     , "vector::Vector(<Viewport*>)"); 
+  type_map.set("ImVector_ImGuiPlatformMonitor" , "vector::Vector(<PlatformMonitor>)"); 
+  type_map.set("ImVector_ImGuiSelectionRequest", "vector::Vector(<SelectionRequest>)"); 
+  type_map.set("ImVector_ImU32"                , "vector::Vector(<uint>)"); 
+  type_map.set("ImVector_float"                , "vector::Vector(<float>)"); 
+  type_map.set("ImVector_char"                 , "vector::Vector(<char>)"); 
+  type_map.set("ImVector_unsigned_char"        , "vector::Vector(<char>)"); 
 
   type_map.set("ImGuiIO", "ImIO");
   type_map.set("ImGuiID", "ImID");
 
   type_map.set("ImGuiContext*", "void*");
-}
-
-fn void init_enum_types() @init {
-  enum_types.set("ImGuiMouseCursor_", "int");
+  type_map.set("ImFontBuilderIO*", "void*");
 }
 
 fn void init_blacklist_typedefs() @init {
@@ -127,7 +137,7 @@ fn void init_blacklist_structs() @init {
 }
 
 fn void init_opaque_structs() @init {
-  opaque_structs.set("ImGuiContext*", "void*");
+  //opaque_structs.set("ImGuiContext*", "void*");
 }
 
 fn void init_struct_name_map() @init {
@@ -136,14 +146,7 @@ fn void init_struct_name_map() @init {
 }
 
 fn void init_typedef_names_map() @init {
-  typedef_names_map.set("ImDrawIdx"             , "DrawIdx");
-  typedef_names_map.set("ImTextureID"           , "TextureID");
-  typedef_names_map.set("ImGuiID"               , "ImID");
-  typedef_names_map.set("ImGuiSelectionUserData", "GuiSelectionUserData");
-  typedef_names_map.set("ImGuiKeyChord"         , "GuiKeyChord");
-  typedef_names_map.set("ImWchar"               , "Wchar");
-  typedef_names_map.set("ImWchar32"             , "Wchar32");
-  typedef_names_map.set("ImWchar16"             , "Wchar16");
+  typedef_names_map.set("ImGuiID", "ImID");
 
   typedef_names_map.set("ImS16", "ImS16");
   typedef_names_map.set("ImS8" , "ImS8");
@@ -237,7 +240,7 @@ fn String to_constant_case(DString* buffer, String str) {
       temp.append_char(c);
     }
   }
-  str = temp.str_view();
+  str = temp.str_view().trim();
 
   buffer.clear();
 
@@ -285,6 +288,14 @@ fn String to_constant_case(DString* buffer, String str) {
   return buffer.str_view();
 }
 
+fn usz! fpad(io::OutStream stream, String str, usz len) {
+  usz written = 0;
+  for (; len > 0; len--) {
+    written += io::fprintf(stream, "%s", str)!;
+  }
+  return written;
+}
+
 fn bool is_valid_constant(String str) {
   if (!ascii::is_alpha(str[0])) {
     return false;
@@ -323,3 +334,4 @@ fn void test_to_constant_case() @test {
   buffer.temp_init();
   io::printfn(to_constant_case(&buffer, "ImGuiKey_NamedKey_BEGIN"));
 }
+
