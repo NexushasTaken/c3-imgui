@@ -83,7 +83,13 @@ fn void output_imgui_func(File* output, List(<Object*>) funcs) {
     String func_ret = clean_type(&func_ret_buffer, func.get_string("ret")!!);
     String func_params = clean_params_list(&func_params_buffer, func, &callbacks, func_name);
 
-    (void)io::fprintf(output, "//%s%s %s -> %s\n", func_extern_name, func.get_string("argsoriginal")!!, func_name, func_ret);
+    if (try udt_val = func.get_int("nonUDT")) {
+      // TODO: use first parameter as return value?
+      assert(func_ret == "void");
+      (void)io::fprintf(output, "//%s%s %s -> %s, %d\n", func_extern_name, func.get_string("argsoriginal")!!, func_name, func_ret, udt_val);
+    } else {
+      (void)io::fprintf(output, "//%s%s %s -> %s\n", func_extern_name, func.get_string("argsoriginal")!!, func_name, func_ret);
+    }
     (void)io::fprintf(output, "extern fn %s %s(%s) @extern(\"%s\");\n", func_ret, func_name, func_params, func_extern_name);
     foreach (cb : callbacks) {
       (void)io::fprintf(output, "%s\n", cb);
