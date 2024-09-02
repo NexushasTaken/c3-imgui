@@ -282,23 +282,32 @@ fn int get_typedef_order(Tuple(<String, String>) typedef) {
   }
 }
 
-fn String clean_callback(DString* buffer, String cb) {
-  usz s = cb.index_of("(*)")!!;
-  buffer.clear();
+// str = (type param, type param, ...)
+fn String clean_params(DString* buffer, String params) {
+  assert(params[0] == '(');
+  assert(params[^1] == ')');
 
-  buffer.append_chars("fn ");
-  String type = clean_type(buffer, cb[..s-1]);
-  buffer.append_chars("(");
-  String args = cb[s+4..cb.rindex_of_char(')')!!-1];
-  foreach (idx, arg : args.split(",")) {
+  buffer.append_char('(');
+  foreach (idx, param : params[1..^2].split(",")) {
     if (idx != 0) {
       buffer.appendf(", ");
     }
     DString type_buffer;
     type_buffer.temp_init();
-    buffer.appendf("%s %s", clean_type(&type_buffer, arg[..arg.rindex_of_char(' ')!!-1]), arg[arg.rindex_of_char(' ')!!+1..]);
+    buffer.appendf("%s %s", clean_type(&type_buffer, param[..param.rindex_of_char(' ')!!-1]), param[param.rindex_of_char(' ')!!+1..]);
   }
-  buffer.appendf(")");
+  buffer.append_char(')');
+  return buffer.str_view();
+}
+
+fn String clean_callback(DString* buffer, String cb) {
+  usz s = cb.index_of("(*)")!!;
+  buffer.clear();
+
+  buffer.append_chars("fn ");
+  clean_type(buffer, cb[..s-1]);
+  String params = cb[s+3..cb.rindex_of_char(')')!!];
+  clean_params(buffer, params);
   return buffer.str_view();
 }
 
