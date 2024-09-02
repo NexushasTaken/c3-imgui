@@ -152,13 +152,7 @@ fn void clean_value(DString* buffer, String s) {
       if (idx != 0) {
         buffer.appendf(", ");
       }
-      DString v_buf;
-      v_buf.temp_init();
-      v_buf.appendf("%s", v.trim());
-      // TODO: just directly replace 'buffer'?
-      v_buf.replace("FLT_MIN", "float.min");
-      v_buf.replace("FLT_MAX", "float.max");
-      buffer.appendf("%s", v_buf.str_view());
+      clean_constant(buffer, v);
     }
     buffer.appendf("}");
   } else if (s.starts_with("%")) {
@@ -170,12 +164,17 @@ fn void clean_value(DString* buffer, String s) {
   } else if (try value = s.to_double()) {
     buffer.appendf(" = %f", value);
   } else {
-    DString v_buf;
-    v_buf.temp_init();
-    v_buf.appendf("%s", s);
-    // TODO: just directly replace 'buffer'?
-    v_buf.replace("FLT_MIN", "float.min");
-    v_buf.replace("FLT_MAX", "float.max");
-    buffer.appendf(" = %s", v_buf.str_view());
+    clean_constant(buffer, s);
   }
+}
+
+// INFO: think of a better name
+fn void clean_constant(DString* buffer, String s) {
+  DString v_buf;
+  v_buf.temp_init();
+  v_buf.appendf("%s", s);
+  // TODO: just directly replace 'buffer'?
+  v_buf.replace("FLT_MIN", "float.min");
+  v_buf.replace("FLT_MAX", "float.max");
+  buffer.appendf(" = %s", v_buf.str_view());
 }
