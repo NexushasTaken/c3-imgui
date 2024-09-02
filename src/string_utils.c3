@@ -6,10 +6,14 @@ import std::collections::map;
 HashMap(<String, String>) type_map;
 HashMap(<String, String>) enum_types;
 HashMap(<String, int>) blacklist_structs;
+HashMap(<String, int>) blacklist_typedefs;
 HashMap(<String, String>) opaque_structs;
 
 HashMap(<String, String>) struct_name_map;
 HashMap(<String, String>) enum_values_map;
+HashMap(<String, String>) enum_types_map;
+
+HashMap(<String, String>) typedef_names_map;
 
 macro String! find_type_starts_with(String needle) {
   type_map.@each(; String type, String alt) {
@@ -26,22 +30,45 @@ fn void init_type_map() @init {
   type_map.set("unsigned char" , "char"); 
   type_map.set("unsigned short", "ushort"); 
   type_map.set("short"         , "short"); 
+  type_map.set("signed short"  , "short"); 
   type_map.set("unsigned int"  , "uint"); 
+  type_map.set("signed int"    , "int"); 
   type_map.set("int"           , "int"); 
   type_map.set("float"         , "float"); 
   type_map.set("size_t"        , "usz"); 
   type_map.set("bool"          , "bool"); 
+  type_map.set("long long"     , "long");
+  type_map.set("unsigned long long", "ulong");
+  type_map.set("signed long long", "long");
 
-  type_map.set("float&", "float*"); // TODO: is reference type is pointer equivalent?
+  //type_map.set("float&", "float*"); // TODO: is reference type is pointer equivalent?
 
-  type_map.set("ImS8", "ichar");
-  type_map.set("ImU8", "char");
-  type_map.set("ImS16", "short");
-  type_map.set("ImU16", "ushort");
-  type_map.set("ImS32", "int");
-  type_map.set("ImU32", "uint");
-  type_map.set("ImS64", "long");
-  type_map.set("ImU64", "ulong");
+  //type_map.set("ImS8", "ichar");
+  //type_map.set("ImU8", "char");
+  //type_map.set("ImS16", "short");
+  //type_map.set("ImU16", "ushort");
+  //type_map.set("ImS32", "int");
+  //type_map.set("ImU32", "uint");
+  //type_map.set("ImS64", "long");
+  //type_map.set("ImU64", "ulong");
+
+  type_map.set("ImS8" , "imgui::ImU8");
+  type_map.set("ImU8" , "imgui::ImU8");
+  type_map.set("ImS16", "imgui::ImU16");
+  type_map.set("ImU16", "imgui::ImU16");
+  type_map.set("ImS32", "imgui::ImU32");
+  type_map.set("ImU32", "imgui::ImU32");
+  type_map.set("ImS64", "imgui::ImU64");
+  type_map.set("ImU64", "imgui::ImU64");
+//def ImDrawIdx = unsigned short;
+//def ImTextureID = void*;
+//def ImWchar32 = unsigned int;
+//def ImGuiID = unsigned int;
+//def ImWchar = ImWchar16;
+//def ImGuiSelectionUserData = ImS64;
+//def ImGuiKeyChord = int;
+//def ImWchar16 = unsigned short;
+
 
   type_map.set("ImChunkStream_ImGuiWindowSettings", "ImChunkStream(<WindowSettings>)"); 
 
@@ -69,7 +96,7 @@ fn void init_type_map() @init {
   type_map.set("ImVector_ImDrawVert"           , "ImVector(<DrawVert>)"); 
   type_map.set("ImVector_ImGuiViewportPtr"     , "ImVector(<Viewport*>)"); 
   type_map.set("ImVector_ImGuiPlatformMonitor" , "ImVector(<PlatformMonitor>)"); 
-  type_map.set("ImVector_ImGuiSelectionRequest" , "ImVector(<SelectionRequest>)"); 
+  type_map.set("ImVector_ImGuiSelectionRequest", "ImVector(<SelectionRequest>)"); 
   type_map.set("ImVector_ImU32"                , "ImVector(<uint>)"); 
   type_map.set("ImVector_float"                , "ImVector(<float>)"); 
   type_map.set("ImVector_char"                 , "ImVector(<char>)"); 
@@ -83,6 +110,12 @@ fn void init_type_map() @init {
 
 fn void init_enum_types() @init {
   enum_types.set("ImGuiMouseCursor_", "int");
+}
+
+fn void init_blacklist_typedefs() @init {
+  blacklist_typedefs.set("iterator", 0);
+  blacklist_typedefs.set("const_iterator", 0);
+  blacklist_typedefs.set("value_type", 0);
 }
 
 fn void init_blacklist_structs() @init {
@@ -100,6 +133,26 @@ fn void init_opaque_structs() @init {
 fn void init_struct_name_map() @init {
   struct_name_map.set("ImGuiIO", "ImIO");
   struct_name_map.set("ImGuiID", "ImID");
+}
+
+fn void init_typedef_names_map() @init {
+  typedef_names_map.set("ImDrawIdx"             , "DrawIdx");
+  typedef_names_map.set("ImTextureID"           , "TextureID");
+  typedef_names_map.set("ImGuiID"               , "ImID");
+  typedef_names_map.set("ImGuiSelectionUserData", "GuiSelectionUserData");
+  typedef_names_map.set("ImGuiKeyChord"         , "GuiKeyChord");
+  typedef_names_map.set("ImWchar"               , "Wchar");
+  typedef_names_map.set("ImWchar32"             , "Wchar32");
+  typedef_names_map.set("ImWchar16"             , "Wchar16");
+
+  typedef_names_map.set("ImS16", "ImS16");
+  typedef_names_map.set("ImS8" , "ImS8");
+  typedef_names_map.set("ImS32", "ImS32");
+  typedef_names_map.set("ImU32", "ImU32");
+  typedef_names_map.set("ImU8" , "ImU8");
+  typedef_names_map.set("ImU16", "ImU16");
+  typedef_names_map.set("ImU64", "ImU64");
+  typedef_names_map.set("ImS64", "ImS64");
 }
 
 fn String to_snake_case(DString* buffer, String str) {
