@@ -33,7 +33,8 @@
       // and overrides of global settings here.
       "sources": [
         "src/generator.c3",
-        "src/string_utils.c3"
+        "src/string_utils.c3",
+        "src/function_output.c3",
       ],
     },
   },

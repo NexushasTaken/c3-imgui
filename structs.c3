@@ -326,7 +326,7 @@ struct ImIO {
   bool config_viewports_no_decoration;
   bool config_viewports_no_default_parent;
   bool mouse_draw_cursor;
-  bool config_mac_osxb_ehaviors;
+  bool config_mac_osx_behaviors;
   bool config_nav_swap_gamepad_buttons;
   bool config_input_trickle_event_queue;
   bool config_input_text_cursor_blink;

@@ -160,136 +160,6 @@ fn void init_typedef_names_map() @init {
   typedef_names_map.set("ImS64", "ImS64");
 }
 
-fn String to_snake_case(DString* buffer, String str) {
-  assert(buffer != null);
-
-  buffer.clear();
-
-  usz idx = 0;
-  while (idx < str.len && str[idx] == '_') {
-    idx += 1;
-  }
-
-  while (idx < str.len) {
-    // assuming boundary was found
-    if (idx != 0) {
-      buffer.append('_');
-    }
-
-    bool isupper = false;
-    bool pack = false;
-    usz word_start = idx;
-    usz word_end = idx;
-
-    isupper = ascii::is_upper(str[word_start]);
-    if (isupper && word_end + 1 < str.len) {
-      pack = ascii::is_upper(str[word_end + 1]);
-      word_end += 1;
-    }
-
-    // find the word end boundary
-    usz jdx;
-    for (jdx = word_end + 1; jdx < str.len; jdx++) {
-      if (pack) {
-        if (ascii::is_lower(str[jdx]) || str[jdx] == '_') {
-          break;
-        }
-      } else {
-        if (ascii::is_upper(str[jdx]) || str[jdx] == '_') {
-          break;
-        }
-      }
-    }
-    word_end = jdx - 1;
-    idx = word_end + 1;
-
-    while (idx < str.len && str[idx] == '_') {
-      idx += 1;
-    }
-
-    foreach (char c : str[word_start..word_end]) {
-      buffer.append(ascii::to_lower(c));
-    }
-  }
-  return buffer.str_view();
-}
-
-// WARNING: only used for callbacks, param 'str' must be valid snakecased
-fn String to_pascal_case(DString* buffer, String str) {
-  assert(buffer != null);
-
-  buffer.clear();
-
-  foreach (word : str.split("_")) {
-    foreach (i, c : word) {
-      if (i == 0) {
-        buffer.append_char(ascii::to_upper(c));
-      } else {
-        buffer.append_char(c);
-      }
-    }
-  }
-  return buffer.str_view();
-}
-
-fn String to_constant_case(DString* buffer, String str) {
-  assert(buffer != null);
-  // TODO: do something about this
-  DString temp;
-  temp.temp_init();
-  foreach (c : str) {
-    if (c != '_') {
-      temp.append_char(c);
-    }
-  }
-  str = temp.str_view().trim();
-
-  buffer.clear();
-
-  usz idx = 0;
-  while (idx < str.len) {
-    // assuming boundary was found
-    if (idx != 0) {
-      buffer.append('_');
-    }
-    while (str[idx] == '_') {
-      idx += 1;
-    }
-
-    bool isupper = false;
-    bool pack = false;
-    usz word_start = idx;
-    usz word_end = idx;
-
-    isupper = ascii::is_upper(str[word_start]);
-    if (isupper && word_end + 1 < str.len) {
-      pack = ascii::is_upper(str[word_end + 1]);
-      word_end += 1;
-    }
-
-    // find the word end boundary
-    usz jdx;
-    for (jdx = word_end + 1; jdx < str.len; jdx++) {
-      if (pack) {
-        if (ascii::is_lower(str[jdx])) {
-          break;
-        }
-      } else {
-        if (ascii::is_upper(str[jdx])) {
-          break;
-        }
-      }
-    }
-    word_end = jdx - 1;
-    idx = word_end + 1;
-
-    foreach (char c : str[word_start..word_end]) {
-      buffer.append(ascii::to_upper(c));
-    }
-  }
-  return buffer.str_view();
-}
-
 fn usz! fpad(io::OutStream stream, String str, usz len) {
   usz written = 0;
   for (; len > 0; len--) {
@@ -313,13 +183,6 @@ fn bool is_valid_constant(String str) {
   return true;
 }
 
-fn void test_to_snake_case() @test {
-  io::printn();
-  DString buffer;
-  buffer.temp_init();
-  io::printfn("%s", to_snake_case(&buffer, "Platform_CreateWindow"));
-}
-
 fn void test_is_valid_constant() @test {
   assert(is_valid_constant("HELLO_WORLD") == true);
   assert(is_valid_constant("HELLO_world") == false);
@@ -330,10 +193,195 @@ fn void test_is_valid_constant() @test {
   assert(is_valid_constant("8") == false);
 }
 
-fn void test_to_constant_case() @test {
+def MatchWord = fn String(String);
+def FormatWord = fn void(DString*, String, usz);
+
+fn String match_lowercased(String str) @local {
+  if (str.len == 0) {
+    return str;
+  }
+  if (str[0].is_upper()) {
+    return str[:0];
+  }
+  usz i = 0;
+  while (i < str.len-1 && (str[i+1].is_lower() || str[i+1].is_digit())) {
+    i++;
+  }
+  return str[..i];
+}
+
+fn String match_capitalized(String str) @local {
+  if (str.len == 0) {
+    return str;
+  }
+  if (str[0].is_lower()) {
+    return str[:0];
+  }
+  String word = match_lowercased(str[1..]);
+  if (word.len == 0) {
+    return str[:0];
+  }
+  return str[..word.len];
+}
+
+// HELLO -> HELLO
+// HELLo -> 
+fn String match_uppercased_whole(String str) @local {
+  if (str.len == 0) {
+    return str;
+  }
+  foreach (c : str) {
+    if (!c.is_digit() && !c.is_upper()) {
+      return str[:0];
+    }
+  }
+  return str;
+}
+
+// HELLOWorld -> HELLO
+fn String match_uppercased(String str) @local {
+  if (str.len == 0) {
+    return str;
+  }
+  if (match_capitalized(str).len > 0) {
+    return str[:0];
+  }
+  usz i = 0;
+  while (i < str.len && match_capitalized(str[i..]).len == 0) {
+    i++;
+  }
+  return str[..i-1];
+}
+
+/*
+([a-z]+)
+([A-Z][a-z0-9]+)
+([A-Z0-9]+$)
+([A-Z]+(?=[A-Z][a-z0-9]+))
+[^A-Za-z0-9]
+*/
+
+fn void fmt_lowercase(DString* buf, String str, usz n) {
+  foreach (c : str) {
+    buf.append_char(c.to_lower());
+  }
+}
+
+fn void fmt_uppercase(DString* buf, String str, usz n) {
+  foreach (c : str) {
+    buf.append_char(c.to_upper());
+  }
+}
+
+fn void fmt_capitalized(DString* buf, String str, usz n) {
+  foreach (i, c : str) {
+    if (i != 0) {
+      buf.append_char(c.to_lower());
+    } else {
+      buf.append_char(c.to_upper());
+    }
+  }
+}
+
+fn void fmt_camelized(DString* buf, String str, usz n) {
+  foreach (i, c : str) {
+    if (n == 0) {
+      buf.append_char(c.to_lower());
+    } else {
+      if (i != 0) {
+        buf.append_char(c.to_lower());
+      } else {
+        buf.append_char(c.to_upper());
+      }
+    }
+  }
+}
+
+fn String change_case(DString* buffer, String str, String delimiter, FormatWord fmt_word, bool clear = true) {
+  List(<MatchWord>) matchs;
+  matchs.push(&match_lowercased);
+  matchs.push(&match_capitalized);
+  matchs.push(&match_uppercased_whole);
+  matchs.push(&match_uppercased);
+
+  if (clear) {
+    buffer.clear();
+  }
+  usz words = 0;
+  usz i = 0;
+  while (i < str.len) {
+    if (!str[i].is_alnum()) {
+      i += 1;
+      continue;
+    }
+    foreach (cb : matchs) {
+      String word = cb(str[i..]);
+      if (word.len > 0) {
+        i += word.len;
+        if (words != 0) {
+          buffer.append_chars(delimiter);
+        }
+        fmt_word(buffer, word, words);
+        words += 1;
+        break;
+      }
+    }
+  }
+  return buffer.str_view();
+}
+
+macro String to_constant_case(DString* buffer, String str, bool clear = true) => change_case(buffer, str, "_", &fmt_uppercase, clear);
+macro String to_camel_case(DString* buffer, String str, bool clear = true) => change_case(buffer, str, "", &fmt_camelized, clear);
+macro String to_pascal_case(DString* buffer, String str, bool clear = true) => change_case(buffer, str, "", &fmt_capitalized, clear);
+macro String to_snake_case(DString* buffer, String str, bool clear = true) => change_case(buffer, str, "_", &fmt_lowercase, clear);
+
+fn void test_change_case() @test {
   io::printn();
   DString buffer;
   buffer.temp_init();
-  io::printfn(to_constant_case(&buffer, "ImGuiKey_NamedKey_BEGIN"));
-}
 
+  io::printfn("\n// Pascal Case");
+  io::printfn("%s", to_pascal_case(&buffer, "VSlider"));
+  io::printfn("%s", to_pascal_case(&buffer, "HelloWorld"));
+  io::printfn("%s", to_pascal_case(&buffer, "HELLOWorld"));
+  io::printfn("%s", to_pascal_case(&buffer, "DrawFPS"));
+  io::printfn("%s", to_pascal_case(&buffer, "ITSWorking!"));
+  io::printfn("%s", to_pascal_case(&buffer, "hello_world"));
+  io::printfn("%s", to_pascal_case(&buffer, "helloWorld"));
+
+  io::printfn("\n// Camel Case");
+  io::printfn("%s", to_camel_case(&buffer, "VSlider"));
+  io::printfn("%s", to_camel_case(&buffer, "HelloWorld"));
+  io::printfn("%s", to_camel_case(&buffer, "HELLOWorld"));
+  io::printfn("%s", to_camel_case(&buffer, "DrawFPS"));
+  io::printfn("%s", to_camel_case(&buffer, "ITSWorking!"));
+  io::printfn("%s", to_camel_case(&buffer, "hello_world"));
+  io::printfn("%s", to_camel_case(&buffer, "helloWorld"));
+
+  io::printfn("\n// Constant Case");
+  io::printfn("%s", to_constant_case(&buffer, "VSlider"));
+  io::printfn("%s", to_constant_case(&buffer, "HelloWorld"));
+  io::printfn("%s", to_constant_case(&buffer, "HELLOWorld"));
+  io::printfn("%s", to_constant_case(&buffer, "DrawFPS"));
+  io::printfn("%s", to_constant_case(&buffer, "ITSWorking!"));
+  io::printfn("%s", to_constant_case(&buffer, "hello_world"));
+  io::printfn("%s", to_constant_case(&buffer, "helloWorld"));
+  io::printfn("%s", to_constant_case(&buffer, "hello_World"));
+  io::printfn("%s", to_constant_case(&buffer, "Hello_World"));
+
+  io::printfn("\n// Snake Case");
+  io::printfn("%s", to_snake_case(&buffer, "VSlider"));
+  io::printfn("%s", to_snake_case(&buffer, "HelloWorld"));
+  io::printfn("%s", to_snake_case(&buffer, "HELLOWorld"));
+  io::printfn("%s", to_snake_case(&buffer, "DrawFPS"));
+  io::printfn("%s", to_snake_case(&buffer, "ITSWorking!"));
+  io::printfn("%s", to_snake_case(&buffer, "hello_world"));
+  io::printfn("%s", to_snake_case(&buffer, "helloWorld"));
+  io::printfn("%s", to_snake_case(&buffer, "TexPixelsRGBA32"));
+  io::printfn("%s", to_snake_case(&buffer, "TexPixelsRGBA"));
+
+  io::printfn("\n// Match uppercased whole");
+  io::printfn("%s", match_uppercased_whole("RGBA"));
+  io::printfn("%s", match_uppercased_whole("8RGBA32"));
+  io::printfn("%s", match_uppercased_whole("wRGBA32j"));
+}

@@ -26,7 +26,7 @@ fn Object* get_file_json(String file_path) {
 fn int main(String[] args) {
   Object* types_json = get_file_json(STRUCTS_AND_ENUMS_JSON);
   Object* typedefs_json = get_file_json(TYPEDEFS_JSON);
-  //Object* functions_json = get_file_json(DEFINITIONS_JSON);
+  Object* functions_json = get_file_json(DEFINITIONS_JSON);
 
   assert(types_json.is_map());
   digest_types(types_json);
@@ -34,6 +34,7 @@ fn int main(String[] args) {
   output_structs(types_json, "structs.c3");
   output_templated_structs(types_json, "templated_structs.c3");
   output_typedefs(typedefs_json, "typedefs.c3");
+  output_functions(functions_json, "functions.c3");
 
   return 0;
 }
@@ -124,6 +125,7 @@ fn void output_enums(Object* json_obj, String output_path) {
   };
 }
 
+// ISSUE: bitfields MUST be handled
 fn void output_templated_structs(Object* json_obj, String output_path) {
   io::printf("Outputting templated structs...\n");
   File output = file::open(output_path, "w")!!;
@@ -159,9 +161,6 @@ fn void output_structs(Object* json_obj, String output_path) {
   File output = file::open(output_path, "w")!!;
   defer (void)output.close();
 
-  DString buffer;
-  buffer.temp_init();
-
   (void)io::fprintf(&output, "module %s;\n", IMGUI_MODULE_NAME);
 
   json_obj.get("structs")!!.map.@each(; String name, Object* members) {
@@ -176,24 +175,32 @@ fn void output_structs(Object* json_obj, String output_path) {
         member_type_buffer.temp_init();
         String member_type = clean_type(&member_type_buffer, member.get_string("type")!!);
 
+        DString member_name_buffer;
+        member_name_buffer.temp_init();
+
+        if (member.get_string("name")!!.starts_with("_")) {
+          member_name_buffer.append_char('_');
+        }
         if (try s = member.get_string("name")!!.index_of_char('[') && try e = member.get_string("name")!!.index_of_char(']')) {
           String key = member.get_string("name")!![s+1..e-1];
           String value = enum_value_map.get(key) ?? key;
-          (void)io::fprintf(&output, "  %s[(usz)(%s)] %s;\n", member_type, value, to_snake_case(&buffer, member.get_string("name")!![..s-1]));
+
+          (void)io::fprintf(&output, "  %s[(usz)(%s)] %s;\n", member_type, value, to_snake_case(&member_name_buffer, member.get_string("name")!![..s-1], false));
         } else {
           if (member_type.starts_with("fn")) {
             DString fn_buffer;
             fn_buffer.temp_init();
-            to_pascal_case(&fn_buffer, to_snake_case(&buffer, member.get_string("name")!!));
+            to_snake_case(&member_name_buffer, member.get_string("name")!!, false);
+            to_pascal_case(&fn_buffer, member_name_buffer.str_view());
             fn_buffer.append_chars("Callback");
 
-            (void)io::fprintf(&output, "  %s %s;\n", fn_buffer, to_snake_case(&buffer, member.get_string("name")!!));
+            (void)io::fprintf(&output, "  %s %s;\n", fn_buffer, member_name_buffer.str_view());
 
             callbacks.push(string::new_format("def %s = %s;", fn_buffer, member_type));
           } else if (member_type.starts_with("union")) {
             (void)io::fprintf(&output, "  %s\n", member_type);
           } else {
-            (void)io::fprintf(&output, "  %s %s;\n", member_type, to_snake_case(&buffer, member.get_string("name")!!));
+            (void)io::fprintf(&output, "  %s %s;\n", member_type, to_snake_case(&member_name_buffer, member.get_string("name")!!, false));
           }
         }
       }
