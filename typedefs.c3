@@ -1,7 +1,7 @@
 module imgui;
 def InputTextCallback = fn int(InputTextCallbackData* data);
-def MemFreeFuncCallback = fn void(void* ptr, void* user_data);
-def MemAllocFuncCallback = fn void*(usz sz, void* user_data);
+def MemFreeFunc = fn void(void* ptr, void* user_data);
+def MemAllocFunc = fn void*(usz sz, void* user_data);
 def DrawCallback = fn void(DrawList* parent_list, DrawCmd* cmd);
 def SizeCallback = fn void(SizeCallbackData* data);
 def ImGuiInputFlags = InputFlags;

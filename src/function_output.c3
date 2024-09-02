@@ -38,7 +38,7 @@ struct Func {
 }
 
 fn void output_functions(Object* json_obj, String output_path) {
-  //io::printf("Outputting functions...\n");
+  io::printf("Outputting functions...\n");
   File output = file::open(output_path, "w")!!;
   defer (void)output.close();
 
@@ -52,21 +52,23 @@ fn void output_functions(Object* json_obj, String output_path) {
     assert(values.is_array());
     foreach (func : values.array) {
       assert(func.has_key("stname"));
-
-      String stname = func.get_string("stname")!!.trim();
-      if (stname.len > 0) {
-        struct_funcs.push(func);
-      } else {
-        imgui_funcs.push(func);
+      if (!func.get_string("args")!!.contains("va_list")) {
+        String stname = func.get_string("stname")!!.trim();
+        if (stname.len > 0) {
+          struct_funcs.push(func);
+        } else {
+          imgui_funcs.push(func);
+        }
       }
     }
   };
 
-  output_imgui_func(imgui_funcs);
-  //output_struct_func(struct_funcs);
+  (void)io::fprintf(&output, "module %s;\n", IMGUI_MODULE_NAME);
+  output_imgui_func(&output, imgui_funcs);
+  //output_struct_func(&output, struct_funcs);
 }
 
-fn void output_imgui_func(List(<Object*>) funcs) {
+fn void output_imgui_func(File* output, List(<Object*>) funcs) {
   foreach (func : funcs) {
     DString func_name_buffer;
     func_name_buffer.temp_init();
@@ -81,12 +83,12 @@ fn void output_imgui_func(List(<Object*>) funcs) {
     String func_ret = clean_type(&func_ret_buffer, func.get_string("ret")!!);
     String func_params = clean_params_list(&func_params_buffer, func, &callbacks, func_name);
 
-    io::printf("//%s%s %s -> %s\n", func_extern_name, func.get_string("args")!!, func_name, func_ret);
-    io::printf("fn %s %s(%s) @extern(\"%s\");\n", func_ret, func_name, func_params, func_extern_name);
+    (void)io::fprintf(output, "//%s%s %s -> %s\n", func_extern_name, func.get_string("argsoriginal")!!, func_name, func_ret);
+    (void)io::fprintf(output, "extern fn %s %s(%s) @extern(\"%s\");\n", func_ret, func_name, func_params, func_extern_name);
     foreach (cb : callbacks) {
-      io::printf("%s\n", cb);
+      (void)io::fprintf(output, "%s\n", cb);
     }
-    io::printf("\n");
+    (void)io::fprintf(output, "\n");
   }
 }
 
@@ -126,18 +128,23 @@ fn String clean_params_list(DString* buffer, Object* func, List(<String>)* callb
       DString type_buffer;
       type_buffer.temp_init();
 
-      buffer.appendf("%s %s", clean_type(&type_buffer, param.get_string("type")!!), param.get_string("name")!!);
+      if (param.get_string("type")!! == "...") {
+        buffer.appendf("...");
+      } else {
+        buffer.appendf("%s %s", clean_type(&type_buffer, param.get_string("type")!!), param.get_string("name")!!);
+        func.get("defaults")!!.map.@each(; String param_name, Object* default_value) {
+          if (param_name == param.get_string("name")!!) {
+            clean_value(buffer, default_value.s);
+          }
+        };
+      }
 
-      func.get("defaults")!!.map.@each(; String param_name, Object* default_value) {
-        if (param_name == param.get_string("name")!!) {
-          clean_value(buffer, default_value.s);
-        }
-      };
     }
   }
   return buffer.str_view();
 }
 
+// TODO: redesign this function and clean_constant()
 fn void clean_value(DString* buffer, String s) {
   // TODO: move this to string_utils?
   if (s == "NULL") {
@@ -152,11 +159,11 @@ fn void clean_value(DString* buffer, String s) {
       if (idx != 0) {
         buffer.appendf(", ");
       }
-      clean_constant(buffer, v);
+      clean_constant(buffer, v, "");
     }
     buffer.appendf("}");
   } else if (s.starts_with("%")) {
-    buffer.appendf(" = %%%s", s);
+    buffer.appendf(" = \"%s\"", s);
   } else if (s.ends_with("f")) {
     buffer.appendf(" = %s", s);
   } else if (try value = s.to_long()) { // TODO: is long is enough?. make sure it doesn't convert floating point
@@ -164,17 +171,17 @@ fn void clean_value(DString* buffer, String s) {
   } else if (try value = s.to_double()) {
     buffer.appendf(" = %f", value);
   } else {
-    clean_constant(buffer, s);
+    clean_constant(buffer, s, " = ");
   }
 }
 
 // INFO: think of a better name
-fn void clean_constant(DString* buffer, String s) {
+fn void clean_constant(DString* buffer, String s, String prefix) {
   DString v_buf;
   v_buf.temp_init();
   v_buf.appendf("%s", s);
   // TODO: just directly replace 'buffer'?
   v_buf.replace("FLT_MIN", "float.min");
   v_buf.replace("FLT_MAX", "float.max");
-  buffer.appendf(" = %s", v_buf.str_view());
+  buffer.appendf("%s%s", prefix, v_buf.str_view());
 }

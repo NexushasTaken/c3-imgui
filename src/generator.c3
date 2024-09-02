@@ -246,7 +246,7 @@ fn void output_typedefs(Object* json_obj, String output_path) {
 
   foreach (typedef : typedefs) {
     if (try typedef.second.index_of("(*)")) {
-      (void)io::fprintf(&output, "def %sCallback = %s;\n", clean_imgui(typedef.first).strip_end("Callback"), clean_callback(&buffer, typedef.second));
+      (void)io::fprintf(&output, "def %s = %s;\n", clean_imgui(typedef.first), clean_callback(&buffer, typedef.second));
     } else {
       if (try type = distinct_enum_map.get(typedef.first)) {
         (void)io::fprintf(&output, "def %s = %s;\n", typedef.first, type);
