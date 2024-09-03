@@ -282,13 +282,10 @@ fn int get_typedef_order(Tuple(<String, String>) typedef) {
   }
 }
 
-// str = (type param, type param, ...)
+// str = type param, type param, ...
 fn String clean_params(DString* buffer, String params) {
-  assert(params[0] == '(');
-  assert(params[^1] == ')');
-
   buffer.append_char('(');
-  foreach (idx, param : params[1..^2].split(",")) {
+  foreach (idx, param : params.split(",")) {
     if (idx != 0) {
       buffer.appendf(", ");
     }
@@ -306,7 +303,7 @@ fn String clean_callback(DString* buffer, String cb) {
 
   buffer.append_chars("fn ");
   clean_type(buffer, cb[..s-1]);
-  String params = cb[s+3..cb.rindex_of_char(')')!!];
+  String params = cb[s+3..cb.rindex_of_char(')')!!].trim("()");
   clean_params(buffer, params);
   return buffer.str_view();
 }

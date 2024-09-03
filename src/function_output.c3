@@ -122,7 +122,7 @@ fn String clean_params_list(DString* buffer, Object* func, List(<String>)* callb
       cb_name_buffer.temp_init();
 
       String ret_type = clean_type(&ret_buffer, ret);
-      String params = clean_params(&param_buffer, param.get_string("signature")!!);
+      String params = clean_params(&param_buffer, param.get_string("signature")!!.trim("()"));
       cb_buffer.appendf("fn %s%s", ret_type, params);
 
       to_pascal_case(&cb_name_buffer, func_name);
