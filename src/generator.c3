@@ -52,7 +52,6 @@ fn void digest_types(Object* json_obj) {
     foreach (value : values.array) {
       DString value_name;
       to_constant_case(&value_name, clean_imgui(value.get_string("name")!!));
-      assert(value_name.str_view());
       enum_value_map.set(value.get_string("name")!!, value_name.copy_str());
     }
   };
@@ -63,65 +62,68 @@ fn void output_enums(Object* json_obj, String output_path) {
   File output = file::open(output_path, "w")!!;
   defer (void)output.close();
 
-  DString buffer;
-  buffer.temp_init();
-
   (void)io::fprintf(&output, "module %s;\n", IMGUI_MODULE_NAME);
 
   json_obj.get("enums")!!.map.@each(; String name, Object* values) {
-    (void)io::fprintf(&output, "// %s\n", name);
+    @start_string_builder(&output; DString* sb) {
+      sb.appendf("// %s\n", name);
 
-    if (try ctype = json_obj.get("enumtypes")!!.get_string(name)) { // typed enum
-      (void)io::fprintf(&output, "distinct %s = %s;\n", enum_map.get(name)!!, type_map.get(ctype)!!);
-    } else {
-      (void)io::fprintf(&output, "distinct %s = int;\n", enum_map.get(name)!!);
-    }
+      // distinct enum declaration
+      sb.appendf("distinct %s = ", enum_map.get(name)!!);
+      if (try ctype = json_obj.get("enumtypes")!!.get_string(name)) { // typed enum
+        sb.appendf("%s", type_map.get(ctype)!!);
+      } else {
+        sb.appendf("int");
+      }
+      sb.appendf(";\n");
+    };
 
     List(<Tuple(<String, DString>)>) cleaned_values;
 
     assert(values.is_array());
     { // Gather
-      foreach (value : values.array) {
-        DString value_value;
+      foreach (type : values.array) {
+        DString type_value;
 
-        if (try value.get_string("value")!!.index_of_char('|')) {
-          foreach (i, v : value.get_string("value")!!.split("|")) {
+        if (try type.get_string("value")!!.index_of_char('|')) {
+          foreach (i, v : type.get_string("value")!!.split("|")) {
             if (i != 0) {
-              value_value.appendf(" | ");
+              type_value.appendf(" | ");
             }
-            value_value.appendf("%s", enum_value_map.get(v.trim())!!);
+            type_value.appendf("%s", enum_value_map.get(v.trim())!!);
           }
         } else {
-          if (try value.get_string("value")!!.to_uint()) {
-            value_value.appendf("%s", value.get_string("value")!!);
-          } else if (value.get_string("value")!!.contains("<<")) { // TODO: remove this branch duplication
-            value_value.appendf("%s", value.get_string("value")!!);
-          } else if (value.get_string("value")!!.contains("-")) {
-            value_value.appendf("%d", value.get_long("calc_value")!!);
+          if (try type.get_string("value")!!.to_uint()) {
+            type_value.appendf("%s", type.get_string("value")!!);
+          } else if (type.get_string("value")!!.contains("<<")) { // TODO: remove this branch duplication
+            type_value.appendf("%s", type.get_string("value")!!);
+          } else if (type.get_string("value")!!.contains("-")) {
+            type_value.appendf("%d", type.get_long("calc_value")!!);
           } else {
-            value_value.appendf("%s", to_constant_case(&buffer, clean_imgui(value.get_string("value")!!)));
+            to_constant_case(&type_value, clean_imgui(type.get_string("value")!!));
           }
         }
 
-        cleaned_values.push({ enum_value_map.get(value.get_string("name")!!)!!, value_value });
+        cleaned_values.push({ enum_value_map.get(type.get_string("name")!!)!!, type_value });
         distinct_enum_map.set(name.strip_end("_"), clean_enum(name));
       }
     }
 
-    { // Output
+    // Output
+    @start_string_builder(&output, 516; DString* sb) {
       usz max_len = cleaned_values[0].first.len;
       foreach (entry : cleaned_values) {
         max_len = math::max(entry.first.len, max_len);
       }
       foreach (entry : cleaned_values) {
-        (void)io::fprintf(&output, "const %s %s", clean_enum(name), entry.first);
-        (void)fpad(&output, " ", max_len - entry.first.len);
-        (void)io::fprintf(&output, " = %s;\n", entry.second);
+        sb.appendf("const %s %s", clean_enum(name), entry.first);
+        sb.append_repeat(' ', max_len - entry.first.len);
+        sb.appendf(" = %s;\n", entry.second);
 
         entry.second.free();
       }
-      (void)io::fprintf(&output, "\n");
-    }
+      sb.appendf("\n");
+    };
   };
 }
 
@@ -131,31 +133,37 @@ fn void output_templated_structs(Object* json_obj, String output_path) {
   File output = file::open(output_path, "w")!!;
   defer (void)output.close();
 
-  DString buffer;
-  buffer.temp_init();
-
   json_obj.get("templated_structs")!!.map.@each(; String name, Object* members) {
     if (catch blacklist_structs.get(name)) {
-      String typename = json_obj.get("typenames")!!.get_string(name)!!;
-      assert(typename == "T");
+      @start_string_builder(&output; DString* sb) {
+        String typename = json_obj.get("typenames")!!.get_string(name)!!;
+        assert(typename == "T");
 
-      (void)io::fprintf(&output, "module %s::%s(<Type>);\n", IMGUI_MODULE_NAME, to_snake_case(&buffer, clean_imgui(name)));
-      (void)io::fprintf(&output, "// %s\n", name);
-      (void)io::fprintf(&output, "struct %s {\n", clean_imgui(name));
+        sb.appendf("module %s::", IMGUI_MODULE_NAME);
+        to_snake_case(sb, clean_imgui(name));
+        sb.appendf("(<Type>);\n");
+        sb.appendf("// %s\n", name);
+        sb.appendf("struct %s {\n", clean_imgui(name));
 
-      assert(members.is_array());
-      foreach (member : members.array) {
-        if (member.get_string("type")!!.starts_with(typename)) {
-          (void)io::fprintf(&output, "  Type%s %s;\n", member.get_string("type")!!.strip(typename), to_snake_case(&buffer, member.get_string("name")!!));
-        } else {
-          (void)io::fprintf(&output, "  %s %s;\n", member.get_string("type")!!, to_snake_case(&buffer, member.get_string("name")!!));
+        assert(members.is_array());
+        foreach (member : members.array) {
+          sb.appendf("\t");
+          if (member.get_string("type")!!.starts_with(typename)) {
+            sb.appendf("Type%s", member.get_string("type")!!.strip(typename));
+          } else {
+            sb.appendf("%s", member.get_string("type")!!);
+          }
+          sb.appendf(" ");
+          to_snake_case(sb, member.get_string("name")!!);
+          sb.appendf(";\n");
         }
-      }
-      (void)io::fprintf(&output, "}\n\n");
+        sb.appendf("}\n\n");
+      };
     }
   };
 }
 
+// ISSUE: bitfields MUST be handled
 fn void output_structs(Object* json_obj, String output_path) {
   io::printf("Outputting structs...\n");
   File output = file::open(output_path, "w")!!;
@@ -165,53 +173,64 @@ fn void output_structs(Object* json_obj, String output_path) {
 
   json_obj.get("structs")!!.map.@each(; String name, Object* members) {
     if (try loc = json_obj.get("locations")!!.get(name) && !loc.s.starts_with("imgui_internal") && !loc.s.starts_with("imstb_textedit")) {
-      (void)io::fprintf(&output, "// %s\n", name);
-      (void)io::fprintf(&output, "struct %s {\n", struct_map.get(name)!!);
+      @start_string_builder(&output, 516; DString* sb) {
+        sb.appendf("// %s\n", name);
+        sb.appendf("struct %s {\n", struct_map.get(name)!!);
 
-      List(<String>) callbacks;
-      assert(members.is_array());
-      foreach (member : members.array) {
-        DString member_type_buffer;
-        member_type_buffer.temp_init();
-        String member_type = clean_type(&member_type_buffer, member.get_string("type")!!);
+        DString callbacks;
+        callbacks.temp_init();
 
-        DString member_name_buffer;
-        member_name_buffer.temp_init();
+        assert(members.is_array());
+        foreach (member : members.array) {
+          String member_name = member.get_string("name")!!;
 
-        if (member.get_string("name")!!.starts_with("_")) {
-          member_name_buffer.append_char('_');
-        }
-        if (try s = member.get_string("name")!!.index_of_char('[') && try e = member.get_string("name")!!.index_of_char(']')) {
-          String key = member.get_string("name")!![s+1..e-1];
-          String value = enum_value_map.get(key) ?? key;
+          sb.appendf("\t");
+          if (try s = member_name.index_of_char('[') && try e = member_name.index_of_char(']')) {
+            String key = member_name[s+1..e-1];
 
-          (void)io::fprintf(&output, "  %s[(usz)(%s)] %s;\n", member_type, value, to_snake_case(&member_name_buffer, member.get_string("name")!![..s-1], false));
-        } else {
-          if (member_type.starts_with("fn")) {
-            DString fn_buffer;
-            fn_buffer.temp_init();
-            to_snake_case(&member_name_buffer, member.get_string("name")!!, false);
-            to_pascal_case(&fn_buffer, member_name_buffer.str_view());
-            fn_buffer.append_chars("Func");
-
-            (void)io::fprintf(&output, "  %s %s;\n", fn_buffer, member_name_buffer.str_view());
-
-            callbacks.push(string::new_format("def %s = %s;", fn_buffer, member_type));
-          } else if (member_type.starts_with("union")) {
-            (void)io::fprintf(&output, "  %s\n", member_type);
+            clean_type(sb, member.get_string("type")!!);
+            sb.appendf("[(usz)(%s)] ", enum_value_map.get(key) ?? key);
+            if (member_name.starts_with("_")) {
+              sb.appendf("_");
+            }
+            to_snake_case(sb, member_name[..s-1]);
+            sb.appendf(";\n");
           } else {
-            (void)io::fprintf(&output, "  %s %s;\n", member_type, to_snake_case(&member_name_buffer, member.get_string("name")!!, false));
+            if (member.get_string("type")!!.contains("(*)")) {
+              // member
+              make_member_callback_name(sb, member);
+              sb.appendf(" ");
+              if (member_name.starts_with("_")) {
+                sb.appendf("_");
+              }
+              to_snake_case(sb, member_name);
+              sb.appendf(";\n");
+
+              // function pointer
+              callbacks.appendf("def ");
+              make_member_callback_name(&callbacks, member);
+              callbacks.appendf(" = ");
+              clean_type(&callbacks, member.get_string("type")!!);
+              callbacks.appendf(";\n");
+            } else if (member.get_string("type")!!.starts_with("union")) {
+              clean_type(sb, member.get_string("type")!!); // member union
+              sb.appendf("\n");
+            } else {
+              clean_type(sb, member.get_string("type")!!);
+              sb.appendf(" ");
+              if (member_name.starts_with("_")) {
+                sb.appendf("_");
+              }
+              to_snake_case(sb, member_name);
+              sb.appendf(";\n");
+            }
           }
         }
-      }
-      (void)io::fprintf(&output, "}\n\n");
-      if (callbacks.len() > 0) {
-        foreach (func_def : callbacks) {
-          (void)io::fprintf(&output, "%s\n", func_def);
-          free(func_def);
+        sb.appendf("}\n\n");
+        if (callbacks.len() > 0) {
+          sb.appendf("%s\n", callbacks);
         }
-        (void)io::fprintf(&output, "\n");
-      }
+      };
     }
   };
 }
@@ -220,9 +239,6 @@ fn void output_typedefs(Object* json_obj, String output_path) {
   io::printf("Outputting typedefs...\n");
   File output = file::open(output_path, "w")!!;
   defer (void)output.close();
-
-  DString buffer;
-  buffer.temp_init();
 
   List(<Tuple(<String, String>)>) typedefs;
 
@@ -245,22 +261,27 @@ fn void output_typedefs(Object* json_obj, String output_path) {
   (void)io::fprintf(&output, "module %s;\n", IMGUI_MODULE_NAME);
 
   foreach (typedef : typedefs) {
-    if (try typedef.second.index_of("(*)")) {
-      (void)io::fprintf(&output, "def %s = %s;\n", clean_imgui(typedef.first), clean_callback(&buffer, typedef.second));
-    } else {
-      if (try type = distinct_enum_map.get(typedef.first)) {
-        (void)io::fprintf(&output, "def %s = %s;\n", typedef.first, type);
+    @start_string_builder(&output; DString* sb) {
+      sb.appendf("def ");
+      if (try typedef.second.index_of("(*)")) {
+        sb.appendf("%s = ", clean_imgui(typedef.first));
+        clean_callback(sb, typedef.second);
       } else {
-        String type_name = typedef_names_map.get(typedef.first) ?? clean_imgui(typedef.first);
-        if (try value = typedef_names_map.get(typedef.second)) {
-          (void)io::fprintf(&output, "def %s = %s;\n", type_name, value);
-        } else if (try def_type = type_map.get(typedef.second)) {
-          (void)io::fprintf(&output, "def %s = %s;\n", type_name, def_type);
+        if (try type = distinct_enum_map.get(typedef.first)) {
+          sb.appendf("%s = %s", typedef.first, type);
         } else {
-          (void)io::fprintf(&output, "def %s = %s;\n", type_name, clean_imgui(typedef.second));
+          sb.appendf("%s = ", typedef_names_map.get(typedef.first) ?? clean_imgui(typedef.first)); // type name
+          if (try value = typedef_names_map.get(typedef.second)) {
+            sb.appendf("%s", value);
+          } else if (try def_type = type_map.get(typedef.second)) {
+            sb.appendf("%s", def_type);
+          } else {
+            sb.appendf("%s", clean_imgui(typedef.second));
+          }
         }
       }
-    }
+      sb.appendf(";\n");
+    };
   };
 }
 
@@ -280,98 +301,5 @@ fn int get_typedef_order(Tuple(<String, String>) typedef) {
       }
     }
   }
-}
-
-// str = type param, type param, ...
-fn String clean_params(DString* buffer, String params) {
-  foreach (idx, param : params.split(",")) {
-    if (idx != 0) {
-      buffer.appendf(", ");
-    }
-    DString type_buffer;
-    type_buffer.temp_init();
-    buffer.appendf("%s %s", clean_type(&type_buffer, param[..param.rindex_of_char(' ')!!-1]), param[param.rindex_of_char(' ')!!+1..]);
-  }
-  return buffer.str_view();
-}
-
-fn String clean_callback(DString* buffer, String cb) {
-  usz s = cb.index_of("(*)")!!;
-  buffer.clear();
-
-  buffer.append_chars("fn ");
-  clean_type(buffer, cb[..s-1]);
-  String params = cb[s+3..cb.rindex_of_char(')')!!].trim("()");
-  buffer.appendf("(");
-  clean_params(buffer, params);
-  buffer.appendf(")");
-  return buffer.str_view();
-}
-
-fn String clean_enum(String name) {
-  return clean_imgui(name).trim().strip_end("_");
-}
-
-fn String clean_type(DString* buffer, String orig_type) {
-  if (try orig_type.index_of("(*)")) {
-    DString fn_buffer;
-    fn_buffer.temp_init();
-    buffer.appendf("%s", clean_callback(&fn_buffer, orig_type));
-  } else {
-    orig_type = orig_type.trim();
-    if (orig_type.starts_with("const char*")) {
-      buffer.append_chars("ZString");
-      if (orig_type.ends_with("[]")) {
-        buffer.append_chars("[]");
-      }
-    } else {
-      assert(!orig_type.contains("[]"));
-      orig_type = orig_type.strip("const ");
-
-      if (try type = type_map.get(orig_type)) {
-        buffer.append_chars(type);
-      } else if (try type = find_type_starts_with(orig_type)) {
-        String after = orig_type[type.len..];
-        String before = type_map.get(type)!!;
-        buffer.appendf("%s%s", before, after);
-      } else {
-        buffer.append_chars(clean_imgui(orig_type));
-      }
-    }
-  }
-  return buffer.str_view();
-}
-
-fn void test_clean_type() @test {
-  io::printn();
-  DString buffer;
-  buffer.temp_init();
-  buffer.clear();
-  io::printfn("%s", clean_type(&buffer, "ImHello"));
-  buffer.clear();
-  io::printfn("%s", clean_type(&buffer, "ImGuiHello"));
-  buffer.clear();
-  io::printfn("%s", clean_type(&buffer, "Hello"));
-}
-
-fn String clean_imgui(String str) {
-  if (str.starts_with("Im")/*  && !str.starts_with("Image") */) {
-      String result = str[2..];
-      if (result.starts_with("Gui")) {
-          result = result[3..];
-      }
-      return result;
-  }
-
-  return str;
-}
-
-fn String clean_field(String field, String enum_name) {
-  field = field.trim();
-  field = field.strip_end("_");
-  if (field.starts_with(enum_name)) {
-    field = field[enum_name.len + (enum_name[^1] != '_' ? 1 : 0)..];
-  }
-  return clean_imgui(field);
 }
 

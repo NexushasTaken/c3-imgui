@@ -42,9 +42,6 @@ fn void output_functions(Object* json_obj, String output_path) {
   File output = file::open(output_path, "w")!!;
   defer (void)output.close();
 
-  DString buffer;
-  buffer.temp_init();
-
   List(<Object*>) imgui_funcs;
   List(<Object*>) struct_funcs;
 
@@ -70,20 +67,17 @@ fn void output_functions(Object* json_obj, String output_path) {
 
 fn void output_imgui_func(File* output, List(<Object*>) funcs) {
   foreach (func : funcs) {
-    @create_string_builder(output; DString* sb) {
-      DString func_name_buffer;
-      func_name_buffer.temp_init();
+    @start_string_builder(output; DString* sb) {
       List(<String>) callbacks;
-
-      String func_name = to_snake_case(&func_name_buffer, func.get_string("ov_cimguiname")!!.strip("ig"));
 
       if (try udt_val = func.get_int("nonUDT")) {
         Object* first_param = func.get("argsT")!!.get_at(0);
 
         { // checks
-          DString buffer;
-          buffer.temp_init();
-          assert(clean_type(&buffer, func.get_string("ret")!!) == "void");
+          DString temp;
+          temp.temp_init();
+          clean_type(&temp, func.get_string("ret")!!);
+          assert(temp.str_view() == "void");
           assert(first_param.get_string("name")!! == "pOut");
           usz ptr_count = 0;
           clean_ptr(first_param.get_string("type")!!, &ptr_count);
@@ -101,7 +95,7 @@ fn void output_imgui_func(File* output, List(<Object*>) funcs) {
         sb.appendf("fn ");
         clean_type(sb, clean_ptr(first_param.get_string("type")!!)); // return type
         sb.appendf(" ");
-        to_snake_case(sb, func.get_string("ov_cimguiname")!!.strip("ig"), false);
+        to_snake_case(sb, func.get_string("ov_cimguiname")!!.strip("ig"));
         sb.appendf("(");
         clean_params_list(sb, func);
         sb.appendf(") @inline {\n\t");
@@ -124,7 +118,7 @@ fn void output_imgui_func(File* output, List(<Object*>) funcs) {
         sb.appendf("extern fn ");
         clean_type(sb, func.get_string("ret")!!);
         sb.appendf(" ");
-        to_snake_case(sb, func.get_string("ov_cimguiname")!!.strip("ig"), false);
+        to_snake_case(sb, func.get_string("ov_cimguiname")!!.strip("ig"));
         sb.appendf("(");
         clean_params_list(sb, func);
         sb.appendf(") @extern(\"%s\");\n", func.get_string("ov_cimguiname")!!)!!;
@@ -147,7 +141,7 @@ fn void output_struct_func(List(<Object*>) funcs) {
 fn DString* make_callback_name(DString* sb, Object* func, Object* param) {
   sb.appendf(func.get_string("funcname")!!.strip("ig"));
   sb.appendf("_");
-  to_pascal_case(sb, param.get_string("name")!!, false);
+  to_pascal_case(sb, param.get_string("name")!!);
   sb.appendf("_");
   sb.appendf("Func");
   return sb;
@@ -169,7 +163,7 @@ fn DString* output_callbacks(DString* sb, Object* func) {
 }
 
 // TODO: separate callback parser?
-fn String clean_params_list(DString* buffer, Object* func, bool full = false) {
+fn String clean_params_list(DString* sb, Object* func, bool full = false) {
   usz i = func.get_int("nonUDT") ?? 0;
   usz start = i;
   Object* args = func.get("argsT")!!;
@@ -181,63 +175,61 @@ fn String clean_params_list(DString* buffer, Object* func, bool full = false) {
   for (; i < args.array.len(); i++) {
     Object* param = args.get_at(i);
     if (i != start) {
-      buffer.append_chars(", ");
+      sb.append_chars(", ");
     }
 
     if (try ret = param.get_string("ret")) {
-      make_callback_name(buffer, func, param);
-      buffer.appendf(" %s", param.get_string("name")!!);
+      make_callback_name(sb, func, param);
+      sb.appendf(" %s", param.get_string("name")!!);
     } else {
-      DString type_buffer;
-      type_buffer.temp_init();
-
       if (param.get_string("type")!! == "...") {
-        buffer.appendf("...");
+        sb.appendf("...");
       } else {
-        buffer.appendf("%s %s", clean_type(&type_buffer, param.get_string("type")!!), param.get_string("name")!!);
+        clean_type(sb, param.get_string("type")!!);
+        sb.appendf(" %s", param.get_string("name")!!);
         if (try default_value = func.get("defaults")!!.get(param.get_string("name")!!)) {
-          clean_value(buffer, default_value.s);
+          clean_value(sb, default_value.s);
         }
       }
     }
   }
-  return buffer.str_view();
+  return sb.str_view();
 }
 
 // TODO: redesign this function and clean_constant()
-fn void clean_value(DString* buffer, String s) {
-  DString value_buffer;
-  value_buffer.temp_init();
+fn void clean_value(DString* sb, String s) {
+  DString temp;
+  temp.temp_init();
   // TODO: move this to string_utils?
   if (s == "NULL") {
-    value_buffer.append_chars(" = null");
+    temp.append_chars(" = null");
   } else if (s == "true" || s == "false") {
-    value_buffer.appendf(" = %s", s);
+    temp.appendf(" = %s", s);
   } else if (s.starts_with("sizeof")) {
-    value_buffer.appendf(" = %s.sizeof", s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1]);
+    temp.appendf(" = %s.sizeof", s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1]);
   } else if (s.starts_with("ImVec")) {
-    value_buffer.appendf(" = {");
+    temp.appendf(" = {");
     foreach (idx, v : s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1].split(",")) {
       if (idx != 0) {
-        value_buffer.appendf(", ");
+        temp.appendf(", ");
       }
-      value_buffer.appendf("%s", v);
+      temp.appendf("%s", v);
     }
-    value_buffer.appendf("}");
+    temp.appendf("}");
   } else if (s.starts_with("%")) {
-    value_buffer.appendf(" = \"%s\"", s);
+    temp.appendf(" = \"%s\"", s);
   } else if (s.ends_with("f")) {
-    value_buffer.appendf(" = %s", s);
-  } else if (try value = s.to_long()) { // TODO: is long is enough?. make sure it doesn't convert floating point
-    value_buffer.appendf(" = %d", value);
+    temp.appendf(" = %s", s);
+  } else if (try value = s.to_long()) { // TODO: is 'long' type enough?. make sure it will not convert floating point
+    temp.appendf(" = %d", value);
   } else if (try value = s.to_double()) {
-    value_buffer.appendf(" = %f", value);
+    temp.appendf(" = %f", value);
   } else {
-    value_buffer.appendf(" = %s", s);
+    temp.appendf(" = %s", s);
   }
 
-  value_buffer.replace("FLT_MIN", "float.min");
-  value_buffer.replace("FLT_MAX", "float.max");
-  buffer.append_string(value_buffer);
+  temp.replace("FLT_MIN", "float.min");
+  temp.replace("FLT_MAX", "float.max");
+  sb.append_string(temp);
 }
 

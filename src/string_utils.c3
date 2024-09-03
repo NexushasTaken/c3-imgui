@@ -3,11 +3,11 @@ import std::io;
 import std::ascii;
 import std::collections::map;
 import std::collections::list;
+import std::collections::object;
 
 HashMap(<String, String>) type_map;
 HashMap(<String, int>) blacklist_structs;
 HashMap(<String, int>) blacklist_typedefs;
-HashMap(<String, String>) opaque_structs;
 
 HashMap(<String, String>) distinct_enum_map;
 
@@ -137,11 +137,6 @@ fn void init_blacklist_structs() @init {
   blacklist_structs.set("ImSpanAllocator", 0);
 }
 
-fn void init_opaque_structs() @init {
-  //opaque_structs.set("ImGuiContext*", "void*");
-  //opaque_structs.set("DrawListSharedData*", "void*");
-}
-
 fn void init_struct_map() @init {
   struct_map.set("ImGuiIO", "ImIO");
   struct_map.set("ImGuiID", "ImID");
@@ -160,14 +155,15 @@ fn void init_typedef_names_map() @init {
   typedef_names_map.set("ImS64", "ImS64");
 }
 
-macro void @create_string_builder(File* output; @body(sb_name)) {
+macro void @start_string_builder(File* output, usz capacity = 16; @body(sb_name)) {
   DString sb;
-  sb.temp_init();
+  sb.temp_init(capacity);
   defer io::fprintf(output, "%s", sb)!!;
   @body(&sb);
 }
 
 fn usz String.count_chars(s, char needle) {
+
   usz count = 0;
   foreach (c : s) {
     if (c == needle) {
@@ -187,18 +183,107 @@ fn String clean_ptr(String str, usz* ptr_count = null) {
   return str;
 }
 
+// INFO: add struct name as callback prefix?
+fn DString* make_member_callback_name(DString* sb, Object* member) {
+  to_pascal_case(sb, member.get_string("name")!!);
+  sb.appendf("_Func");
+  return sb;
+}
+
+// str = type param, type param, ...
+fn DString* clean_params(DString* sb, String params) {
+  foreach (idx, param : params.split(",")) {
+    if (idx != 0) {
+      sb.appendf(", ");
+    }
+    clean_type(sb, param[..param.rindex_of_char(' ')!!-1]);
+    sb.appendf(" %s", param[param.rindex_of_char(' ')!!+1..]);
+  }
+  return sb;
+}
+
+fn DString* clean_callback(DString* sb, String cb) {
+  usz s = cb.index_of("(*)")!!;
+
+  sb.append_chars("fn ");
+  clean_type(sb, cb[..s-1]);
+  String params = cb[s+3..cb.rindex_of_char(')')!!].trim("()");
+  sb.appendf("(");
+  clean_params(sb, params);
+  sb.appendf(")");
+  return sb;
+}
+
+fn String clean_enum(String name) {
+  return clean_imgui(name).trim().strip_end("_");
+}
+
+// INFO: convert function pointer into function pointer name instead of converting the function pointer itself?, or just remove this operation?
+fn DString* clean_type(DString* sb, String orig_type) {
+  if (try orig_type.index_of("(*)")) {
+    clean_callback(sb, orig_type);
+  } else {
+    orig_type = orig_type.trim();
+    if (orig_type.starts_with("const char*")) {
+      sb.append_chars("ZString");
+      if (orig_type.ends_with("[]")) {
+        sb.append_chars("[]");
+      }
+    } else {
+      assert(!orig_type.contains("[]"));
+      orig_type = orig_type.strip("const ");
+
+      if (try type = type_map.get(orig_type)) {
+        sb.append_chars(type);
+      } else if (try type = find_type_starts_with(orig_type)) {
+        String after = orig_type[type.len..];
+        String before = type_map.get(type)!!;
+        sb.appendf("%s%s", before, after);
+      } else {
+        sb.append_chars(clean_imgui(orig_type));
+      }
+    }
+  }
+  return sb;
+}
+
+fn void test_clean_type() @test {
+  io::printn();
+  DString buffer;
+  buffer.temp_init();
+  buffer.clear();
+  io::printfn("%s", clean_type(&buffer, "ImHello"));
+  buffer.clear();
+  io::printfn("%s", clean_type(&buffer, "ImGuiHello"));
+  buffer.clear();
+  io::printfn("%s", clean_type(&buffer, "Hello"));
+}
+
+fn String clean_imgui(String str) {
+  if (str.starts_with("Im")/*  && !str.starts_with("Image") */) {
+      String result = str[2..];
+      if (result.starts_with("Gui")) {
+          result = result[3..];
+      }
+      return result;
+  }
+
+  return str;
+}
+
+fn String clean_field(String field, String enum_name) {
+  field = field.trim();
+  field = field.strip_end("_");
+  if (field.starts_with(enum_name)) {
+    field = field[enum_name.len + (enum_name[^1] != '_' ? 1 : 0)..];
+  }
+  return clean_imgui(field);
+}
+
 fn void test_clean_ptr() @test {
   io::printn();
   usz p = 0;
   io::printfn("%s", clean_ptr("void*", &p));
-}
-
-fn usz! fpad(io::OutStream stream, String str, usz len) {
-  usz written = 0;
-  for (; len > 0; len--) {
-    written += io::fprintf(stream, "%s", str)!;
-  }
-  return written;
 }
 
 fn bool is_valid_constant(String str) {
@@ -225,6 +310,9 @@ fn void test_is_valid_constant() @test {
   assert(is_valid_constant("HELLO_123") == true);
   assert(is_valid_constant("8") == false);
 }
+
+//------------------------------------------------------------------------------------
+// Change case functions
 
 def MatchWord = fn String(String);
 def FormatWord = fn void(DString*, String, usz);
@@ -363,10 +451,10 @@ fn String change_case(DString* buffer, String str, String delimiter, FormatWord 
   return buffer.str_view();
 }
 
-macro String to_constant_case(DString* buffer, String str, bool clear = true) => change_case(buffer, str, "_", &fmt_uppercase, clear);
-macro String to_camel_case(DString* buffer, String str, bool clear = true) => change_case(buffer, str, "", &fmt_camelized, clear);
-macro String to_pascal_case(DString* buffer, String str, bool clear = true) => change_case(buffer, str, "", &fmt_capitalized, clear);
-macro String to_snake_case(DString* buffer, String str, bool clear = true) => change_case(buffer, str, "_", &fmt_lowercase, clear);
+macro String to_constant_case(DString* buffer, String str, bool clear = false) => change_case(buffer, str, "_", &fmt_uppercase, clear);
+macro String to_camel_case(DString* buffer, String str, bool clear = false) => change_case(buffer, str, "", &fmt_camelized, clear);
+macro String to_pascal_case(DString* buffer, String str, bool clear = false) => change_case(buffer, str, "", &fmt_capitalized, clear);
+macro String to_snake_case(DString* buffer, String str, bool clear = false) => change_case(buffer, str, "_", &fmt_lowercase, clear);
 
 fn void test_change_case() @test {
   io::printn();
@@ -374,47 +462,48 @@ fn void test_change_case() @test {
   buffer.temp_init();
 
   io::printfn("\n// Pascal Case");
-  io::printfn("%s", to_pascal_case(&buffer, "VSlider"));
-  io::printfn("%s", to_pascal_case(&buffer, "HelloWorld"));
-  io::printfn("%s", to_pascal_case(&buffer, "HELLOWorld"));
-  io::printfn("%s", to_pascal_case(&buffer, "DrawFPS"));
-  io::printfn("%s", to_pascal_case(&buffer, "ITSWorking!"));
-  io::printfn("%s", to_pascal_case(&buffer, "hello_world"));
-  io::printfn("%s", to_pascal_case(&buffer, "helloWorld"));
+  io::printfn("%s", to_pascal_case(&buffer, "VSlider", true));
+  io::printfn("%s", to_pascal_case(&buffer, "HelloWorld", true));
+  io::printfn("%s", to_pascal_case(&buffer, "HELLOWorld", true));
+  io::printfn("%s", to_pascal_case(&buffer, "DrawFPS", true));
+  io::printfn("%s", to_pascal_case(&buffer, "ITSWorking!", true));
+  io::printfn("%s", to_pascal_case(&buffer, "hello_world", true));
+  io::printfn("%s", to_pascal_case(&buffer, "helloWorld", true));
 
   io::printfn("\n// Camel Case");
-  io::printfn("%s", to_camel_case(&buffer, "VSlider"));
-  io::printfn("%s", to_camel_case(&buffer, "HelloWorld"));
-  io::printfn("%s", to_camel_case(&buffer, "HELLOWorld"));
-  io::printfn("%s", to_camel_case(&buffer, "DrawFPS"));
-  io::printfn("%s", to_camel_case(&buffer, "ITSWorking!"));
-  io::printfn("%s", to_camel_case(&buffer, "hello_world"));
-  io::printfn("%s", to_camel_case(&buffer, "helloWorld"));
+  io::printfn("%s", to_camel_case(&buffer, "VSlider", true));
+  io::printfn("%s", to_camel_case(&buffer, "HelloWorld", true));
+  io::printfn("%s", to_camel_case(&buffer, "HELLOWorld", true));
+  io::printfn("%s", to_camel_case(&buffer, "DrawFPS", true));
+  io::printfn("%s", to_camel_case(&buffer, "ITSWorking!", true));
+  io::printfn("%s", to_camel_case(&buffer, "hello_world", true));
+  io::printfn("%s", to_camel_case(&buffer, "helloWorld", true));
 
   io::printfn("\n// Constant Case");
-  io::printfn("%s", to_constant_case(&buffer, "VSlider"));
-  io::printfn("%s", to_constant_case(&buffer, "HelloWorld"));
-  io::printfn("%s", to_constant_case(&buffer, "HELLOWorld"));
-  io::printfn("%s", to_constant_case(&buffer, "DrawFPS"));
-  io::printfn("%s", to_constant_case(&buffer, "ITSWorking!"));
-  io::printfn("%s", to_constant_case(&buffer, "hello_world"));
-  io::printfn("%s", to_constant_case(&buffer, "helloWorld"));
-  io::printfn("%s", to_constant_case(&buffer, "hello_World"));
-  io::printfn("%s", to_constant_case(&buffer, "Hello_World"));
+  io::printfn("%s", to_constant_case(&buffer, "VSlider", true));
+  io::printfn("%s", to_constant_case(&buffer, "HelloWorld", true));
+  io::printfn("%s", to_constant_case(&buffer, "HELLOWorld", true));
+  io::printfn("%s", to_constant_case(&buffer, "DrawFPS", true));
+  io::printfn("%s", to_constant_case(&buffer, "ITSWorking!", true));
+  io::printfn("%s", to_constant_case(&buffer, "hello_world", true));
+  io::printfn("%s", to_constant_case(&buffer, "helloWorld", true));
+  io::printfn("%s", to_constant_case(&buffer, "hello_World", true));
+  io::printfn("%s", to_constant_case(&buffer, "Hello_World", true));
 
   io::printfn("\n// Snake Case");
-  io::printfn("%s", to_snake_case(&buffer, "VSlider"));
-  io::printfn("%s", to_snake_case(&buffer, "HelloWorld"));
-  io::printfn("%s", to_snake_case(&buffer, "HELLOWorld"));
-  io::printfn("%s", to_snake_case(&buffer, "DrawFPS"));
-  io::printfn("%s", to_snake_case(&buffer, "ITSWorking!"));
-  io::printfn("%s", to_snake_case(&buffer, "hello_world"));
-  io::printfn("%s", to_snake_case(&buffer, "helloWorld"));
-  io::printfn("%s", to_snake_case(&buffer, "TexPixelsRGBA32"));
-  io::printfn("%s", to_snake_case(&buffer, "TexPixelsRGBA"));
+  io::printfn("%s", to_snake_case(&buffer, "VSlider", true));
+  io::printfn("%s", to_snake_case(&buffer, "HelloWorld", true));
+  io::printfn("%s", to_snake_case(&buffer, "HELLOWorld", true));
+  io::printfn("%s", to_snake_case(&buffer, "DrawFPS", true));
+  io::printfn("%s", to_snake_case(&buffer, "ITSWorking!", true));
+  io::printfn("%s", to_snake_case(&buffer, "hello_world", true));
+  io::printfn("%s", to_snake_case(&buffer, "helloWorld", true));
+  io::printfn("%s", to_snake_case(&buffer, "TexPixelsRGBA32", true));
+  io::printfn("%s", to_snake_case(&buffer, "TexPixelsRGBA", true));
 
   io::printfn("\n// Match uppercased whole");
-  io::printfn("%s", match_uppercased_whole("RGBA"));
-  io::printfn("%s", match_uppercased_whole("8RGBA32"));
-  io::printfn("%s", match_uppercased_whole("wRGBA32j"));
+  io::printfn("%s", match_uppercased_whole("RGBA", true));
+  io::printfn("%s", match_uppercased_whole("8RGBA32", true));
+  io::printfn("%s", match_uppercased_whole("wRGBA32j", true));
 }
+
