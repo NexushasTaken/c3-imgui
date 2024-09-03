@@ -252,11 +252,11 @@ fn void test_clean_type() @test {
   DString buffer;
   buffer.temp_init();
   buffer.clear();
-  io::printfn("%s", clean_type(&buffer, "ImHello"));
+  io::printfn("%s", clean_type(&buffer, "ImHello").str_view());
   buffer.clear();
-  io::printfn("%s", clean_type(&buffer, "ImGuiHello"));
+  io::printfn("%s", clean_type(&buffer, "ImGuiHello").str_view());
   buffer.clear();
-  io::printfn("%s", clean_type(&buffer, "Hello"));
+  io::printfn("%s", clean_type(&buffer, "Hello").str_view());
 }
 
 fn String clean_imgui(String str) {
@@ -502,8 +502,8 @@ fn void test_change_case() @test {
   io::printfn("%s", to_snake_case(&buffer, "TexPixelsRGBA", true));
 
   io::printfn("\n// Match uppercased whole");
-  io::printfn("%s", match_uppercased_whole("RGBA", true));
-  io::printfn("%s", match_uppercased_whole("8RGBA32", true));
-  io::printfn("%s", match_uppercased_whole("wRGBA32j", true));
+  io::printfn("%s", match_uppercased_whole("RGBA"));
+  io::printfn("%s", match_uppercased_whole("8RGBA32"));
+  io::printfn("%s", match_uppercased_whole("wRGBA32j"));
 }
 

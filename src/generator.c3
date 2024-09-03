@@ -163,23 +163,6 @@ fn void output_templated_structs(Object* json_obj, String output_path) {
   };
 }
 
-struct Foo {
-  bitstruct : uint {
-    uint colored : 0..0;
-    uint visible : 1..1;
-    uint codepoint : 2..31;
-  }
-	float advance_x;
-	float x0;
-	float y0;
-	float x1;
-	float y1;
-	float u0;
-	float v0;
-	float u1;
-	float v1;
-}
-
 fn void output_structs(Object* json_obj, String output_path) {
   io::printf("Outputting structs...\n");
   File output = file::open(output_path, "w")!!;
