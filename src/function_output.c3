@@ -138,13 +138,10 @@ fn String clean_params_list(DString* buffer, Object* func, List(<String>)* callb
         buffer.appendf("...");
       } else {
         buffer.appendf("%s %s", clean_type(&type_buffer, param.get_string("type")!!), param.get_string("name")!!);
-        func.get("defaults")!!.map.@each(; String param_name, Object* default_value) {
-          if (param_name == param.get_string("name")!!) {
-            clean_value(buffer, default_value.s);
-          }
-        };
+        if (try default_value = func.get("defaults")!!.get(param.get_string("name")!!)) {
+          clean_value(buffer, default_value.s);
+        }
       }
-
     }
   }
   return buffer.str_view();
@@ -152,42 +149,38 @@ fn String clean_params_list(DString* buffer, Object* func, List(<String>)* callb
 
 // TODO: redesign this function and clean_constant()
 fn void clean_value(DString* buffer, String s) {
+  DString value_buffer;
+  value_buffer.temp_init();
   // TODO: move this to string_utils?
   if (s == "NULL") {
-    buffer.append_chars(" = null");
+    value_buffer.append_chars(" = null");
   } else if (s == "true" || s == "false") {
-    buffer.appendf(" = %s", s);
+    value_buffer.appendf(" = %s", s);
   } else if (s.starts_with("sizeof")) {
-    buffer.appendf(" = %s.sizeof", s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1]);
+    value_buffer.appendf(" = %s.sizeof", s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1]);
   } else if (s.starts_with("ImVec")) {
-    buffer.appendf(" = {");
+    value_buffer.appendf(" = {");
     foreach (idx, v : s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1].split(",")) {
       if (idx != 0) {
-        buffer.appendf(", ");
+        value_buffer.appendf(", ");
       }
-      clean_constant(buffer, v, "");
+      value_buffer.appendf("%s", v);
     }
-    buffer.appendf("}");
+    value_buffer.appendf("}");
   } else if (s.starts_with("%")) {
-    buffer.appendf(" = \"%s\"", s);
+    value_buffer.appendf(" = \"%s\"", s);
   } else if (s.ends_with("f")) {
-    buffer.appendf(" = %s", s);
+    value_buffer.appendf(" = %s", s);
   } else if (try value = s.to_long()) { // TODO: is long is enough?. make sure it doesn't convert floating point
-    buffer.appendf(" = %d", value);
+    value_buffer.appendf(" = %d", value);
   } else if (try value = s.to_double()) {
-    buffer.appendf(" = %f", value);
+    value_buffer.appendf(" = %f", value);
   } else {
-    clean_constant(buffer, s, " = ");
+    value_buffer.appendf(" = %s", s);
   }
+
+  value_buffer.replace("FLT_MIN", "float.min");
+  value_buffer.replace("FLT_MAX", "float.max");
+  buffer.append_string(value_buffer);
 }
 
-// INFO: think of a better name
-fn void clean_constant(DString* buffer, String s, String prefix) {
-  DString v_buf;
-  v_buf.temp_init();
-  v_buf.appendf("%s", s);
-  // TODO: just directly replace 'buffer'?
-  v_buf.replace("FLT_MIN", "float.min");
-  v_buf.replace("FLT_MAX", "float.max");
-  buffer.appendf("%s%s", prefix, v_buf.str_view());
-}
