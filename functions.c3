@@ -2,8 +2,13 @@ module imgui;
 //igTableGetColumnName(int column_n=-1) table_get_column_name -> ZString
 extern fn ZString table_get_column_name(int column_n = -1) @extern("igTableGetColumnName");
 
-//igGetMousePos() get_mouse_pos -> void, 1
-extern fn void get_mouse_pos(Vec2* pOut) @extern("igGetMousePos");
+//igGetMousePos()(ImVec2 *pOut) get_mouse_pos -> void, 1
+extern fn void igGetMousePos(Vec2* pOut) @extern("igGetMousePos");
+fn Vec2 get_mouse_pos() @inline {
+  Vec2 pOut;
+  igGetMousePos(&pOut);
+  return pOut;
+}
 
 //igLoadIniSettingsFromMemory(const char* ini_data,size_t ini_size=0) load_ini_settings_from_memory -> void
 extern fn void load_ini_settings_from_memory(ZString ini_data, usz ini_size = 0) @extern("igLoadIniSettingsFromMemory");
@@ -26,8 +31,13 @@ extern fn void end_frame() @extern("igEndFrame");
 //igShortcut(ImGuiKeyChord key_chord,ImGuiInputFlags flags=0) shortcut -> bool
 extern fn bool shortcut(KeyChord key_chord, InputFlags flags = 0) @extern("igShortcut");
 
-//igGetItemRectMax() get_item_rect_max -> void, 1
-extern fn void get_item_rect_max(Vec2* pOut) @extern("igGetItemRectMax");
+//igGetItemRectMax()(ImVec2 *pOut) get_item_rect_max -> void, 1
+extern fn void igGetItemRectMax(Vec2* pOut) @extern("igGetItemRectMax");
+fn Vec2 get_item_rect_max() @inline {
+  Vec2 pOut;
+  igGetItemRectMax(&pOut);
+  return pOut;
+}
 
 //igGetTextLineHeight() get_text_line_height -> float
 extern fn float get_text_line_height() @extern("igGetTextLineHeight");
@@ -173,8 +183,13 @@ extern fn void push_i_d__ptr(void* ptr_id) @extern("igPushID_Ptr");
 //igPushID_Int(int int_id) push_i_d__int -> void
 extern fn void push_i_d__int(int int_id) @extern("igPushID_Int");
 
-//igGetFontTexUvWhitePixel() get_font_tex_uv_white_pixel -> void, 1
-extern fn void get_font_tex_uv_white_pixel(Vec2* pOut) @extern("igGetFontTexUvWhitePixel");
+//igGetFontTexUvWhitePixel()(ImVec2 *pOut) get_font_tex_uv_white_pixel -> void, 1
+extern fn void igGetFontTexUvWhitePixel(Vec2* pOut) @extern("igGetFontTexUvWhitePixel");
+fn Vec2 get_font_tex_uv_white_pixel() @inline {
+  Vec2 pOut;
+  igGetFontTexUvWhitePixel(&pOut);
+  return pOut;
+}
 
 //igStyleColorsLight(ImGuiStyle* dst=((void*)0)) style_colors_light -> void
 extern fn void style_colors_light(Style* dst = null) @extern("igStyleColorsLight");
@@ -188,8 +203,13 @@ extern fn int table_get_column_index() @extern("igTableGetColumnIndex");
 //igTableGetSortSpecs() table_get_sort_specs -> TableSortSpecs*
 extern fn TableSortSpecs* table_get_sort_specs() @extern("igTableGetSortSpecs");
 
-//igGetItemRectMin() get_item_rect_min -> void, 1
-extern fn void get_item_rect_min(Vec2* pOut) @extern("igGetItemRectMin");
+//igGetItemRectMin()(ImVec2 *pOut) get_item_rect_min -> void, 1
+extern fn void igGetItemRectMin(Vec2* pOut) @extern("igGetItemRectMin");
+fn Vec2 get_item_rect_min() @inline {
+  Vec2 pOut;
+  igGetItemRectMin(&pOut);
+  return pOut;
+}
 
 //igShowFontSelector(const char* label) show_font_selector -> void
 extern fn void show_font_selector(ZString label) @extern("igShowFontSelector");
@@ -550,8 +570,13 @@ extern fn DrawList* get_foreground_draw_list(Viewport* viewport = null) @extern(
 //igDebugTextEncoding(const char* text) debug_text_encoding -> void
 extern fn void debug_text_encoding(ZString text) @extern("igDebugTextEncoding");
 
-//igColorConvertU32ToFloat4(ImU32 in) color_convert_u32_to_float4 -> void, 1
-extern fn void color_convert_u32_to_float4(Vec4* pOut, ImU32 in) @extern("igColorConvertU32ToFloat4");
+//igColorConvertU32ToFloat4(ImU32 in)(ImVec4 *pOut,ImU32 in) color_convert_u32_to_float4 -> void, 1
+extern fn void igColorConvertU32ToFloat4(Vec4* pOut, ImU32 in) @extern("igColorConvertU32ToFloat4");
+fn Vec4 color_convert_u32_to_float4(ImU32 in) @inline {
+  Vec4 pOut;
+  igColorConvertU32ToFloat4(&pOut, in);
+  return pOut;
+}
 
 //igSetStateStorage(ImGuiStorage* storage) set_state_storage -> void
 extern fn void set_state_storage(Storage* storage) @extern("igSetStateStorage");
@@ -586,8 +611,13 @@ extern fn float get_scroll_max_y() @extern("igGetScrollMaxY");
 //igGetCursorPosY() get_cursor_pos_y -> float
 extern fn float get_cursor_pos_y() @extern("igGetCursorPosY");
 
-//igGetCursorStartPos() get_cursor_start_pos -> void, 1
-extern fn void get_cursor_start_pos(Vec2* pOut) @extern("igGetCursorStartPos");
+//igGetCursorStartPos()(ImVec2 *pOut) get_cursor_start_pos -> void, 1
+extern fn void igGetCursorStartPos(Vec2* pOut) @extern("igGetCursorStartPos");
+fn Vec2 get_cursor_start_pos() @inline {
+  Vec2 pOut;
+  igGetCursorStartPos(&pOut);
+  return pOut;
+}
 
 //igOpenPopup_Str(const char* str_id,ImGuiPopupFlags popup_flags=0) open_popup_str -> void
 extern fn void open_popup_str(ZString str_id, PopupFlags popup_flags = 0) @extern("igOpenPopup_Str");
@@ -607,8 +637,13 @@ extern fn void set_scroll_from_pos_x(float local_x, float center_x_ratio = 0.5f)
 //igSetScrollFromPosY(float local_y,float center_y_ratio=0.5f) set_scroll_from_pos_y -> void
 extern fn void set_scroll_from_pos_y(float local_y, float center_y_ratio = 0.5f) @extern("igSetScrollFromPosY");
 
-//igCalcTextSize(const char* text,const char* text_end=((void*)0),bool hide_text_after_double_hash=false,float wrap_width=-1.0f) calc_text_size -> void, 1
-extern fn void calc_text_size(Vec2* pOut, ZString text, ZString text_end = null, bool hide_text_after_double_hash = false, float wrap_width = -1.0f) @extern("igCalcTextSize");
+//igCalcTextSize(const char* text,const char* text_end=((void*)0),bool hide_text_after_double_hash=false,float wrap_width=-1.0f)(ImVec2 *pOut,const char* text,const char* text_end,bool hide_text_after_double_hash,float wrap_width) calc_text_size -> void, 1
+extern fn void igCalcTextSize(Vec2* pOut, ZString text, ZString text_end = null, bool hide_text_after_double_hash = false, float wrap_width = -1.0f) @extern("igCalcTextSize");
+fn Vec2 calc_text_size(ZString text, ZString text_end = null, bool hide_text_after_double_hash = false, float wrap_width = -1.0f) @inline {
+  Vec2 pOut;
+  igCalcTextSize(&pOut, text,text_end,hide_text_after_double_hash,wrap_width);
+  return pOut;
+}
 
 //igEndDisabled() end_disabled -> void
 extern fn void end_disabled() @extern("igEndDisabled");
@@ -664,8 +699,13 @@ extern fn float get_window_width() @extern("igGetWindowWidth");
 //igEndCombo() end_combo -> void
 extern fn void end_combo() @extern("igEndCombo");
 
-//igGetMouseDragDelta(ImGuiMouseButton button=0,float lock_threshold=-1.0f) get_mouse_drag_delta -> void, 1
-extern fn void get_mouse_drag_delta(Vec2* pOut, MouseButton button = 0, float lock_threshold = -1.0f) @extern("igGetMouseDragDelta");
+//igGetMouseDragDelta(ImGuiMouseButton button=0,float lock_threshold=-1.0f)(ImVec2 *pOut,ImGuiMouseButton button,float lock_threshold) get_mouse_drag_delta -> void, 1
+extern fn void igGetMouseDragDelta(Vec2* pOut, MouseButton button = 0, float lock_threshold = -1.0f) @extern("igGetMouseDragDelta");
+fn Vec2 get_mouse_drag_delta(MouseButton button = 0, float lock_threshold = -1.0f) @inline {
+  Vec2 pOut;
+  igGetMouseDragDelta(&pOut, button,lock_threshold);
+  return pOut;
+}
 
 //igSetScrollHereY(float center_y_ratio=0.5f) set_scroll_here_y -> void
 extern fn void set_scroll_here_y(float center_y_ratio = 0.5f) @extern("igSetScrollHereY");
@@ -673,8 +713,13 @@ extern fn void set_scroll_here_y(float center_y_ratio = 0.5f) @extern("igSetScro
 //igSetScrollHereX(float center_x_ratio=0.5f) set_scroll_here_x -> void
 extern fn void set_scroll_here_x(float center_x_ratio = 0.5f) @extern("igSetScrollHereX");
 
-//igGetContentRegionAvail() get_content_region_avail -> void, 1
-extern fn void get_content_region_avail(Vec2* pOut) @extern("igGetContentRegionAvail");
+//igGetContentRegionAvail()(ImVec2 *pOut) get_content_region_avail -> void, 1
+extern fn void igGetContentRegionAvail(Vec2* pOut) @extern("igGetContentRegionAvail");
+fn Vec2 get_content_region_avail() @inline {
+  Vec2 pOut;
+  igGetContentRegionAvail(&pOut);
+  return pOut;
+}
 
 //igSliderScalar(const char* label,ImGuiDataType data_type,void* p_data,const void* p_min,const void* p_max,const char* format=((void*)0),ImGuiSliderFlags flags=0) slider_scalar -> bool
 extern fn bool slider_scalar(ZString label, DataType data_type, void* p_data, void* p_min, void* p_max, ZString format = null, SliderFlags flags = 0) @extern("igSliderScalar");
@@ -742,8 +787,13 @@ extern fn float get_font_size() @extern("igGetFontSize");
 //igTextWrapped(const char* fmt,...) text_wrapped -> void
 extern fn void text_wrapped(ZString fmt, ...) @extern("igTextWrapped");
 
-//igGetCursorPos() get_cursor_pos -> void, 1
-extern fn void get_cursor_pos(Vec2* pOut) @extern("igGetCursorPos");
+//igGetCursorPos()(ImVec2 *pOut) get_cursor_pos -> void, 1
+extern fn void igGetCursorPos(Vec2* pOut) @extern("igGetCursorPos");
+fn Vec2 get_cursor_pos() @inline {
+  Vec2 pOut;
+  igGetCursorPos(&pOut);
+  return pOut;
+}
 
 //igColorEdit4(const char* label,float col[4],ImGuiColorEditFlags flags=0) color_edit4 -> bool
 extern fn bool color_edit4(ZString label, float[4] col, ColorEditFlags flags = 0) @extern("igColorEdit4");
@@ -751,8 +801,13 @@ extern fn bool color_edit4(ZString label, float[4] col, ColorEditFlags flags = 0
 //igColorEdit3(const char* label,float col[3],ImGuiColorEditFlags flags=0) color_edit3 -> bool
 extern fn bool color_edit3(ZString label, float[3] col, ColorEditFlags flags = 0) @extern("igColorEdit3");
 
-//igGetWindowSize() get_window_size -> void, 1
-extern fn void get_window_size(Vec2* pOut) @extern("igGetWindowSize");
+//igGetWindowSize()(ImVec2 *pOut) get_window_size -> void, 1
+extern fn void igGetWindowSize(Vec2* pOut) @extern("igGetWindowSize");
+fn Vec2 get_window_size() @inline {
+  Vec2 pOut;
+  igGetWindowSize(&pOut);
+  return pOut;
+}
 
 //igGetBackgroundDrawList(ImGuiViewport* viewport=((void*)0)) get_background_draw_list -> DrawList*
 extern fn DrawList* get_background_draw_list(Viewport* viewport = null) @extern("igGetBackgroundDrawList");
@@ -880,8 +935,13 @@ extern fn void style_colors_dark(Style* dst = null) @extern("igStyleColorsDark")
 //igSetNextItemWidth(float item_width) set_next_item_width -> void
 extern fn void set_next_item_width(float item_width) @extern("igSetNextItemWidth");
 
-//igGetMousePosOnOpeningCurrentPopup() get_mouse_pos_on_opening_current_popup -> void, 1
-extern fn void get_mouse_pos_on_opening_current_popup(Vec2* pOut) @extern("igGetMousePosOnOpeningCurrentPopup");
+//igGetMousePosOnOpeningCurrentPopup()(ImVec2 *pOut) get_mouse_pos_on_opening_current_popup -> void, 1
+extern fn void igGetMousePosOnOpeningCurrentPopup(Vec2* pOut) @extern("igGetMousePosOnOpeningCurrentPopup");
+fn Vec2 get_mouse_pos_on_opening_current_popup() @inline {
+  Vec2 pOut;
+  igGetMousePosOnOpeningCurrentPopup(&pOut);
+  return pOut;
+}
 
 //igIsItemEdited() is_item_edited -> bool
 extern fn bool is_item_edited() @extern("igIsItemEdited");
@@ -916,8 +976,13 @@ extern fn bool set_drag_drop_payload(ZString type, void* data, usz sz, Cond cond
 //igPopID() pop_id -> void
 extern fn void pop_id() @extern("igPopID");
 
-//igGetCursorScreenPos() get_cursor_screen_pos -> void, 1
-extern fn void get_cursor_screen_pos(Vec2* pOut) @extern("igGetCursorScreenPos");
+//igGetCursorScreenPos()(ImVec2 *pOut) get_cursor_screen_pos -> void, 1
+extern fn void igGetCursorScreenPos(Vec2* pOut) @extern("igGetCursorScreenPos");
+fn Vec2 get_cursor_screen_pos() @inline {
+  Vec2 pOut;
+  igGetCursorScreenPos(&pOut);
+  return pOut;
+}
 
 //igCollapsingHeader_TreeNodeFlags(const char* label,ImGuiTreeNodeFlags flags=0) collapsing_header_tree_node_flags -> bool
 extern fn bool collapsing_header_tree_node_flags(ZString label, TreeNodeFlags flags = 0) @extern("igCollapsingHeader_TreeNodeFlags");
@@ -1092,8 +1157,13 @@ extern fn void color_convert_rg_bto_hsv(float r, float g, float b, float* out_h,
 //igSmallButton(const char* label) small_button -> bool
 extern fn bool small_button(ZString label) @extern("igSmallButton");
 
-//igGetItemRectSize() get_item_rect_size -> void, 1
-extern fn void get_item_rect_size(Vec2* pOut) @extern("igGetItemRectSize");
+//igGetItemRectSize()(ImVec2 *pOut) get_item_rect_size -> void, 1
+extern fn void igGetItemRectSize(Vec2* pOut) @extern("igGetItemRectSize");
+fn Vec2 get_item_rect_size() @inline {
+  Vec2 pOut;
+  igGetItemRectSize(&pOut);
+  return pOut;
+}
 
 //igTableSetColumnEnabled(int column_n,bool v) table_set_column_enabled -> void
 extern fn void table_set_column_enabled(int column_n, bool v) @extern("igTableSetColumnEnabled");
@@ -1173,8 +1243,13 @@ extern fn int get_column_index() @extern("igGetColumnIndex");
 //igBullet() bullet -> void
 extern fn void bullet() @extern("igBullet");
 
-//igGetWindowPos() get_window_pos -> void, 1
-extern fn void get_window_pos(Vec2* pOut) @extern("igGetWindowPos");
+//igGetWindowPos()(ImVec2 *pOut) get_window_pos -> void, 1
+extern fn void igGetWindowPos(Vec2* pOut) @extern("igGetWindowPos");
+fn Vec2 get_window_pos() @inline {
+  Vec2 pOut;
+  igGetWindowPos(&pOut);
+  return pOut;
+}
 
 //igSetNextWindowBgAlpha(float alpha) set_next_window_bg_alpha -> void
 extern fn void set_next_window_bg_alpha(float alpha) @extern("igSetNextWindowBgAlpha");

@@ -86,11 +86,37 @@ fn void output_imgui_func(File* output, List(<Object*>) funcs) {
     if (try udt_val = func.get_int("nonUDT")) {
       // TODO: use first parameter as return value?
       assert(func_ret == "void");
-      (void)io::fprintf(output, "//%s%s %s -> %s, %d\n", func_extern_name, func.get_string("argsoriginal")!!, func_name, func_ret, udt_val);
+      (void)io::fprintf(output, "//%s%s%s %s -> %s, %d\n", func_extern_name, func.get_string("argsoriginal")!!, func.get_string("args")!!, func_name, func_ret, udt_val);
+      //(void)io::fprintf(output, "extern fn %s %s(%s) @extern(\"%s\");\n", func_ret, func_name, func_params, func_extern_name);
+
+      {
+        Object* first_param = func.get("argsT")!!.get_at(0);
+        String name = first_param.get_string("name")!!;
+        assert(name == "pOut");
+        usz ptr_count = 0;
+        DString type_buffer;
+        type_buffer.temp_init();
+        String type = clean_type(&type_buffer, clean_ptr(first_param.get_string("type")!!, &ptr_count));
+        assert(ptr_count == 1);
+        DString full_params;
+        full_params.temp_init();
+        (void)io::fprintf(output, "extern fn %s %s(%s) @extern(\"%s\");\n", func_ret, func_extern_name, clean_params_list(&full_params, func, null, func_name, true), func_extern_name);
+        (void)io::fprintf(output, "fn %s %s(%s) @inline {\n", type, func_name, func_params);
+        (void)io::fprintf(output, "  %s %s;\n", type, name);
+        if (func.get_string("call_args")!! == "()") {
+          (void)io::fprintf(output, "  %s(&%s);\n", func_extern_name, name);
+        } else {
+          (void)io::fprintf(output, "  %s(&%s, %s);\n", func_extern_name, name, func.get_string("call_args")!!.trim("()"));
+        }
+        (void)io::fprintf(output, "  return %s;\n", name);
+        (void)io::fprintf(output, "}\n");
+        
+        io::printfn("// HERE{%s}", *first_param);
+      }
     } else {
       (void)io::fprintf(output, "//%s%s %s -> %s\n", func_extern_name, func.get_string("argsoriginal")!!, func_name, func_ret);
+      (void)io::fprintf(output, "extern fn %s %s(%s) @extern(\"%s\");\n", func_ret, func_name, func_params, func_extern_name);
     }
-    (void)io::fprintf(output, "extern fn %s %s(%s) @extern(\"%s\");\n", func_ret, func_name, func_params, func_extern_name);
     foreach (cb : callbacks) {
       (void)io::fprintf(output, "%s\n", cb);
     }
@@ -106,11 +132,21 @@ fn void output_struct_func(List(<Object*>) funcs) {
   }
 }
 
-fn String clean_params_list(DString* buffer, Object* func, List(<String>)* callbacks, String func_name) {
-  foreach (i, param : func.get("argsT")!!.array) {
-    if (i != 0) {
+fn String clean_params_list(DString* buffer, Object* func, List(<String>)* callbacks, String func_name, bool full = false) {
+  usz i = func.get_int("nonUDT") ?? 0;
+  usz start = i;
+  Object* args = func.get("argsT")!!;
+  if (full) {
+    i = 0;
+    start = 0;
+  }
+  
+  for (; i < args.array.len(); i++) {
+    Object* param = args.get_at(i);
+    if (i != start) {
       buffer.append_chars(", ");
     }
+
     if (try ret = param.get_string("ret")) {
       DString param_buffer;
       param_buffer.temp_init();
@@ -128,7 +164,9 @@ fn String clean_params_list(DString* buffer, Object* func, List(<String>)* callb
       to_pascal_case(&cb_name_buffer, func_name);
       cb_name_buffer.append_chars("Callback");
 
-      callbacks.push(string::new_format("def %s = %s;", cb_name_buffer.str_view(), cb_buffer.str_view()));
+      if (callbacks != null) {
+        callbacks.push(string::new_format("def %s = %s;", cb_name_buffer.str_view(), cb_buffer.str_view()));
+      }
       buffer.appendf("%s %s", cb_name_buffer.str_view(), param.get_string("name")!!);
     } else {
       DString type_buffer;

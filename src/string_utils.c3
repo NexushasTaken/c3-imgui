@@ -160,6 +160,33 @@ fn void init_typedef_names_map() @init {
   typedef_names_map.set("ImS64", "ImS64");
 }
 
+fn usz String.count_chars(s, char needle) {
+  usz count = 0;
+  foreach (c : s) {
+    if (c == needle) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+/**
+ * @param [&out] ptr_count
+ */
+fn String clean_ptr(String str, usz* ptr_count) {
+  if (try i = str.index_of_char('*')) {
+    *ptr_count = str.count_chars('*');
+    return str[:i];
+  }
+  return str;
+}
+
+fn void test_clean_ptr() @test {
+  io::printn();
+  usz p = 0;
+  io::printfn("%s", clean_ptr("void*", &p));
+}
+
 fn usz! fpad(io::OutStream stream, String str, usz len) {
   usz written = 0;
   for (; len > 0; len--) {
