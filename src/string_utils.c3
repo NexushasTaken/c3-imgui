@@ -156,10 +156,12 @@ fn void init_typedef_names_map() @init {
 }
 
 macro void @start_string_builder(File* output, usz capacity = 16; @body(sb_name)) {
-  DString sb;
-  sb.temp_init(capacity);
-  defer io::fprintf(output, "%s", sb)!!;
-  @body(&sb);
+  @pool() {
+    DString sb;
+    sb.temp_init(capacity);
+    defer io::fprintf(output, "%s", sb)!!;
+    @body(&sb);
+  };
 }
 
 fn usz String.count_chars(s, char needle) {
@@ -317,25 +319,26 @@ fn void test_is_valid_constant() @test {
 def MatchWord = fn String(String);
 def FormatWord = fn void(DString*, String, usz);
 
+macro bool char.is_digit_upper(c) => c.is_digit() || c.is_upper();
+macro bool char.is_digit_lower(c) => c.is_digit() || c.is_lower();
+macro bool char.is_alpha_digit(c) => c.is_digit() || c.is_alpha();
+
 fn String match_lowercased(String str) @local {
   if (str.len == 0) {
     return str;
   }
-  if (str[0].is_upper()) {
-    return str[:0];
-  }
   usz i = 0;
-  while (i < str.len-1 && (str[i+1].is_lower() || str[i+1].is_digit())) {
+  while (i < str.len && str[i].is_digit_lower()) {
     i++;
   }
-  return str[..i];
+  return str[:i];
 }
 
 fn String match_capitalized(String str) @local {
   if (str.len == 0) {
     return str;
   }
-  if (str[0].is_lower()) {
+  if (str[0].is_digit_lower() || !str[0].is_alpha()) {
     return str[:0];
   }
   String word = match_lowercased(str[1..]);
@@ -352,7 +355,7 @@ fn String match_uppercased_whole(String str) @local {
     return str;
   }
   foreach (c : str) {
-    if (!c.is_digit() && !c.is_upper()) {
+    if (!c.is_digit_upper()) {
       return str[:0];
     }
   }
@@ -360,18 +363,30 @@ fn String match_uppercased_whole(String str) @local {
 }
 
 // HELLOWorld -> HELLO
+fn String match_uppercased_word(String str) @local {
+  if (str.len == 0) {
+    return str;
+  }
+  usz i = 0;
+  while (i < str.len && str[i].is_alpha() && match_capitalized(str[i..]).len == 0) {
+    i++;
+  }
+  return str[:i];
+}
+
+// HELLOWorld -> HELLOW
 fn String match_uppercased(String str) @local {
   if (str.len == 0) {
     return str;
   }
-  if (match_capitalized(str).len > 0) {
+  if (!str[0].is_alpha() || str[0].is_lower()) {
     return str[:0];
   }
   usz i = 0;
-  while (i < str.len && match_capitalized(str[i..]).len == 0) {
-    i++;
+  while (i < str.len && (str[i].is_upper() || str[i].is_digit())) {
+   i++;
   }
-  return str[..i-1];
+  return str[:i];
 }
 
 /*
@@ -379,6 +394,7 @@ fn String match_uppercased(String str) @local {
 ([A-Z][a-z0-9]+)
 ([A-Z0-9]+$)
 ([A-Z]+(?=[A-Z][a-z0-9]+))
+([A-Z0-9]+)
 [^A-Za-z0-9]
 */
 
@@ -423,6 +439,7 @@ fn String change_case(DString* buffer, String str, String delimiter, FormatWord 
   matchs.push(&match_lowercased);
   matchs.push(&match_capitalized);
   matchs.push(&match_uppercased_whole);
+  matchs.push(&match_uppercased_word);
   matchs.push(&match_uppercased);
 
   if (clear) {
@@ -456,54 +473,116 @@ macro String to_camel_case(DString* buffer, String str, bool clear = false) => c
 macro String to_pascal_case(DString* buffer, String str, bool clear = false) => change_case(buffer, str, "", &fmt_capitalized, clear);
 macro String to_snake_case(DString* buffer, String str, bool clear = false) => change_case(buffer, str, "_", &fmt_lowercase, clear);
 
-fn void test_change_case() @test {
+macro @assert_equal(#left, #right) {
+  assert((#left) == (#right), "%d : \"%s\" != \"%s\"", ($$LINE), (#left), (#right));
+}
+
+fn void test_match_lowercased() @test {
+  @assert_equal(match_lowercased("foo"), "foo");
+  @assert_equal(match_lowercased("fooBar"), "foo");
+  @assert_equal(match_lowercased("foo Bar"), "foo");
+  @assert_equal(match_lowercased("foo_Bar"), "foo");
+  @assert_equal(match_lowercased("foo1Bar"), "foo1");
+  @assert_equal(match_lowercased("foo1bar"), "foo1bar");
+  @assert_equal(match_lowercased("Bar"), "");
+  @assert_equal(match_lowercased("BAR"), "");
+  @assert_equal(match_lowercased("fOO"), "f");
+  @assert_equal(match_lowercased("1"), "1");
+  @assert_equal(match_lowercased("00"), "00");
+  @assert_equal(match_lowercased("f"), "f");
+  @assert_equal(match_lowercased("_"), "");
+  @assert_equal(match_lowercased(" "), "");
+}
+
+fn void test_match_capitalized() @test {
+  @assert_equal(match_capitalized("foo"), "");
+  @assert_equal(match_capitalized("123"), "");
+  @assert_equal(match_capitalized("f00"), "");
+  @assert_equal(match_capitalized("Foo Bar"), "Foo");
+  @assert_equal(match_capitalized("Foo_Bar"), "Foo");
+  @assert_equal(match_capitalized("Foo.Bar"), "Foo");
+  @assert_equal(match_capitalized("Foo8Bar"), "Foo8");
+  @assert_equal(match_capitalized("FooBar"), "Foo");
+  @assert_equal(match_capitalized("FoBar"), "Fo");
+  @assert_equal(match_capitalized("FBar"), "");
+  @assert_equal(match_capitalized("F00"), "F00");
+}
+
+fn void test_match_uppercased_whole() @test {
+  @assert_equal(match_uppercased_whole("FOO"), "FOO");
+  @assert_equal(match_uppercased_whole("F00"), "F00");
+  @assert_equal(match_uppercased_whole("1FOO2"), "1FOO2");
+  @assert_equal(match_uppercased_whole("123"), "123");
+  @assert_equal(match_uppercased_whole("Foo"), "");
+  @assert_equal(match_uppercased_whole(""), "");
+  @assert_equal(match_uppercased_whole("F-"), "");
+  @assert_equal(match_uppercased_whole("F_"), "");
+  @assert_equal(match_uppercased_whole("fOO"), "");
+}
+
+fn void test_match_uppercase_word() @test {
+  @assert_equal(match_uppercased_word("FOO_"), "FOO");
+  @assert_equal(match_uppercased_word("HELLOWorld"), "HELLO");
+  @assert_equal(match_uppercased_word("IO_ImGuiIO"), "IO");
+  @assert_equal(match_uppercased_word("_ImGuiIO"), "");
+}
+
+fn void test_to_snake_case() @test {
+  DString buffer;
+  buffer.temp_init();
+  @assert_equal(to_snake_case(&buffer, "VSlider", true), "v_slider");
+  @assert_equal(to_snake_case(&buffer, "HelloWorld", true), "hello_world");
+  @assert_equal(to_snake_case(&buffer, "HELLOWorld", true), "hello_world");
+  @assert_equal(to_snake_case(&buffer, "DrawFPS", true), "draw_fps");
+  @assert_equal(to_snake_case(&buffer, "ITSWorking!", true), "its_working");
+  @assert_equal(to_snake_case(&buffer, "hello_world", true), "hello_world");
+  @assert_equal(to_snake_case(&buffer, "helloWorld", true), "hello_world");
+}
+
+fn void test_to_camel_case() @test {
+  DString buffer;
+  buffer.temp_init();
+  @assert_equal(to_camel_case(&buffer, "VSlider", true), "vSlider");
+  @assert_equal(to_camel_case(&buffer, "HelloWorld", true), "helloWorld");
+  @assert_equal(to_camel_case(&buffer, "HELLOWorld", true), "helloWorld");
+  @assert_equal(to_camel_case(&buffer, "DrawFPS", true), "drawFps");
+  @assert_equal(to_camel_case(&buffer, "ITSWorking!", true), "itsWorking");
+  @assert_equal(to_camel_case(&buffer, "hello_world", true), "helloWorld");
+  @assert_equal(to_camel_case(&buffer, "helloWorld", true), "helloWorld");
+}
+
+fn void test_to_constant_case() @test {
+  DString buffer;
+  buffer.temp_init();
+  @assert_equal(to_constant_case(&buffer, "VSlider", true), "V_SLIDER");
+  @assert_equal(to_constant_case(&buffer, "HelloWorld", true), "HELLO_WORLD");
+  @assert_equal(to_constant_case(&buffer, "HELLOWorld", true), "HELLO_WORLD");
+  @assert_equal(to_constant_case(&buffer, "DrawFPS", true), "DRAW_FPS");
+  @assert_equal(to_constant_case(&buffer, "ITSWorking!", true), "ITS_WORKING");
+  @assert_equal(to_constant_case(&buffer, "hello_world", true), "HELLO_WORLD");
+  @assert_equal(to_constant_case(&buffer, "helloWorld", true), "HELLO_WORLD");
+}
+
+fn void test_to_pascal_case() @test {
+  DString buffer;
+  buffer.temp_init();
+  @assert_equal(to_pascal_case(&buffer, "VSlider", true), "VSlider");
+  @assert_equal(to_pascal_case(&buffer, "HelloWorld", true), "HelloWorld");
+  @assert_equal(to_pascal_case(&buffer, "HELLOWorld", true), "HelloWorld");
+  @assert_equal(to_pascal_case(&buffer, "DrawFPS", true), "DrawFps");
+  @assert_equal(to_pascal_case(&buffer, "ITSWorking!", true), "ItsWorking");
+  @assert_equal(to_pascal_case(&buffer, "hello_world", true), "HelloWorld");
+  @assert_equal(to_pascal_case(&buffer, "helloWorld", true), "HelloWorld");
+}
+
+fn void test_change_case2() @test {
   io::printn();
   DString buffer;
   buffer.temp_init();
 
-  io::printfn("\n// Pascal Case");
-  io::printfn("%s", to_pascal_case(&buffer, "VSlider", true));
-  io::printfn("%s", to_pascal_case(&buffer, "HelloWorld", true));
-  io::printfn("%s", to_pascal_case(&buffer, "HELLOWorld", true));
-  io::printfn("%s", to_pascal_case(&buffer, "DrawFPS", true));
-  io::printfn("%s", to_pascal_case(&buffer, "ITSWorking!", true));
-  io::printfn("%s", to_pascal_case(&buffer, "hello_world", true));
-  io::printfn("%s", to_pascal_case(&buffer, "helloWorld", true));
-
-  io::printfn("\n// Camel Case");
-  io::printfn("%s", to_camel_case(&buffer, "VSlider", true));
-  io::printfn("%s", to_camel_case(&buffer, "HelloWorld", true));
-  io::printfn("%s", to_camel_case(&buffer, "HELLOWorld", true));
-  io::printfn("%s", to_camel_case(&buffer, "DrawFPS", true));
-  io::printfn("%s", to_camel_case(&buffer, "ITSWorking!", true));
-  io::printfn("%s", to_camel_case(&buffer, "hello_world", true));
-  io::printfn("%s", to_camel_case(&buffer, "helloWorld", true));
-
-  io::printfn("\n// Constant Case");
-  io::printfn("%s", to_constant_case(&buffer, "VSlider", true));
-  io::printfn("%s", to_constant_case(&buffer, "HelloWorld", true));
-  io::printfn("%s", to_constant_case(&buffer, "HELLOWorld", true));
-  io::printfn("%s", to_constant_case(&buffer, "DrawFPS", true));
-  io::printfn("%s", to_constant_case(&buffer, "ITSWorking!", true));
-  io::printfn("%s", to_constant_case(&buffer, "hello_world", true));
-  io::printfn("%s", to_constant_case(&buffer, "helloWorld", true));
-  io::printfn("%s", to_constant_case(&buffer, "hello_World", true));
-  io::printfn("%s", to_constant_case(&buffer, "Hello_World", true));
-
-  io::printfn("\n// Snake Case");
-  io::printfn("%s", to_snake_case(&buffer, "VSlider", true));
-  io::printfn("%s", to_snake_case(&buffer, "HelloWorld", true));
-  io::printfn("%s", to_snake_case(&buffer, "HELLOWorld", true));
-  io::printfn("%s", to_snake_case(&buffer, "DrawFPS", true));
-  io::printfn("%s", to_snake_case(&buffer, "ITSWorking!", true));
-  io::printfn("%s", to_snake_case(&buffer, "hello_world", true));
-  io::printfn("%s", to_snake_case(&buffer, "helloWorld", true));
-  io::printfn("%s", to_snake_case(&buffer, "TexPixelsRGBA32", true));
-  io::printfn("%s", to_snake_case(&buffer, "TexPixelsRGBA", true));
-
-  io::printfn("\n// Match uppercased whole");
-  io::printfn("%s", match_uppercased_whole("RGBA"));
-  io::printfn("%s", match_uppercased_whole("8RGBA32"));
-  io::printfn("%s", match_uppercased_whole("wRGBA32j"));
+  io::printfn("\n// Match uppercased word");
+  io::printfn("%s", match_uppercased_word("FOO_"));
+  io::printfn("%s", match_uppercased_word("HELLOWorld"));
+  io::printfn("%s", match_uppercased_word("IO_ImGuiIO"));
+  io::printfn("%s", match_uppercased_word("_ImGuiIO"));
 }
-
