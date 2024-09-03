@@ -190,9 +190,11 @@ def RendererSwapBuffers_Func = fn void(Viewport* vp, void* render_arg);
 
 // ImFontGlyph
 struct FontGlyph {
-	uint colored;
-	uint visible;
-	uint codepoint;
+	bitstruct : uint {
+		uint colored : 0..0;
+		uint visible : 1..1;
+		uint codepoint : 2..31;
+	}
 	float advance_x;
 	float x0;
 	float y0;

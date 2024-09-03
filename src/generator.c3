@@ -163,7 +163,23 @@ fn void output_templated_structs(Object* json_obj, String output_path) {
   };
 }
 
-// ISSUE: bitfields MUST be handled
+struct Foo {
+  bitstruct : uint {
+    uint colored : 0..0;
+    uint visible : 1..1;
+    uint codepoint : 2..31;
+  }
+	float advance_x;
+	float x0;
+	float y0;
+	float x1;
+	float y1;
+	float u0;
+	float v0;
+	float u1;
+	float v1;
+}
+
 fn void output_structs(Object* json_obj, String output_path) {
   io::printf("Outputting structs...\n");
   File output = file::open(output_path, "w")!!;
@@ -180,9 +196,26 @@ fn void output_structs(Object* json_obj, String output_path) {
         DString callbacks;
         callbacks.temp_init();
 
+        usz bitfield_count = 0;
         assert(members.is_array());
         foreach (member : members.array) {
           String member_name = member.get_string("name")!!;
+
+          // WARNING: for now, lets stick with this implementation
+          if (try size = member.get("bitfield")) {
+            assert(name == "ImFontGlyph");
+            assert(member.get_string("type")!! == "unsigned int");
+            if (bitfield_count < 2) {
+              bitfield_count += 1;
+              continue;
+            }
+            sb.appendf("\tbitstruct : uint {\n");
+            sb.appendf("\t\tuint colored : 0..0;\n");
+            sb.appendf("\t\tuint visible : 1..1;\n");
+            sb.appendf("\t\tuint codepoint : 2..31;\n");
+            sb.appendf("\t}\n");
+            continue;
+          }
 
           sb.appendf("\t");
           if (try s = member_name.index_of_char('[') && try e = member_name.index_of_char(']')) {
