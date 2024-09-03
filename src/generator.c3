@@ -192,7 +192,7 @@ fn void output_structs(Object* json_obj, String output_path) {
             fn_buffer.temp_init();
             to_snake_case(&member_name_buffer, member.get_string("name")!!, false);
             to_pascal_case(&fn_buffer, member_name_buffer.str_view());
-            fn_buffer.append_chars("Callback");
+            fn_buffer.append_chars("Func");
 
             (void)io::fprintf(&output, "  %s %s;\n", fn_buffer, member_name_buffer.str_view());
 
@@ -284,7 +284,6 @@ fn int get_typedef_order(Tuple(<String, String>) typedef) {
 
 // str = type param, type param, ...
 fn String clean_params(DString* buffer, String params) {
-  buffer.append_char('(');
   foreach (idx, param : params.split(",")) {
     if (idx != 0) {
       buffer.appendf(", ");
@@ -293,7 +292,6 @@ fn String clean_params(DString* buffer, String params) {
     type_buffer.temp_init();
     buffer.appendf("%s %s", clean_type(&type_buffer, param[..param.rindex_of_char(' ')!!-1]), param[param.rindex_of_char(' ')!!+1..]);
   }
-  buffer.append_char(')');
   return buffer.str_view();
 }
 
@@ -304,7 +302,9 @@ fn String clean_callback(DString* buffer, String cb) {
   buffer.append_chars("fn ");
   clean_type(buffer, cb[..s-1]);
   String params = cb[s+3..cb.rindex_of_char(')')!!].trim("()");
+  buffer.appendf("(");
   clean_params(buffer, params);
+  buffer.appendf(")");
   return buffer.str_view();
 }
 

@@ -70,57 +70,69 @@ fn void output_functions(Object* json_obj, String output_path) {
 
 fn void output_imgui_func(File* output, List(<Object*>) funcs) {
   foreach (func : funcs) {
-    DString func_name_buffer;
-    func_name_buffer.temp_init();
-    DString func_params_buffer;
-    func_params_buffer.temp_init();
-    DString func_ret_buffer;
-    func_ret_buffer.temp_init();
-    List(<String>) callbacks;
+    @create_string_builder(output; DString* sb) {
+      DString func_name_buffer;
+      func_name_buffer.temp_init();
+      List(<String>) callbacks;
 
-    String func_extern_name = func.get_string("ov_cimguiname")!!;
-    String func_name = to_snake_case(&func_name_buffer, func.get_string("ov_cimguiname")!!.strip("ig"));
-    String func_ret = clean_type(&func_ret_buffer, func.get_string("ret")!!);
-    String func_params = clean_params_list(&func_params_buffer, func, &callbacks, func_name);
+      String func_name = to_snake_case(&func_name_buffer, func.get_string("ov_cimguiname")!!.strip("ig"));
 
-    if (try udt_val = func.get_int("nonUDT")) {
-      // TODO: use first parameter as return value?
-      assert(func_ret == "void");
-      (void)io::fprintf(output, "//%s%s%s %s -> %s, %d\n", func_extern_name, func.get_string("argsoriginal")!!, func.get_string("args")!!, func_name, func_ret, udt_val);
-      //(void)io::fprintf(output, "extern fn %s %s(%s) @extern(\"%s\");\n", func_ret, func_name, func_params, func_extern_name);
-
-      {
+      if (try udt_val = func.get_int("nonUDT")) {
         Object* first_param = func.get("argsT")!!.get_at(0);
-        String name = first_param.get_string("name")!!;
-        assert(name == "pOut");
-        usz ptr_count = 0;
-        DString type_buffer;
-        type_buffer.temp_init();
-        String type = clean_type(&type_buffer, clean_ptr(first_param.get_string("type")!!, &ptr_count));
-        assert(ptr_count == 1);
-        DString full_params;
-        full_params.temp_init();
-        (void)io::fprintf(output, "extern fn %s %s(%s) @extern(\"%s\");\n", func_ret, func_extern_name, clean_params_list(&full_params, func, null, func_name, true), func_extern_name);
-        (void)io::fprintf(output, "fn %s %s(%s) @inline {\n", type, func_name, func_params);
-        (void)io::fprintf(output, "  %s %s;\n", type, name);
-        if (func.get_string("call_args")!! == "()") {
-          (void)io::fprintf(output, "  %s(&%s);\n", func_extern_name, name);
-        } else {
-          (void)io::fprintf(output, "  %s(&%s, %s);\n", func_extern_name, name, func.get_string("call_args")!!.trim("()"));
+
+        { // checks
+          DString buffer;
+          buffer.temp_init();
+          assert(clean_type(&buffer, func.get_string("ret")!!) == "void");
+          assert(first_param.get_string("name")!! == "pOut");
+          usz ptr_count = 0;
+          clean_ptr(first_param.get_string("type")!!, &ptr_count);
+          assert(ptr_count == 1);
         }
-        (void)io::fprintf(output, "  return %s;\n", name);
-        (void)io::fprintf(output, "}\n");
-        
-        io::printfn("// HERE{%s}", *first_param);
+
+        // extern function
+        sb.appendf("extern fn ");
+        clean_type(sb, func.get_string("ret")!!); // return type
+        sb.appendf(" %s(", func.get_string("ov_cimguiname")!!); // function name
+        clean_params_list(sb, func, true); // parameters
+        sb.appendf(") @extern(\"%s\") @local;\n", func.get_string("ov_cimguiname")!!); // link name
+
+        // function definition
+        sb.appendf("fn ");
+        clean_type(sb, clean_ptr(first_param.get_string("type")!!)); // return type
+        sb.appendf(" ");
+        to_snake_case(sb, func.get_string("ov_cimguiname")!!.strip("ig"), false);
+        sb.appendf("(");
+        clean_params_list(sb, func);
+        sb.appendf(") @inline {\n\t");
+
+        // temporary variable
+        clean_type(sb, clean_ptr(first_param.get_string("type")!!));
+        sb.appendf(" ");
+        sb.appendf("%s;\n\t", first_param.get_string("name")!!);
+
+        // extern function call
+        sb.appendf("%s(&%s", func.get_string("ov_cimguiname")!!, first_param.get_string("name")!!);
+        if (func.get_string("call_args")!! != "()") {
+          sb.appendf(", %s", func.get_string("call_args")!!.trim("()"));
+        }
+        sb.appendf(");\n\t");
+
+        sb.appendf("return %s;\n", first_param.get_string("name")!!);
+        sb.appendf("}\n");
+      } else {
+        sb.appendf("extern fn ");
+        clean_type(sb, func.get_string("ret")!!);
+        sb.appendf(" ");
+        to_snake_case(sb, func.get_string("ov_cimguiname")!!.strip("ig"), false);
+        sb.appendf("(");
+        clean_params_list(sb, func);
+        sb.appendf(") @extern(\"%s\");\n", func.get_string("ov_cimguiname")!!)!!;
       }
-    } else {
-      (void)io::fprintf(output, "//%s%s %s -> %s\n", func_extern_name, func.get_string("argsoriginal")!!, func_name, func_ret);
-      (void)io::fprintf(output, "extern fn %s %s(%s) @extern(\"%s\");\n", func_ret, func_name, func_params, func_extern_name);
-    }
-    foreach (cb : callbacks) {
-      (void)io::fprintf(output, "%s\n", cb);
-    }
-    (void)io::fprintf(output, "\n");
+
+      output_callbacks(sb, func);
+      sb.appendf("\n")!!;
+    };
   }
 }
 
@@ -132,7 +144,32 @@ fn void output_struct_func(List(<Object*>) funcs) {
   }
 }
 
-fn String clean_params_list(DString* buffer, Object* func, List(<String>)* callbacks, String func_name, bool full = false) {
+fn DString* make_callback_name(DString* sb, Object* func, Object* param) {
+  sb.appendf(func.get_string("funcname")!!.strip("ig"));
+  sb.appendf("_");
+  to_pascal_case(sb, param.get_string("name")!!, false);
+  sb.appendf("_");
+  sb.appendf("Func");
+  return sb;
+}
+
+fn DString* output_callbacks(DString* sb, Object* func) {
+  foreach (param : func.get("argsT")!!.array) {
+    if (try ret = param.get_string("ret")) {
+      sb.appendf("def ");
+      make_callback_name(sb, func, param);
+      sb.appendf(" = fn ");
+      clean_type(sb, ret);
+      sb.appendf("(");
+      clean_params(sb, param.get_string("signature")!!.trim("()"));
+      sb.appendf(");\n");
+    }
+  }
+  return sb;
+}
+
+// TODO: separate callback parser?
+fn String clean_params_list(DString* buffer, Object* func, bool full = false) {
   usz i = func.get_int("nonUDT") ?? 0;
   usz start = i;
   Object* args = func.get("argsT")!!;
@@ -148,26 +185,8 @@ fn String clean_params_list(DString* buffer, Object* func, List(<String>)* callb
     }
 
     if (try ret = param.get_string("ret")) {
-      DString param_buffer;
-      param_buffer.temp_init();
-      DString ret_buffer;
-      ret_buffer.temp_init();
-      DString cb_buffer;
-      cb_buffer.temp_init();
-      DString cb_name_buffer;
-      cb_name_buffer.temp_init();
-
-      String ret_type = clean_type(&ret_buffer, ret);
-      String params = clean_params(&param_buffer, param.get_string("signature")!!.trim("()"));
-      cb_buffer.appendf("fn %s%s", ret_type, params);
-
-      to_pascal_case(&cb_name_buffer, func_name);
-      cb_name_buffer.append_chars("Callback");
-
-      if (callbacks != null) {
-        callbacks.push(string::new_format("def %s = %s;", cb_name_buffer.str_view(), cb_buffer.str_view()));
-      }
-      buffer.appendf("%s %s", cb_name_buffer.str_view(), param.get_string("name")!!);
+      make_callback_name(buffer, func, param);
+      buffer.appendf(" %s", param.get_string("name")!!);
     } else {
       DString type_buffer;
       type_buffer.temp_init();

@@ -137,56 +137,56 @@ struct DrawData {
 
 // ImGuiPlatformIO
 struct PlatformIO {
-  PlatformCreateWindowCallback platform_create_window;
-  PlatformDestroyWindowCallback platform_destroy_window;
-  PlatformShowWindowCallback platform_show_window;
-  PlatformSetWindowPosCallback platform_set_window_pos;
-  PlatformGetWindowPosCallback platform_get_window_pos;
-  PlatformSetWindowSizeCallback platform_set_window_size;
-  PlatformGetWindowSizeCallback platform_get_window_size;
-  PlatformSetWindowFocusCallback platform_set_window_focus;
-  PlatformGetWindowFocusCallback platform_get_window_focus;
-  PlatformGetWindowMinimizedCallback platform_get_window_minimized;
-  PlatformSetWindowTitleCallback platform_set_window_title;
-  PlatformSetWindowAlphaCallback platform_set_window_alpha;
-  PlatformUpdateWindowCallback platform_update_window;
-  PlatformRenderWindowCallback platform_render_window;
-  PlatformSwapBuffersCallback platform_swap_buffers;
-  PlatformGetWindowDpiScaleCallback platform_get_window_dpi_scale;
-  PlatformOnChangedViewportCallback platform_on_changed_viewport;
-  PlatformCreateVkSurfaceCallback platform_create_vk_surface;
-  RendererCreateWindowCallback renderer_create_window;
-  RendererDestroyWindowCallback renderer_destroy_window;
-  RendererSetWindowSizeCallback renderer_set_window_size;
-  RendererRenderWindowCallback renderer_render_window;
-  RendererSwapBuffersCallback renderer_swap_buffers;
+  PlatformCreateWindowFunc platform_create_window;
+  PlatformDestroyWindowFunc platform_destroy_window;
+  PlatformShowWindowFunc platform_show_window;
+  PlatformSetWindowPosFunc platform_set_window_pos;
+  PlatformGetWindowPosFunc platform_get_window_pos;
+  PlatformSetWindowSizeFunc platform_set_window_size;
+  PlatformGetWindowSizeFunc platform_get_window_size;
+  PlatformSetWindowFocusFunc platform_set_window_focus;
+  PlatformGetWindowFocusFunc platform_get_window_focus;
+  PlatformGetWindowMinimizedFunc platform_get_window_minimized;
+  PlatformSetWindowTitleFunc platform_set_window_title;
+  PlatformSetWindowAlphaFunc platform_set_window_alpha;
+  PlatformUpdateWindowFunc platform_update_window;
+  PlatformRenderWindowFunc platform_render_window;
+  PlatformSwapBuffersFunc platform_swap_buffers;
+  PlatformGetWindowDpiScaleFunc platform_get_window_dpi_scale;
+  PlatformOnChangedViewportFunc platform_on_changed_viewport;
+  PlatformCreateVkSurfaceFunc platform_create_vk_surface;
+  RendererCreateWindowFunc renderer_create_window;
+  RendererDestroyWindowFunc renderer_destroy_window;
+  RendererSetWindowSizeFunc renderer_set_window_size;
+  RendererRenderWindowFunc renderer_render_window;
+  RendererSwapBuffersFunc renderer_swap_buffers;
   vector::Vector(<PlatformMonitor>) monitors;
   vector::Vector(<Viewport*>) viewports;
 }
 
-def PlatformCreateWindowCallback = fn void(Viewport* vp);
-def PlatformDestroyWindowCallback = fn void(Viewport* vp);
-def PlatformShowWindowCallback = fn void(Viewport* vp);
-def PlatformSetWindowPosCallback = fn void(Viewport* vp, Vec2 pos);
-def PlatformGetWindowPosCallback = fn Vec2(Viewport* vp);
-def PlatformSetWindowSizeCallback = fn void(Viewport* vp, Vec2 size);
-def PlatformGetWindowSizeCallback = fn Vec2(Viewport* vp);
-def PlatformSetWindowFocusCallback = fn void(Viewport* vp);
-def PlatformGetWindowFocusCallback = fn bool(Viewport* vp);
-def PlatformGetWindowMinimizedCallback = fn bool(Viewport* vp);
-def PlatformSetWindowTitleCallback = fn void(Viewport* vp, ZString str);
-def PlatformSetWindowAlphaCallback = fn void(Viewport* vp, float alpha);
-def PlatformUpdateWindowCallback = fn void(Viewport* vp);
-def PlatformRenderWindowCallback = fn void(Viewport* vp, void* render_arg);
-def PlatformSwapBuffersCallback = fn void(Viewport* vp, void* render_arg);
-def PlatformGetWindowDpiScaleCallback = fn float(Viewport* vp);
-def PlatformOnChangedViewportCallback = fn void(Viewport* vp);
-def PlatformCreateVkSurfaceCallback = fn int(Viewport* vp, ImU64 vk_inst, void* vk_allocators, ImU64* out_vk_surface);
-def RendererCreateWindowCallback = fn void(Viewport* vp);
-def RendererDestroyWindowCallback = fn void(Viewport* vp);
-def RendererSetWindowSizeCallback = fn void(Viewport* vp, Vec2 size);
-def RendererRenderWindowCallback = fn void(Viewport* vp, void* render_arg);
-def RendererSwapBuffersCallback = fn void(Viewport* vp, void* render_arg);
+def PlatformCreateWindowFunc = fn void(Viewport* vp);
+def PlatformDestroyWindowFunc = fn void(Viewport* vp);
+def PlatformShowWindowFunc = fn void(Viewport* vp);
+def PlatformSetWindowPosFunc = fn void(Viewport* vp, Vec2 pos);
+def PlatformGetWindowPosFunc = fn Vec2(Viewport* vp);
+def PlatformSetWindowSizeFunc = fn void(Viewport* vp, Vec2 size);
+def PlatformGetWindowSizeFunc = fn Vec2(Viewport* vp);
+def PlatformSetWindowFocusFunc = fn void(Viewport* vp);
+def PlatformGetWindowFocusFunc = fn bool(Viewport* vp);
+def PlatformGetWindowMinimizedFunc = fn bool(Viewport* vp);
+def PlatformSetWindowTitleFunc = fn void(Viewport* vp, ZString str);
+def PlatformSetWindowAlphaFunc = fn void(Viewport* vp, float alpha);
+def PlatformUpdateWindowFunc = fn void(Viewport* vp);
+def PlatformRenderWindowFunc = fn void(Viewport* vp, void* render_arg);
+def PlatformSwapBuffersFunc = fn void(Viewport* vp, void* render_arg);
+def PlatformGetWindowDpiScaleFunc = fn float(Viewport* vp);
+def PlatformOnChangedViewportFunc = fn void(Viewport* vp);
+def PlatformCreateVkSurfaceFunc = fn int(Viewport* vp, ImU64 vk_inst, void* vk_allocators, ImU64* out_vk_surface);
+def RendererCreateWindowFunc = fn void(Viewport* vp);
+def RendererDestroyWindowFunc = fn void(Viewport* vp);
+def RendererSetWindowSizeFunc = fn void(Viewport* vp, Vec2 size);
+def RendererRenderWindowFunc = fn void(Viewport* vp, void* render_arg);
+def RendererSwapBuffersFunc = fn void(Viewport* vp, void* render_arg);
 
 // ImFontGlyph
 struct FontGlyph {
@@ -273,10 +273,10 @@ struct DrawCmd {
 // ImGuiSelectionExternalStorage
 struct SelectionExternalStorage {
   void* user_data;
-  AdapterSetItemSelectedCallback adapter_set_item_selected;
+  AdapterSetItemSelectedFunc adapter_set_item_selected;
 }
 
-def AdapterSetItemSelectedCallback = fn void(SelectionExternalStorage* self, int idx, bool selected);
+def AdapterSetItemSelectedFunc = fn void(SelectionExternalStorage* self, int idx, bool selected);
 
 // ImFontConfig
 struct FontConfig {
@@ -350,12 +350,12 @@ struct ImIO {
   void* backend_platform_user_data;
   void* backend_renderer_user_data;
   void* backend_language_user_data;
-  GetClipboardTextFnCallback get_clipboard_text_fn;
-  SetClipboardTextFnCallback set_clipboard_text_fn;
+  GetClipboardTextFnFunc get_clipboard_text_fn;
+  SetClipboardTextFnFunc set_clipboard_text_fn;
   void* clipboard_user_data;
-  PlatformOpenInShellFnCallback platform_open_in_shell_fn;
+  PlatformOpenInShellFnFunc platform_open_in_shell_fn;
   void* platform_open_in_shell_user_data;
-  PlatformSetImeDataFnCallback platform_set_ime_data_fn;
+  PlatformSetImeDataFnFunc platform_set_ime_data_fn;
   Wchar platform_locale_decimal_point;
   bool want_capture_mouse;
   bool want_capture_keyboard;
@@ -409,10 +409,10 @@ struct ImIO {
   vector::Vector(<Wchar>) input_queue_characters;
 }
 
-def GetClipboardTextFnCallback = fn ZString(void* user_data);
-def SetClipboardTextFnCallback = fn void(void* user_data, ZString text);
-def PlatformOpenInShellFnCallback = fn bool(void* ctx, ZString path);
-def PlatformSetImeDataFnCallback = fn void(void* ctx, Viewport* viewport, PlatformImeData* data);
+def GetClipboardTextFnFunc = fn ZString(void* user_data);
+def SetClipboardTextFnFunc = fn void(void* user_data, ZString text);
+def PlatformOpenInShellFnFunc = fn bool(void* ctx, ZString path);
+def PlatformSetImeDataFnFunc = fn void(void* ctx, Viewport* viewport, PlatformImeData* data);
 
 // ImDrawListSplitter
 struct DrawListSplitter {
@@ -492,12 +492,12 @@ struct SelectionBasicStorage {
   int size;
   bool preserve_order;
   void* user_data;
-  AdapterIndexToStorageIdCallback adapter_index_to_storage_id;
+  AdapterIndexToStorageIdFunc adapter_index_to_storage_id;
   int _selection_order;
   Storage _storage;
 }
 
-def AdapterIndexToStorageIdCallback = fn ImID(SelectionBasicStorage* self, int idx);
+def AdapterIndexToStorageIdFunc = fn ImID(SelectionBasicStorage* self, int idx);
 
 // ImGuiListClipper
 struct ListClipper {

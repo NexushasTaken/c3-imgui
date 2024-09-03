@@ -160,6 +160,13 @@ fn void init_typedef_names_map() @init {
   typedef_names_map.set("ImS64", "ImS64");
 }
 
+macro void @create_string_builder(File* output; @body(sb_name)) {
+  DString sb;
+  sb.temp_init();
+  defer io::fprintf(output, "%s", sb)!!;
+  @body(&sb);
+}
+
 fn usz String.count_chars(s, char needle) {
   usz count = 0;
   foreach (c : s) {
@@ -170,12 +177,11 @@ fn usz String.count_chars(s, char needle) {
   return count;
 }
 
-/**
- * @param [&out] ptr_count
- */
-fn String clean_ptr(String str, usz* ptr_count) {
+fn String clean_ptr(String str, usz* ptr_count = null) {
   if (try i = str.index_of_char('*')) {
-    *ptr_count = str.count_chars('*');
+    if (ptr_count != null) {
+      *ptr_count = str.count_chars('*');
+    }
     return str[:i];
   }
   return str;
