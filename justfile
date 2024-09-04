@@ -9,5 +9,6 @@ generate-cimgui: init
 build-cimgui: generate-cimgui
   make static -C cimgui
 
-cimgui-linux-x64: build-cimgui
-  mkdir -p ./linux-x64 && cp -vf ./cimgui/libcimgui.a ./linux-x64/libcimgui.a
+# see 'c3c --list-targets' for available targets
+build TARGET: build-cimgui
+  mkdir -p ./{{TARGET}} && cp -vf ./cimgui/libcimgui.a ./{{TARGET}}/libcimgui.a
