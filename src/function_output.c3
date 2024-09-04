@@ -286,10 +286,7 @@ fn String clean_params_list(DString* sb, Object* func, bool full = false) {
   return sb.str_view();
 }
 
-// TODO: redesign this function and clean_constant()
 fn void clean_value(DString* sb, String s, String type) {
-  io::printfn("'%s'", type);
-  // TODO: move this to string_utils?
   if (s == "NULL") {
     sb.append_chars(" = null");
   } else if (type == "bool") {
