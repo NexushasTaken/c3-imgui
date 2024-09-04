@@ -1,3 +1,5 @@
+module imgui;
+
 module imgui::vector(<Type>);
 // ImVector
 struct Vector {

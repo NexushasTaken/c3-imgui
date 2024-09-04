@@ -1,4 +1,5 @@
 module imgui;
+
 // ImDrawFlags_
 distinct DrawFlags = int;
 const DrawFlags DRAW_FLAGS_NONE                       = 0;

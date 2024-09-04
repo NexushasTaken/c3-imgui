@@ -1,4 +1,5 @@
 module imgui;
+
 def InputTextCallback = fn int(InputTextCallbackData* data);
 def MemFreeFunc = fn void(void* ptr, void* user_data);
 def MemAllocFunc = fn void*(usz sz, void* user_data);

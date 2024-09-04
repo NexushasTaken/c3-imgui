@@ -34,7 +34,7 @@ fn int main(String[] args) {
   output_structs(types_json, "structs.c3");
   output_templated_structs(types_json, "templated_structs.c3");
   output_typedefs(typedefs_json, "typedefs.c3");
-  output_functions(functions_json, "functions.c3");
+  output_functions(functions_json, "wrappers.c3", "imgui.c3i");
 
   return 0;
 }
@@ -62,7 +62,7 @@ fn void output_enums(Object* json_obj, String output_path) {
   File output = file::open(output_path, "w")!!;
   defer (void)output.close();
 
-  (void)io::fprintf(&output, "module %s;\n", IMGUI_MODULE_NAME);
+  output_header(&output);
 
   json_obj.get("enums")!!.map.@each(; String name, Object* values) {
     @start_string_builder(&output; DString* sb) {
@@ -133,6 +133,7 @@ fn void output_templated_structs(Object* json_obj, String output_path) {
   File output = file::open(output_path, "w")!!;
   defer (void)output.close();
 
+  output_header(&output);
   json_obj.get("templated_structs")!!.map.@each(; String name, Object* members) {
     if (catch blacklist_structs.get(name)) {
       @start_string_builder(&output; DString* sb) {
@@ -168,7 +169,7 @@ fn void output_structs(Object* json_obj, String output_path) {
   File output = file::open(output_path, "w")!!;
   defer (void)output.close();
 
-  (void)io::fprintf(&output, "module %s;\n", IMGUI_MODULE_NAME);
+  output_header(&output);
 
   json_obj.get("structs")!!.map.@each(; String name, Object* members) {
     if (try loc = json_obj.get("locations")!!.get(name) && !loc.s.starts_with("imgui_internal") && !loc.s.starts_with("imstb_textedit")) {
@@ -274,7 +275,7 @@ fn void output_typedefs(Object* json_obj, String output_path) {
     }
   );
 
-  (void)io::fprintf(&output, "module %s;\n", IMGUI_MODULE_NAME);
+  output_header(&output);
 
   foreach (typedef : typedefs) {
     @start_string_builder(&output; DString* sb) {

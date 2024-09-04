@@ -1,4 +1,5 @@
 module imgui;
+
 extern fn ZString table_get_column_name(int column_n = -1) @extern("igTableGetColumnName");
 
 extern fn void igGetMousePos(Vec2* pOut) @extern("igGetMousePos") @local;

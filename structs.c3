@@ -1,4 +1,5 @@
 module imgui;
+
 // ImGuiTableSortSpecs
 struct TableSortSpecs {
 	TableColumnSortSpecs* specs;

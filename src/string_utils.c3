@@ -4,6 +4,7 @@ import std::ascii;
 import std::collections::map;
 import std::collections::list;
 import std::collections::object;
+import std::io::file;
 
 HashMap(<String, String>) type_map;
 HashMap(<String, int>) blacklist_structs;
@@ -320,6 +321,9 @@ fn void clean_value(DString* sb, String s, String type) {
   }
 }
 
+fn void output_header(File* output) {
+  io::fprintf(output, "module %s;\n\n", IMGUI_MODULE_NAME)!!;
+}
 
 fn void test_clean_ptr() @test {
   io::printn();
