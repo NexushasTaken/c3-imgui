@@ -862,7 +862,7 @@ fn Vec2 get_window_pos() @inline {
 
 extern fn void set_next_window_bg_alpha(float alpha) @extern("igSetNextWindowBgAlpha");
 
-extern fn void imColorHsv(Color* pOut, float h, float s, float v, float a = 1.0f) @extern("ImColor_HSV");
+extern fn void imColorHsv(Color* pOut, float h, float s, float v, float a = 1.0f) @extern("ImColor_HSV") @local;
 fn Color color_hsv(float h, float s, float v, float a = 1.0f) @inline {
 	Color pOut;
 	imColorHsv(&pOut, h, s, v, a);
@@ -975,14 +975,14 @@ extern fn void DrawList.channels_split(DrawList* self, int count) @extern("ImDra
 
 extern fn DrawList* DrawList.clone_output(DrawList* self) @extern("ImDrawList_CloneOutput");
 
-extern fn void imDrawListGetClipRectMax(Vec2* pOut, DrawList* self) @extern("ImDrawList_GetClipRectMax");
+extern fn void imDrawListGetClipRectMax(Vec2* pOut, DrawList* self) @extern("ImDrawList_GetClipRectMax") @local;
 fn Vec2 DrawList.get_clip_rect_max(DrawList* self) @inline {
 	Vec2 pOut;
 	imDrawListGetClipRectMax(&pOut, self);
 	return pOut;
 }
 
-extern fn void imDrawListGetClipRectMin(Vec2* pOut, DrawList* self) @extern("ImDrawList_GetClipRectMin");
+extern fn void imDrawListGetClipRectMin(Vec2* pOut, DrawList* self) @extern("ImDrawList_GetClipRectMin") @local;
 fn Vec2 DrawList.get_clip_rect_min(DrawList* self) @inline {
 	Vec2 pOut;
 	imDrawListGetClipRectMin(&pOut, self);
@@ -1161,7 +1161,7 @@ extern fn void Font.add_remap_char(Font* self, Wchar dst, Wchar src, bool overwr
 
 extern fn void Font.build_lookup_table(Font* self) @extern("ImFont_BuildLookupTable");
 
-extern fn void imFontCalcTextSizeA(Vec2* pOut, Font* self, float size, float max_width, float wrap_width, ZString text_begin, ZString text_end = null, ZString remaining = null) @extern("ImFont_CalcTextSizeA");
+extern fn void imFontCalcTextSizeA(Vec2* pOut, Font* self, float size, float max_width, float wrap_width, ZString text_begin, ZString text_end = null, ZString remaining = null) @extern("ImFont_CalcTextSizeA") @local;
 fn Vec2 Font.calc_text_size_a(Font* self, float size, float max_width, float wrap_width, ZString text_begin, ZString text_end = null, ZString remaining = null) @inline {
 	Vec2 pOut;
 	imFontCalcTextSizeA(&pOut, self, size, max_width, wrap_width, text_begin, text_end, remaining);
@@ -1410,14 +1410,14 @@ extern fn bool TextRange.empty(TextRange* self) @extern("ImGuiTextRange_empty");
 
 extern fn void TextRange.split(TextRange* self, char separator, vector::Vector(<TextRange>)* out) @extern("ImGuiTextRange_split");
 
-extern fn void imGuiViewportGetCenter(Vec2* pOut, Viewport* self) @extern("ImGuiViewport_GetCenter");
+extern fn void imGuiViewportGetCenter(Vec2* pOut, Viewport* self) @extern("ImGuiViewport_GetCenter") @local;
 fn Vec2 Viewport.get_center(Viewport* self) @inline {
 	Vec2 pOut;
 	imGuiViewportGetCenter(&pOut, self);
 	return pOut;
 }
 
-extern fn void imGuiViewportGetWorkCenter(Vec2* pOut, Viewport* self) @extern("ImGuiViewport_GetWorkCenter");
+extern fn void imGuiViewportGetWorkCenter(Vec2* pOut, Viewport* self) @extern("ImGuiViewport_GetWorkCenter") @local;
 fn Vec2 Viewport.get_work_center(Viewport* self) @inline {
 	Vec2 pOut;
 	imGuiViewportGetWorkCenter(&pOut, self);

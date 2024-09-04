@@ -181,15 +181,15 @@ fn void output_struct_func(File* output, List(<Object*>) funcs) {
           to_camel_case(sb, func.get_string("ov_cimguiname")!!);
           sb.appendf("(");
           clean_params_list(sb, func, true);
-          sb.appendf(") @extern(\"%s\");\n", func.get_string("ov_cimguiname")!!);
+          sb.appendf(") @extern(\"%s\") @local;\n", func.get_string("ov_cimguiname")!!);
 
           assert(func.has_key("argsT"));
           Object* first_param = func.get("argsT").get_at(0)!!;
           { // Checks
+            assert(first_param.get_string("name")!! == "pOut");
             usz ptr_count = 0;
             clean_ptr(first_param.get_string("type")!!, &ptr_count);
             assert(ptr_count == 1);
-            assert(first_param.get_string("name")!! == "pOut");
           }
           sb.appendf("fn ");
           clean_type(sb, clean_ptr(first_param.get_string("type")!!));
