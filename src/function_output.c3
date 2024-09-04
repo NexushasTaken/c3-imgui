@@ -36,18 +36,20 @@ fn void output_functions(Object* json_obj, String output_path, String interface_
 
   output_header(&output);
   output_header(&output_interface);
-  output_imgui_func(&output, imgui_funcs);
-  output_struct_func(&output, struct_funcs);
+  output_imgui_func(&output, &output_interface, imgui_funcs);
+  output_struct_func(&output, &output_interface, struct_funcs);
 }
 
-fn void output_imgui_func(File* output, List(<Object*>) funcs) {
+fn void output_imgui_func(File* output, File* output_interface, List(<Object*>) funcs) {
   foreach (func : funcs) {
-    @start_string_builder(output; DString* sb) {
-      List(<String>) callbacks;
-
-      if (try udt_val = func.get_int("nonUDT")) {
+    if (try udt_val = func.get_int("nonUDT")) {
+      @start_string_builder(output; DString* sb) {
         make_non_udt_function(sb, func);
-      } else {
+        output_callbacks(sb, func);
+        sb.appendf("\n")!!;
+      };
+    } else {
+      @start_string_builder(output_interface; DString* sb) {
         sb.appendf("extern fn ");
         clean_type(sb, func.get_string("ret")!!);
         sb.appendf(" ");
@@ -55,34 +57,33 @@ fn void output_imgui_func(File* output, List(<Object*>) funcs) {
         sb.appendf("(");
         clean_params_list(sb, func);
         sb.appendf(") @extern(\"%s\");\n", func.get_string("ov_cimguiname")!!)!!;
-      }
-
-      output_callbacks(sb, func);
-      sb.appendf("\n")!!;
-    };
+        output_callbacks(sb, func);
+        sb.appendf("\n")!!;
+      };
+    }
   }
   output.flush()!!;
 }
 
-fn void output_struct_func(File* output, List(<Object*>) funcs) {
+fn void output_struct_func(File* output, File* output_interface, List(<Object*>) funcs) {
   HashMap(<String, List(<Object*>)>) struct_funcs;
 
   sort::quicksort(funcs);
 
   foreach (func : funcs) {
-    @start_string_builder(output; DString* sb) {
-      assert(func.get_string("ov_cimguiname")!!.starts_with(func.get_string("stname")!!));
-      String struct_name = func.get_string("stname")!!;
-      String method_name_raw = func.get_string("ov_cimguiname")!!.strip(struct_name).strip("_");
-      String overload_name = func.get_string("ov_cimguiname")!!;
+    assert(func.get_string("ov_cimguiname")!!.starts_with(func.get_string("stname")!!));
+    String struct_name = func.get_string("stname")!!;
+    String method_name_raw = func.get_string("ov_cimguiname")!!.strip(struct_name).strip("_");
+    String overload_name = func.get_string("ov_cimguiname")!!;
 
-      DString method_name;
-      method_name.temp_init();
-      DString return_type;
-      return_type.temp_init();
-      DString param_list;
-      param_list.temp_init();
+    DString method_name;
+    method_name.temp_init();
+    DString return_type;
+    return_type.temp_init();
+    DString param_list;
+    param_list.temp_init();
 
+    @start_string_builder(output_interface; DString* sb) {
       if (try ctor = func.get_bool("constructor")) {
         assert(!func.has_key("ret"));
         sb.appendf("extern fn ");
@@ -95,6 +96,7 @@ fn void output_struct_func(File* output, List(<Object*>) funcs) {
         clean_params_list(sb, func, true);
         sb.appendf(") @extern(\"%s\");\n", func.get_string("ov_cimguiname")!!);
 
+        output_callbacks(sb, func);
         sb.appendf("\n");
       } else if (try dtor = func.get_bool("destructor")) {
         assert(func.get_string("ret")!! == "void");
@@ -104,12 +106,17 @@ fn void output_struct_func(File* output, List(<Object*>) funcs) {
         clean_params_list(sb, func, true);
         sb.appendf(") @extern(\"%s\");\n", func.get_string("ov_cimguiname")!!);
 
+        output_callbacks(sb, func);
         sb.appendf("\n");
       } else if (try ret = func.get_string("ret")) {
         assert(func.has_key("ret"));
         if (try func.get_int("nonUDT")) {
-          make_non_udt_function(sb, func);
-          sb.appendf("\n");
+          @start_string_builder(output; DString* sb_udt) {
+            make_non_udt_function(sb_udt, func);
+
+            output_callbacks(sb_udt, func);
+            sb_udt.appendf("\n");
+          };
         } else {
           assert(func.has_key("ret"));
           sb.appendf("extern fn ");
@@ -121,6 +128,8 @@ fn void output_struct_func(File* output, List(<Object*>) funcs) {
           sb.appendf("(");
           clean_params_list(sb, func, true);
           sb.appendf(") @extern(\"%s\");\n", func.get_string("ov_cimguiname")!!);
+
+          output_callbacks(sb, func);
           sb.appendf("\n");
         }
       } else {
