@@ -282,6 +282,18 @@ fn String clean_field(String field, String enum_name) {
   return clean_imgui(field);
 }
 
+fn DString* clean_arguments(DString* sb, String args, String prefix = "") {
+  args = args.trim("()");
+  sb.appendf("%s", prefix);
+  foreach (idx, arg : args.split(",")) {
+    if (idx != 0) {
+      sb.appendf(", ");
+    }
+    sb.appendf("%s", arg);
+  }
+  return sb;
+}
+
 fn void test_clean_ptr() @test {
   io::printn();
   usz p = 0;

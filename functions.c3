@@ -500,7 +500,7 @@ extern fn bool slider_scalar(ZString label, DataType data_type, void* p_data, vo
 
 extern fn void set_next_window_collapsed(bool collapsed, Cond cond = 0) @extern("igSetNextWindowCollapsed");
 
-extern fn bool input_double(ZString label, double* v, double step = 0.000000, double step_fast = 0.000000, ZString format = "%.6f", InputTextFlags flags = 0) @extern("igInputDouble");
+extern fn bool input_double(ZString label, double* v, double step = 0.0, double step_fast = 0.0, ZString format = "%.6f", InputTextFlags flags = 0) @extern("igInputDouble");
 
 extern fn bool is_any_mouse_down() @extern("igIsAnyMouseDown");
 
@@ -735,7 +735,7 @@ extern fn void separator_text(ZString label) @extern("igSeparatorText");
 
 extern fn void set_next_item_shortcut(KeyChord key_chord, InputFlags flags = 0) @extern("igSetNextItemShortcut");
 
-extern fn void progress_bar(float fraction, Vec2 size_arg = {-float.min, 0}, ZString overlay = null) @extern("igProgressBar");
+extern fn void progress_bar(float fraction, Vec2 size_arg = {-FLT_MIN, 0}, ZString overlay = null) @extern("igProgressBar");
 
 extern fn void pop_style_color(int count = 1) @extern("igPopStyleColor");
 
@@ -1390,7 +1390,7 @@ extern fn void TextFilter.build(TextFilter* self) @extern("ImGuiTextFilter_Build
 
 extern fn void TextFilter.clear(TextFilter* self) @extern("ImGuiTextFilter_Clear");
 
-extern fn bool TextFilter.draw(TextFilter* self, ZString label = Filter(inc,-exc), float width = 0.0f) @extern("ImGuiTextFilter_Draw");
+extern fn bool TextFilter.draw(TextFilter* self, ZString label = "Filter(inc,-exc)", float width = 0.0f) @extern("ImGuiTextFilter_Draw");
 
 extern fn TextFilter* new_text_filter(ZString default_filter = "") @extern("ImGuiTextFilter_ImGuiTextFilter");
 

@@ -216,9 +216,7 @@ fn DString* make_non_udt_function(DString* sb, Object* func) {
     sb.appendf(", self");
   }
   if (func.get_string("call_args")!! != "()") {
-    foreach (idx, arg : func.get_string("call_args")!!.trim("()").split(",")) {
-      sb.appendf(", %s", arg);
-    }
+    clean_arguments(sb, func.get_string("call_args")!!, ", ");
   }
   sb.appendf(");\n\t");
 
@@ -275,10 +273,12 @@ fn String clean_params_list(DString* sb, Object* func, bool full = false) {
       if (param.get_string("type")!! == "...") {
         sb.appendf("...");
       } else {
+        usz start_idx = sb.len();
         clean_type(sb, param.get_string("type")!!);
+        usz end_idx = sb.len()-1;
         sb.appendf(" %s", param.get_string("name")!!);
         if (try default_value = func.get("defaults")!!.get(param.get_string("name")!!)) {
-          clean_value(sb, default_value.s);
+          clean_value(sb, default_value.s, sb.str_view()[start_idx..end_idx]);
         }
       }
     }
@@ -287,41 +287,31 @@ fn String clean_params_list(DString* sb, Object* func, bool full = false) {
 }
 
 // TODO: redesign this function and clean_constant()
-fn void clean_value(DString* sb, String s) {
-  DString temp;
-  temp.temp_init();
+fn void clean_value(DString* sb, String s, String type) {
+  io::printfn("'%s'", type);
   // TODO: move this to string_utils?
   if (s == "NULL") {
-    temp.append_chars(" = null");
-  } else if (s == "true" || s == "false") {
-    temp.appendf(" = %s", s);
+    sb.append_chars(" = null");
+  } else if (type == "bool") {
+    sb.appendf(" = %s", s);
   } else if (s.starts_with("sizeof")) {
-    temp.appendf(" = %s.sizeof", s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1]);
-  } else if (s.starts_with("ImVec")) {
-    temp.appendf(" = {");
-    foreach (idx, v : s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1].split(",")) {
-      if (idx != 0) {
-        temp.appendf(", ");
-      }
-      temp.appendf("%s", v);
-    }
-    temp.appendf("}");
-  } else if (s.starts_with("%")) {
-    temp.appendf(" = \"%s\"", s);
-  } else if (s.ends_with("f")) {
-    temp.appendf(" = %s", s);
-  } else if (try value = s.to_long()) { // TODO: is 'long' type enough?. make sure it will not convert floating point
-    temp.appendf(" = %d", value);
-  } else if (try value = s.to_double()) {
-    temp.appendf(" = %f", value);
-  } else if (s.len == 0){
-    temp.appendf(" = \"\"");
+    sb.appendf(" = %s.sizeof", s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1]);
+  } else if (type.starts_with("Vec")) {
+    sb.appendf(" = {");
+    clean_arguments(sb, s[s.index_of_char('(')!!..s.index_of_char(')')!!]);
+    sb.appendf("}");
+  } else if (type == "ZString") {
+    sb.appendf(" = \"%s\"", s);
+  } else if (try s.to_float() && type == "float") {
+    sb.appendf(" = %s", s);
+  } else if (type == "float" && s.starts_with("FLT_")) {
+    sb.appendf(" = %s", s == "FLT_MAX" ? "float.max" : "float.min");
+  } else if (try s.to_double() && type == "double") {
+    sb.appendf(" = %s", s);
+  } else if (try s.to_int128()) {
+    sb.appendf(" = %s", s);
   } else {
-    temp.appendf(" = %s", s);
+    unreachable("[clean_value]: unhandled case %s -> %s", type, s);
   }
-
-  temp.replace("FLT_MIN", "float.min");
-  temp.replace("FLT_MAX", "float.max");
-  sb.append_string(temp);
 }
 
