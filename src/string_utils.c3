@@ -294,6 +294,33 @@ fn DString* clean_arguments(DString* sb, String args, String prefix = "") {
   return sb;
 }
 
+fn void clean_value(DString* sb, String s, String type) {
+  if (s == "NULL") {
+    sb.append_chars("null");
+  } else if (type == "bool") {
+    sb.appendf("%s", s);
+  } else if (s.starts_with("sizeof")) {
+    sb.appendf("%s.sizeof", s[s.index_of_char('(')!!+1..s.index_of_char(')')!!-1]);
+  } else if (type.starts_with("Vec")) {
+    sb.appendf("{");
+    clean_arguments(sb, s[s.index_of_char('(')!!..s.index_of_char(')')!!]);
+    sb.appendf("}");
+  } else if (type == "ZString") {
+    sb.appendf("\"%s\"", s);
+  } else if (try s.to_float() && type == "float") {
+    sb.appendf("%s", s);
+  } else if (type == "float" && s.starts_with("FLT_")) {
+    sb.appendf("%s", s == "FLT_MAX" ? "float.max" : "float.min");
+  } else if (try s.to_double() && type == "double") {
+    sb.appendf("%s", s);
+  } else if (try s.to_int128()) {
+    sb.appendf("%s", s);
+  } else {
+    unreachable("[clean_value]: unhandled case %s -> %s", type, s);
+  }
+}
+
+
 fn void test_clean_ptr() @test {
   io::printn();
   usz p = 0;
