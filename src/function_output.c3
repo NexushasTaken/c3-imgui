@@ -51,10 +51,10 @@ fn void output_functions(Object* json_obj, String output_path) {
       assert(func.has_key("stname"));
       if (!func.get_string("args")!!.contains("va_list")) {
         String stname = func.get_string("stname")!!.trim();
-        if (stname.len > 0) {
-          struct_funcs.push(func);
-        } else {
+        if (stname.len == 0) {
           imgui_funcs.push(func);
+        } else if (!func.has_key("templated")) {
+          struct_funcs.push(func);
         }
       }
     }
@@ -62,7 +62,7 @@ fn void output_functions(Object* json_obj, String output_path) {
 
   (void)io::fprintf(&output, "module %s;\n", IMGUI_MODULE_NAME);
   output_imgui_func(&output, imgui_funcs);
-  //output_struct_func(&output, struct_funcs);
+  output_struct_func(&output, struct_funcs);
 }
 
 fn void output_imgui_func(File* output, List(<Object*>) funcs) {
@@ -95,7 +95,7 @@ fn void output_imgui_func(File* output, List(<Object*>) funcs) {
         sb.appendf("fn ");
         clean_type(sb, clean_ptr(first_param.get_string("type")!!)); // return type
         sb.appendf(" ");
-        to_snake_case(sb, func.get_string("ov_cimguiname")!!.strip("ig"));
+        to_snake_case(sb, func.get_string("ov_cimguiname")!!.strip("ig"), false);
         sb.appendf("(");
         clean_params_list(sb, func);
         sb.appendf(") @inline {\n\t");
@@ -128,13 +128,119 @@ fn void output_imgui_func(File* output, List(<Object*>) funcs) {
       sb.appendf("\n")!!;
     };
   }
+  output.flush()!!;
 }
 
-fn void output_struct_func(List(<Object*>) funcs) {
+fn void output_struct_func(File* output, List(<Object*>) funcs) {
   HashMap(<String, List(<Object*>)>) struct_funcs;
 
+  sort::quicksort(funcs);
+
   foreach (func : funcs) {
-    io::printfn("%s", func.get_string("cimguiname")!!);
+    @start_string_builder(output; DString* sb) {
+      assert(func.get_string("ov_cimguiname")!!.starts_with(func.get_string("stname")!!));
+      String struct_name = func.get_string("stname")!!;
+      String method_name_raw = func.get_string("ov_cimguiname")!!.strip(struct_name).strip("_");
+      String overload_name = func.get_string("ov_cimguiname")!!;
+
+      DString method_name;
+      method_name.temp_init();
+      DString return_type;
+      return_type.temp_init();
+      DString param_list;
+      param_list.temp_init();
+
+      if (try ctor = func.get_bool("constructor")) {
+        assert(!func.has_key("ret"));
+        sb.appendf("extern fn ");
+        clean_type(sb, func.get_string("stname")!!);
+        sb.appendf("* ");
+        sb.appendf("new_");
+        usz name_len = func.get_string("stname")!!.len;
+        to_snake_case(sb, clean_imgui(func.get_string("ov_cimguiname")!![name_len+1..]).strip_end("_Nil"));
+        sb.appendf("(");
+        clean_params_list(sb, func, true);
+        sb.appendf(") @extern(\"%s\");\n", func.get_string("ov_cimguiname")!!);
+
+        sb.appendf("\n");
+      } else if (try dtor = func.get_bool("destructor")) {
+        assert(func.get_string("ret")!! == "void");
+        sb.appendf("extern fn void ");
+        clean_type(sb, func.get_string("stname")!!);
+        sb.appendf(".destroy("); // method name
+        clean_params_list(sb, func, true);
+        sb.appendf(") @extern(\"%s\");\n", func.get_string("ov_cimguiname")!!);
+
+        sb.appendf("\n");
+      } else if (try ret = func.get_string("ret")) {
+        assert(func.has_key("ret"));
+        if (try func.get_int("nonUDT")) {
+          sb.appendf("extern fn ");
+          clean_type(sb, func.get_string("ret")!!);
+          sb.appendf(" ");
+          to_camel_case(sb, func.get_string("ov_cimguiname")!!);
+          sb.appendf("(");
+          clean_params_list(sb, func, true);
+          sb.appendf(") @extern(\"%s\");\n", func.get_string("ov_cimguiname")!!);
+
+          assert(func.has_key("argsT"));
+          Object* first_param = func.get("argsT").get_at(0)!!;
+          { // Checks
+            usz ptr_count = 0;
+            clean_ptr(first_param.get_string("type")!!, &ptr_count);
+            assert(ptr_count == 1);
+            assert(first_param.get_string("name")!! == "pOut");
+          }
+          sb.appendf("fn ");
+          clean_type(sb, clean_ptr(first_param.get_string("type")!!));
+          sb.appendf(" ");
+          if (try func.get_bool("is_static_function")) {
+            to_snake_case(sb, clean_imgui(func.get_string("ov_cimguiname")!!));
+          } else {
+            clean_type(sb, func.get_string("stname")!!);
+            sb.appendf("."); // method name
+            to_snake_case(sb, func.get_string("ov_cimguiname")!![func.get_string("stname")!!.len..]);
+          }
+          sb.appendf("(");
+          clean_params_list(sb, func);
+          sb.appendf(") @inline {\n\t");
+          clean_type(sb, clean_ptr(first_param.get_string("type")!!));
+          sb.appendf(" ");
+          sb.appendf("%s", first_param.get_string("name")!!);
+          sb.appendf(";\n\t");
+          to_camel_case(sb, func.get_string("ov_cimguiname")!!);
+          sb.appendf("(&");
+          sb.appendf("%s", first_param.get_string("name")!!);
+          if (!func.has_key("is_static_function")) {
+            sb.appendf(", self");
+          }
+          if (func.get_string("call_args")!! != "()") {
+            foreach (idx, arg : func.get_string("call_args")!!.trim("()").split(",")) {
+              sb.appendf(", ", arg);
+              sb.appendf("%s", arg);
+            }
+          }
+          sb.appendf(");\n\t");
+          sb.appendf("return %s;", first_param.get_string("name")!!);
+          sb.appendf("\n}\n");
+          sb.appendf("\n");
+        } else {
+          assert(func.has_key("ret"));
+          sb.appendf("extern fn ");
+          clean_type(sb, func.get_string("ret")!!);
+          sb.appendf(" ");
+          clean_type(sb, func.get_string("stname")!!);
+          sb.appendf("."); // method name
+          to_snake_case(sb, func.get_string("ov_cimguiname")!![func.get_string("stname")!!.len..]);
+          sb.appendf("(");
+          clean_params_list(sb, func, true);
+          sb.appendf(") @extern(\"%s\");\n", func.get_string("ov_cimguiname")!!);
+          sb.appendf("\n");
+        }
+      } else {
+        unreachable("HERE: why this '%s' no return type?\n", func.get_string("ov_cimguiname")!!);
+      }
+    };
   }
 }
 
@@ -224,6 +330,8 @@ fn void clean_value(DString* sb, String s) {
     temp.appendf(" = %d", value);
   } else if (try value = s.to_double()) {
     temp.appendf(" = %f", value);
+  } else if (s.len == 0){
+    temp.appendf(" = \"\"");
   } else {
     temp.appendf(" = %s", s);
   }

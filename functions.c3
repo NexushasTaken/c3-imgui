@@ -117,13 +117,13 @@ extern fn void show_about_window(bool* p_open = null) @extern("igShowAboutWindow
 
 extern fn void render_platform_windows_default(void* platform_render_arg = null, void* renderer_render_arg = null) @extern("igRenderPlatformWindowsDefault");
 
-extern fn void push_i_d__str(ZString str_id) @extern("igPushID_Str");
+extern fn void push_id_str(ZString str_id) @extern("igPushID_Str");
 
-extern fn void push_i_d__str_str(ZString str_id_begin, ZString str_id_end) @extern("igPushID_StrStr");
+extern fn void push_id_str_str(ZString str_id_begin, ZString str_id_end) @extern("igPushID_StrStr");
 
-extern fn void push_i_d__ptr(void* ptr_id) @extern("igPushID_Ptr");
+extern fn void push_id_ptr(void* ptr_id) @extern("igPushID_Ptr");
 
-extern fn void push_i_d__int(int int_id) @extern("igPushID_Int");
+extern fn void push_id_int(int int_id) @extern("igPushID_Int");
 
 extern fn void igGetFontTexUvWhitePixel(Vec2* pOut) @extern("igGetFontTexUvWhitePixel") @local;
 fn Vec2 get_font_tex_uv_white_pixel() @inline {
@@ -279,13 +279,13 @@ extern fn void set_next_item_allow_overlap() @extern("igSetNextItemAllowOverlap"
 
 extern fn bool image_button(ZString str_id, TextureID user_texture_id, Vec2 image_size, Vec2 uv0 = {0, 0}, Vec2 uv1 = {1, 1}, Vec4 bg_col = {0, 0, 0, 0}, Vec4 tint_col = {1, 1, 1, 1}) @extern("igImageButton");
 
-extern fn ImID get_i_d__str(ZString str_id) @extern("igGetID_Str");
+extern fn ImID get_id_str(ZString str_id) @extern("igGetID_Str");
 
-extern fn ImID get_i_d__str_str(ZString str_id_begin, ZString str_id_end) @extern("igGetID_StrStr");
+extern fn ImID get_id_str_str(ZString str_id_begin, ZString str_id_end) @extern("igGetID_StrStr");
 
-extern fn ImID get_i_d__ptr(void* ptr_id) @extern("igGetID_Ptr");
+extern fn ImID get_id_ptr(void* ptr_id) @extern("igGetID_Ptr");
 
-extern fn ImID get_i_d__int(int int_id) @extern("igGetID_Int");
+extern fn ImID get_id_int(int int_id) @extern("igGetID_Int");
 
 extern fn float get_scroll_y() @extern("igGetScrollY");
 
@@ -861,4 +861,586 @@ fn Vec2 get_window_pos() @inline {
 }
 
 extern fn void set_next_window_bg_alpha(float alpha) @extern("igSetNextWindowBgAlpha");
+
+extern fn void imColorHsv(Color* pOut, float h, float s, float v, float a = 1.0f) @extern("ImColor_HSV");
+fn Color color_hsv(float h, float s, float v, float a = 1.0f) @inline {
+	Color pOut;
+	imColorHsv(&pOut, h, s, v, a);
+	return pOut;
+}
+
+extern fn Color* new_color() @extern("ImColor_ImColor_Nil");
+
+extern fn Color* new_color_float(float r, float g, float b, float a = 1.0f) @extern("ImColor_ImColor_Float");
+
+extern fn Color* new_color_vec4(Vec4 col) @extern("ImColor_ImColor_Vec4");
+
+extern fn Color* new_color_int(int r, int g, int b, int a = 255) @extern("ImColor_ImColor_Int");
+
+extern fn Color* new_color_u32(ImU32 rgba) @extern("ImColor_ImColor_U32");
+
+extern fn void Color.set_hsv(Color* self, float h, float s, float v, float a = 1.0f) @extern("ImColor_SetHSV");
+
+extern fn void Color.destroy(Color* self) @extern("ImColor_destroy");
+
+extern fn TextureID DrawCmd.get_tex_id(DrawCmd* self) @extern("ImDrawCmd_GetTexID");
+
+extern fn DrawCmd* new_draw_cmd() @extern("ImDrawCmd_ImDrawCmd");
+
+extern fn void DrawCmd.destroy(DrawCmd* self) @extern("ImDrawCmd_destroy");
+
+extern fn void DrawData.add_draw_list(DrawData* self, DrawList* draw_list) @extern("ImDrawData_AddDrawList");
+
+extern fn void DrawData.clear(DrawData* self) @extern("ImDrawData_Clear");
+
+extern fn void DrawData.de_index_all_buffers(DrawData* self) @extern("ImDrawData_DeIndexAllBuffers");
+
+extern fn DrawData* new_draw_data() @extern("ImDrawData_ImDrawData");
+
+extern fn void DrawData.scale_clip_rects(DrawData* self, Vec2 fb_scale) @extern("ImDrawData_ScaleClipRects");
+
+extern fn void DrawData.destroy(DrawData* self) @extern("ImDrawData_destroy");
+
+extern fn void DrawList.add_concave_poly_filled(DrawList* self, Vec2* points, int num_points, ImU32 col) @extern("ImDrawList_AddConcavePolyFilled");
+
+extern fn void DrawListSplitter.clear(DrawListSplitter* self) @extern("ImDrawListSplitter_Clear");
+
+extern fn void DrawListSplitter.clear_free_memory(DrawListSplitter* self) @extern("ImDrawListSplitter_ClearFreeMemory");
+
+extern fn DrawListSplitter* new_draw_list_splitter() @extern("ImDrawListSplitter_ImDrawListSplitter");
+
+extern fn void DrawListSplitter.merge(DrawListSplitter* self, DrawList* draw_list) @extern("ImDrawListSplitter_Merge");
+
+extern fn void DrawListSplitter.set_current_channel(DrawListSplitter* self, DrawList* draw_list, int channel_idx) @extern("ImDrawListSplitter_SetCurrentChannel");
+
+extern fn void DrawListSplitter.split(DrawListSplitter* self, DrawList* draw_list, int count) @extern("ImDrawListSplitter_Split");
+
+extern fn void DrawListSplitter.destroy(DrawListSplitter* self) @extern("ImDrawListSplitter_destroy");
+
+extern fn void DrawList.add_bezier_cubic(DrawList* self, Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, ImU32 col, float thickness, int num_segments = 0) @extern("ImDrawList_AddBezierCubic");
+
+extern fn void DrawList.add_bezier_quadratic(DrawList* self, Vec2 p1, Vec2 p2, Vec2 p3, ImU32 col, float thickness, int num_segments = 0) @extern("ImDrawList_AddBezierQuadratic");
+
+extern fn void DrawList.add_callback(DrawList* self, DrawCallback callback, void* callback_data) @extern("ImDrawList_AddCallback");
+
+extern fn void DrawList.add_circle(DrawList* self, Vec2 center, float radius, ImU32 col, int num_segments = 0, float thickness = 1.0f) @extern("ImDrawList_AddCircle");
+
+extern fn void DrawList.add_circle_filled(DrawList* self, Vec2 center, float radius, ImU32 col, int num_segments = 0) @extern("ImDrawList_AddCircleFilled");
+
+extern fn void DrawList.add_convex_poly_filled(DrawList* self, Vec2* points, int num_points, ImU32 col) @extern("ImDrawList_AddConvexPolyFilled");
+
+extern fn void DrawList.add_draw_cmd(DrawList* self) @extern("ImDrawList_AddDrawCmd");
+
+extern fn void DrawList.add_ellipse(DrawList* self, Vec2 center, Vec2 radius, ImU32 col, float rot = 0.0f, int num_segments = 0, float thickness = 1.0f) @extern("ImDrawList_AddEllipse");
+
+extern fn void DrawList.add_ellipse_filled(DrawList* self, Vec2 center, Vec2 radius, ImU32 col, float rot = 0.0f, int num_segments = 0) @extern("ImDrawList_AddEllipseFilled");
+
+extern fn void DrawList.add_image(DrawList* self, TextureID user_texture_id, Vec2 p_min, Vec2 p_max, Vec2 uv_min = {0, 0}, Vec2 uv_max = {1, 1}, ImU32 col = 4294967295) @extern("ImDrawList_AddImage");
+
+extern fn void DrawList.add_image_quad(DrawList* self, TextureID user_texture_id, Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, Vec2 uv1 = {0, 0}, Vec2 uv2 = {1, 0}, Vec2 uv3 = {1, 1}, Vec2 uv4 = {0, 1}, ImU32 col = 4294967295) @extern("ImDrawList_AddImageQuad");
+
+extern fn void DrawList.add_image_rounded(DrawList* self, TextureID user_texture_id, Vec2 p_min, Vec2 p_max, Vec2 uv_min, Vec2 uv_max, ImU32 col, float rounding, DrawFlags flags = 0) @extern("ImDrawList_AddImageRounded");
+
+extern fn void DrawList.add_line(DrawList* self, Vec2 p1, Vec2 p2, ImU32 col, float thickness = 1.0f) @extern("ImDrawList_AddLine");
+
+extern fn void DrawList.add_ngon(DrawList* self, Vec2 center, float radius, ImU32 col, int num_segments, float thickness = 1.0f) @extern("ImDrawList_AddNgon");
+
+extern fn void DrawList.add_ngon_filled(DrawList* self, Vec2 center, float radius, ImU32 col, int num_segments) @extern("ImDrawList_AddNgonFilled");
+
+extern fn void DrawList.add_polyline(DrawList* self, Vec2* points, int num_points, ImU32 col, DrawFlags flags, float thickness) @extern("ImDrawList_AddPolyline");
+
+extern fn void DrawList.add_quad(DrawList* self, Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, ImU32 col, float thickness = 1.0f) @extern("ImDrawList_AddQuad");
+
+extern fn void DrawList.add_quad_filled(DrawList* self, Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, ImU32 col) @extern("ImDrawList_AddQuadFilled");
+
+extern fn void DrawList.add_rect(DrawList* self, Vec2 p_min, Vec2 p_max, ImU32 col, float rounding = 0.0f, DrawFlags flags = 0, float thickness = 1.0f) @extern("ImDrawList_AddRect");
+
+extern fn void DrawList.add_rect_filled(DrawList* self, Vec2 p_min, Vec2 p_max, ImU32 col, float rounding = 0.0f, DrawFlags flags = 0) @extern("ImDrawList_AddRectFilled");
+
+extern fn void DrawList.add_rect_filled_multi_color(DrawList* self, Vec2 p_min, Vec2 p_max, ImU32 col_upr_left, ImU32 col_upr_right, ImU32 col_bot_right, ImU32 col_bot_left) @extern("ImDrawList_AddRectFilledMultiColor");
+
+extern fn void DrawList.add_text_vec2(DrawList* self, Vec2 pos, ImU32 col, ZString text_begin, ZString text_end = null) @extern("ImDrawList_AddText_Vec2");
+
+extern fn void DrawList.add_text_font_ptr(DrawList* self, Font* font, float font_size, Vec2 pos, ImU32 col, ZString text_begin, ZString text_end = null, float wrap_width = 0.0f, Vec4* cpu_fine_clip_rect = null) @extern("ImDrawList_AddText_FontPtr");
+
+extern fn void DrawList.add_triangle(DrawList* self, Vec2 p1, Vec2 p2, Vec2 p3, ImU32 col, float thickness = 1.0f) @extern("ImDrawList_AddTriangle");
+
+extern fn void DrawList.add_triangle_filled(DrawList* self, Vec2 p1, Vec2 p2, Vec2 p3, ImU32 col) @extern("ImDrawList_AddTriangleFilled");
+
+extern fn void DrawList.channels_merge(DrawList* self) @extern("ImDrawList_ChannelsMerge");
+
+extern fn void DrawList.channels_set_current(DrawList* self, int n) @extern("ImDrawList_ChannelsSetCurrent");
+
+extern fn void DrawList.channels_split(DrawList* self, int count) @extern("ImDrawList_ChannelsSplit");
+
+extern fn DrawList* DrawList.clone_output(DrawList* self) @extern("ImDrawList_CloneOutput");
+
+extern fn void imDrawListGetClipRectMax(Vec2* pOut, DrawList* self) @extern("ImDrawList_GetClipRectMax");
+fn Vec2 DrawList.get_clip_rect_max(DrawList* self) @inline {
+	Vec2 pOut;
+	imDrawListGetClipRectMax(&pOut, self);
+	return pOut;
+}
+
+extern fn void imDrawListGetClipRectMin(Vec2* pOut, DrawList* self) @extern("ImDrawList_GetClipRectMin");
+fn Vec2 DrawList.get_clip_rect_min(DrawList* self) @inline {
+	Vec2 pOut;
+	imDrawListGetClipRectMin(&pOut, self);
+	return pOut;
+}
+
+extern fn DrawList* new_draw_list(void* shared_data) @extern("ImDrawList_ImDrawList");
+
+extern fn void DrawList.path_arc_to(DrawList* self, Vec2 center, float radius, float a_min, float a_max, int num_segments = 0) @extern("ImDrawList_PathArcTo");
+
+extern fn void DrawList.path_arc_to_fast(DrawList* self, Vec2 center, float radius, int a_min_of_12, int a_max_of_12) @extern("ImDrawList_PathArcToFast");
+
+extern fn void DrawList.path_bezier_cubic_curve_to(DrawList* self, Vec2 p2, Vec2 p3, Vec2 p4, int num_segments = 0) @extern("ImDrawList_PathBezierCubicCurveTo");
+
+extern fn void DrawList.path_bezier_quadratic_curve_to(DrawList* self, Vec2 p2, Vec2 p3, int num_segments = 0) @extern("ImDrawList_PathBezierQuadraticCurveTo");
+
+extern fn void DrawList.path_clear(DrawList* self) @extern("ImDrawList_PathClear");
+
+extern fn void DrawList.path_elliptical_arc_to(DrawList* self, Vec2 center, Vec2 radius, float rot, float a_min, float a_max, int num_segments = 0) @extern("ImDrawList_PathEllipticalArcTo");
+
+extern fn void DrawList.path_fill_concave(DrawList* self, ImU32 col) @extern("ImDrawList_PathFillConcave");
+
+extern fn void DrawList.path_fill_convex(DrawList* self, ImU32 col) @extern("ImDrawList_PathFillConvex");
+
+extern fn void DrawList.path_line_to(DrawList* self, Vec2 pos) @extern("ImDrawList_PathLineTo");
+
+extern fn void DrawList.path_line_to_merge_duplicate(DrawList* self, Vec2 pos) @extern("ImDrawList_PathLineToMergeDuplicate");
+
+extern fn void DrawList.path_rect(DrawList* self, Vec2 rect_min, Vec2 rect_max, float rounding = 0.0f, DrawFlags flags = 0) @extern("ImDrawList_PathRect");
+
+extern fn void DrawList.path_stroke(DrawList* self, ImU32 col, DrawFlags flags = 0, float thickness = 1.0f) @extern("ImDrawList_PathStroke");
+
+extern fn void DrawList.pop_clip_rect(DrawList* self) @extern("ImDrawList_PopClipRect");
+
+extern fn void DrawList.pop_texture_id(DrawList* self) @extern("ImDrawList_PopTextureID");
+
+extern fn void DrawList.prim_quad_uv(DrawList* self, Vec2 a, Vec2 b, Vec2 c, Vec2 d, Vec2 uv_a, Vec2 uv_b, Vec2 uv_c, Vec2 uv_d, ImU32 col) @extern("ImDrawList_PrimQuadUV");
+
+extern fn void DrawList.prim_rect(DrawList* self, Vec2 a, Vec2 b, ImU32 col) @extern("ImDrawList_PrimRect");
+
+extern fn void DrawList.prim_rect_uv(DrawList* self, Vec2 a, Vec2 b, Vec2 uv_a, Vec2 uv_b, ImU32 col) @extern("ImDrawList_PrimRectUV");
+
+extern fn void DrawList.prim_reserve(DrawList* self, int idx_count, int vtx_count) @extern("ImDrawList_PrimReserve");
+
+extern fn void DrawList.prim_unreserve(DrawList* self, int idx_count, int vtx_count) @extern("ImDrawList_PrimUnreserve");
+
+extern fn void DrawList.prim_vtx(DrawList* self, Vec2 pos, Vec2 uv, ImU32 col) @extern("ImDrawList_PrimVtx");
+
+extern fn void DrawList.prim_write_idx(DrawList* self, DrawIdx idx) @extern("ImDrawList_PrimWriteIdx");
+
+extern fn void DrawList.prim_write_vtx(DrawList* self, Vec2 pos, Vec2 uv, ImU32 col) @extern("ImDrawList_PrimWriteVtx");
+
+extern fn void DrawList.push_clip_rect(DrawList* self, Vec2 clip_rect_min, Vec2 clip_rect_max, bool intersect_with_current_clip_rect = false) @extern("ImDrawList_PushClipRect");
+
+extern fn void DrawList.push_clip_rect_full_screen(DrawList* self) @extern("ImDrawList_PushClipRectFullScreen");
+
+extern fn void DrawList.push_texture_id(DrawList* self, TextureID texture_id) @extern("ImDrawList_PushTextureID");
+
+extern fn int DrawList.calc_circle_auto_segment_count(DrawList* self, float radius) @extern("ImDrawList__CalcCircleAutoSegmentCount");
+
+extern fn void DrawList.clear_free_memory(DrawList* self) @extern("ImDrawList__ClearFreeMemory");
+
+extern fn void DrawList.on_changed_clip_rect(DrawList* self) @extern("ImDrawList__OnChangedClipRect");
+
+extern fn void DrawList.on_changed_texture_id(DrawList* self) @extern("ImDrawList__OnChangedTextureID");
+
+extern fn void DrawList.on_changed_vtx_offset(DrawList* self) @extern("ImDrawList__OnChangedVtxOffset");
+
+extern fn void DrawList.path_arc_to_fast_ex(DrawList* self, Vec2 center, float radius, int a_min_sample, int a_max_sample, int a_step) @extern("ImDrawList__PathArcToFastEx");
+
+extern fn void DrawList.path_arc_to_n(DrawList* self, Vec2 center, float radius, float a_min, float a_max, int num_segments) @extern("ImDrawList__PathArcToN");
+
+extern fn void DrawList.pop_unused_draw_cmd(DrawList* self) @extern("ImDrawList__PopUnusedDrawCmd");
+
+extern fn void DrawList.reset_for_new_frame(DrawList* self) @extern("ImDrawList__ResetForNewFrame");
+
+extern fn void DrawList.try_merge_draw_cmds(DrawList* self) @extern("ImDrawList__TryMergeDrawCmds");
+
+extern fn void DrawList.destroy(DrawList* self) @extern("ImDrawList_destroy");
+
+extern fn FontAtlasCustomRect* new_font_atlas_custom_rect() @extern("ImFontAtlasCustomRect_ImFontAtlasCustomRect");
+
+extern fn bool FontAtlasCustomRect.is_packed(FontAtlasCustomRect* self) @extern("ImFontAtlasCustomRect_IsPacked");
+
+extern fn void FontAtlasCustomRect.destroy(FontAtlasCustomRect* self) @extern("ImFontAtlasCustomRect_destroy");
+
+extern fn int FontAtlas.add_custom_rect_font_glyph(FontAtlas* self, Font* font, Wchar id, int width, int height, float advance_x, Vec2 offset = {0, 0}) @extern("ImFontAtlas_AddCustomRectFontGlyph");
+
+extern fn int FontAtlas.add_custom_rect_regular(FontAtlas* self, int width, int height) @extern("ImFontAtlas_AddCustomRectRegular");
+
+extern fn Font* FontAtlas.add_font(FontAtlas* self, FontConfig* font_cfg) @extern("ImFontAtlas_AddFont");
+
+extern fn Font* FontAtlas.add_font_default(FontAtlas* self, FontConfig* font_cfg = null) @extern("ImFontAtlas_AddFontDefault");
+
+extern fn Font* FontAtlas.add_font_from_file_ttf(FontAtlas* self, ZString filename, float size_pixels, FontConfig* font_cfg = null, Wchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromFileTTF");
+
+extern fn Font* FontAtlas.add_font_from_memory_compressed_base85_ttf(FontAtlas* self, ZString compressed_font_data_base85, float size_pixels, FontConfig* font_cfg = null, Wchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryCompressedBase85TTF");
+
+extern fn void PlatformIO.destroy(PlatformIO* self) @extern("ImGuiPlatformIO_destroy");
+
+extern fn Font* FontAtlas.add_font_from_memory_compressed_ttf(FontAtlas* self, void* compressed_font_data, int compressed_font_data_size, float size_pixels, FontConfig* font_cfg = null, Wchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryCompressedTTF");
+
+extern fn Font* FontAtlas.add_font_from_memory_ttf(FontAtlas* self, void* font_data, int font_data_size, float size_pixels, FontConfig* font_cfg = null, Wchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryTTF");
+
+extern fn bool FontAtlas.build(FontAtlas* self) @extern("ImFontAtlas_Build");
+
+extern fn void FontAtlas.calc_custom_rect_uv(FontAtlas* self, FontAtlasCustomRect* rect, Vec2* out_uv_min, Vec2* out_uv_max) @extern("ImFontAtlas_CalcCustomRectUV");
+
+extern fn void FontAtlas.clear(FontAtlas* self) @extern("ImFontAtlas_Clear");
+
+extern fn void FontAtlas.clear_fonts(FontAtlas* self) @extern("ImFontAtlas_ClearFonts");
+
+extern fn void FontAtlas.clear_input_data(FontAtlas* self) @extern("ImFontAtlas_ClearInputData");
+
+extern fn void FontAtlas.clear_tex_data(FontAtlas* self) @extern("ImFontAtlas_ClearTexData");
+
+extern fn FontAtlasCustomRect* FontAtlas.get_custom_rect_by_index(FontAtlas* self, int index) @extern("ImFontAtlas_GetCustomRectByIndex");
+
+extern fn Wchar* FontAtlas.get_glyph_ranges_chinese_full(FontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesChineseFull");
+
+extern fn Wchar* FontAtlas.get_glyph_ranges_chinese_simplified_common(FontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon");
+
+extern fn Wchar* FontAtlas.get_glyph_ranges_cyrillic(FontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesCyrillic");
+
+extern fn Wchar* FontAtlas.get_glyph_ranges_default(FontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesDefault");
+
+extern fn Wchar* FontAtlas.get_glyph_ranges_greek(FontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesGreek");
+
+extern fn Wchar* FontAtlas.get_glyph_ranges_japanese(FontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesJapanese");
+
+extern fn Wchar* FontAtlas.get_glyph_ranges_korean(FontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesKorean");
+
+extern fn Wchar* FontAtlas.get_glyph_ranges_thai(FontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesThai");
+
+extern fn Wchar* FontAtlas.get_glyph_ranges_vietnamese(FontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesVietnamese");
+
+extern fn bool FontAtlas.get_mouse_cursor_tex_data(FontAtlas* self, MouseCursor cursor, Vec2* out_offset, Vec2* out_size, Vec2[2] out_uv_border, Vec2[2] out_uv_fill) @extern("ImFontAtlas_GetMouseCursorTexData");
+
+extern fn void FontAtlas.get_tex_data_as_alpha8(FontAtlas* self, char** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = null) @extern("ImFontAtlas_GetTexDataAsAlpha8");
+
+extern fn void FontAtlas.get_tex_data_as_rgba32(FontAtlas* self, char** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = null) @extern("ImFontAtlas_GetTexDataAsRGBA32");
+
+extern fn FontAtlas* new_font_atlas() @extern("ImFontAtlas_ImFontAtlas");
+
+extern fn bool FontAtlas.is_built(FontAtlas* self) @extern("ImFontAtlas_IsBuilt");
+
+extern fn void FontAtlas.set_tex_id(FontAtlas* self, TextureID id) @extern("ImFontAtlas_SetTexID");
+
+extern fn void FontAtlas.destroy(FontAtlas* self) @extern("ImFontAtlas_destroy");
+
+extern fn FontConfig* new_font_config() @extern("ImFontConfig_ImFontConfig");
+
+extern fn void FontConfig.destroy(FontConfig* self) @extern("ImFontConfig_destroy");
+
+extern fn void FontGlyphRangesBuilder.add_char(FontGlyphRangesBuilder* self, Wchar c) @extern("ImFontGlyphRangesBuilder_AddChar");
+
+extern fn void FontGlyphRangesBuilder.add_ranges(FontGlyphRangesBuilder* self, Wchar* ranges) @extern("ImFontGlyphRangesBuilder_AddRanges");
+
+extern fn void FontGlyphRangesBuilder.add_text(FontGlyphRangesBuilder* self, ZString text, ZString text_end = null) @extern("ImFontGlyphRangesBuilder_AddText");
+
+extern fn void FontGlyphRangesBuilder.build_ranges(FontGlyphRangesBuilder* self, vector::Vector(<Wchar>)* out_ranges) @extern("ImFontGlyphRangesBuilder_BuildRanges");
+
+extern fn void FontGlyphRangesBuilder.clear(FontGlyphRangesBuilder* self) @extern("ImFontGlyphRangesBuilder_Clear");
+
+extern fn bool FontGlyphRangesBuilder.get_bit(FontGlyphRangesBuilder* self, usz n) @extern("ImFontGlyphRangesBuilder_GetBit");
+
+extern fn FontGlyphRangesBuilder* new_font_glyph_ranges_builder() @extern("ImFontGlyphRangesBuilder_ImFontGlyphRangesBuilder");
+
+extern fn void FontGlyphRangesBuilder.set_bit(FontGlyphRangesBuilder* self, usz n) @extern("ImFontGlyphRangesBuilder_SetBit");
+
+extern fn void FontGlyphRangesBuilder.destroy(FontGlyphRangesBuilder* self) @extern("ImFontGlyphRangesBuilder_destroy");
+
+extern fn void Font.add_glyph(Font* self, FontConfig* src_cfg, Wchar c, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float advance_x) @extern("ImFont_AddGlyph");
+
+extern fn void Font.add_remap_char(Font* self, Wchar dst, Wchar src, bool overwrite_dst = true) @extern("ImFont_AddRemapChar");
+
+extern fn void Font.build_lookup_table(Font* self) @extern("ImFont_BuildLookupTable");
+
+extern fn void imFontCalcTextSizeA(Vec2* pOut, Font* self, float size, float max_width, float wrap_width, ZString text_begin, ZString text_end = null, ZString remaining = null) @extern("ImFont_CalcTextSizeA");
+fn Vec2 Font.calc_text_size_a(Font* self, float size, float max_width, float wrap_width, ZString text_begin, ZString text_end = null, ZString remaining = null) @inline {
+	Vec2 pOut;
+	imFontCalcTextSizeA(&pOut, self, size, max_width, wrap_width, text_begin, text_end, remaining);
+	return pOut;
+}
+
+extern fn ZString Font.calc_word_wrap_position_a(Font* self, float scale, ZString text, ZString text_end, float wrap_width) @extern("ImFont_CalcWordWrapPositionA");
+
+extern fn void Font.clear_output_data(Font* self) @extern("ImFont_ClearOutputData");
+
+extern fn FontGlyph* Font.find_glyph(Font* self, Wchar c) @extern("ImFont_FindGlyph");
+
+extern fn FontGlyph* Font.find_glyph_no_fallback(Font* self, Wchar c) @extern("ImFont_FindGlyphNoFallback");
+
+extern fn float Font.get_char_advance(Font* self, Wchar c) @extern("ImFont_GetCharAdvance");
+
+extern fn ZString Font.get_debug_name(Font* self) @extern("ImFont_GetDebugName");
+
+extern fn void Font.grow_index(Font* self, int new_size) @extern("ImFont_GrowIndex");
+
+extern fn Font* new_font() @extern("ImFont_ImFont");
+
+extern fn bool Font.is_glyph_range_unused(Font* self, uint c_begin, uint c_last) @extern("ImFont_IsGlyphRangeUnused");
+
+extern fn bool Font.is_loaded(Font* self) @extern("ImFont_IsLoaded");
+
+extern fn void Font.render_char(Font* self, DrawList* draw_list, float size, Vec2 pos, ImU32 col, Wchar c) @extern("ImFont_RenderChar");
+
+extern fn void Font.render_text(Font* self, DrawList* draw_list, float size, Vec2 pos, ImU32 col, Vec4 clip_rect, ZString text_begin, ZString text_end, float wrap_width = 0.0f, bool cpu_fine_clip = false) @extern("ImFont_RenderText");
+
+extern fn void Font.set_glyph_visible(Font* self, Wchar c, bool visible) @extern("ImFont_SetGlyphVisible");
+
+extern fn void Font.destroy(Font* self) @extern("ImFont_destroy");
+
+extern fn void ImIO.add_focus_event(ImIO* self, bool focused) @extern("ImGuiIO_AddFocusEvent");
+
+extern fn void ImIO.add_input_character(ImIO* self, uint c) @extern("ImGuiIO_AddInputCharacter");
+
+extern fn void ImIO.add_input_character_utf16(ImIO* self, Wchar16 c) @extern("ImGuiIO_AddInputCharacterUTF16");
+
+extern fn void ImIO.add_input_characters_utf8(ImIO* self, ZString str) @extern("ImGuiIO_AddInputCharactersUTF8");
+
+extern fn void ImIO.add_key_analog_event(ImIO* self, Key key, bool down, float v) @extern("ImGuiIO_AddKeyAnalogEvent");
+
+extern fn void ImIO.add_key_event(ImIO* self, Key key, bool down) @extern("ImGuiIO_AddKeyEvent");
+
+extern fn void ImIO.add_mouse_button_event(ImIO* self, int button, bool down) @extern("ImGuiIO_AddMouseButtonEvent");
+
+extern fn void ImIO.add_mouse_pos_event(ImIO* self, float x, float y) @extern("ImGuiIO_AddMousePosEvent");
+
+extern fn void ImIO.add_mouse_source_event(ImIO* self, MouseSource source) @extern("ImGuiIO_AddMouseSourceEvent");
+
+extern fn void ImIO.add_mouse_viewport_event(ImIO* self, ImID id) @extern("ImGuiIO_AddMouseViewportEvent");
+
+extern fn void ImIO.add_mouse_wheel_event(ImIO* self, float wheel_x, float wheel_y) @extern("ImGuiIO_AddMouseWheelEvent");
+
+extern fn void ImIO.clear_events_queue(ImIO* self) @extern("ImGuiIO_ClearEventsQueue");
+
+extern fn void ImIO.clear_input_keys(ImIO* self) @extern("ImGuiIO_ClearInputKeys");
+
+extern fn void ImIO.clear_input_mouse(ImIO* self) @extern("ImGuiIO_ClearInputMouse");
+
+extern fn ImIO* new_io() @extern("ImGuiIO_ImGuiIO");
+
+extern fn void ImIO.set_app_accepting_events(ImIO* self, bool accepting_events) @extern("ImGuiIO_SetAppAcceptingEvents");
+
+extern fn void ImIO.set_key_event_native_data(ImIO* self, Key key, int native_keycode, int native_scancode, int native_legacy_index = -1) @extern("ImGuiIO_SetKeyEventNativeData");
+
+extern fn void ImIO.destroy(ImIO* self) @extern("ImGuiIO_destroy");
+
+extern fn void InputTextCallbackData.clear_selection(InputTextCallbackData* self) @extern("ImGuiInputTextCallbackData_ClearSelection");
+
+extern fn void InputTextCallbackData.delete_chars(InputTextCallbackData* self, int pos, int bytes_count) @extern("ImGuiInputTextCallbackData_DeleteChars");
+
+extern fn bool InputTextCallbackData.has_selection(InputTextCallbackData* self) @extern("ImGuiInputTextCallbackData_HasSelection");
+
+extern fn InputTextCallbackData* new_input_text_callback_data() @extern("ImGuiInputTextCallbackData_ImGuiInputTextCallbackData");
+
+extern fn void InputTextCallbackData.insert_chars(InputTextCallbackData* self, int pos, ZString text, ZString text_end = null) @extern("ImGuiInputTextCallbackData_InsertChars");
+
+extern fn void InputTextCallbackData.select_all(InputTextCallbackData* self) @extern("ImGuiInputTextCallbackData_SelectAll");
+
+extern fn void InputTextCallbackData.destroy(InputTextCallbackData* self) @extern("ImGuiInputTextCallbackData_destroy");
+
+extern fn void ListClipper.begin(ListClipper* self, int items_count, float items_height = -1.0f) @extern("ImGuiListClipper_Begin");
+
+extern fn void ListClipper.end(ListClipper* self) @extern("ImGuiListClipper_End");
+
+extern fn ListClipper* new_list_clipper() @extern("ImGuiListClipper_ImGuiListClipper");
+
+extern fn void ListClipper.include_item_by_index(ListClipper* self, int item_index) @extern("ImGuiListClipper_IncludeItemByIndex");
+
+extern fn void ListClipper.include_items_by_index(ListClipper* self, int item_begin, int item_end) @extern("ImGuiListClipper_IncludeItemsByIndex");
+
+extern fn void ListClipper.seek_cursor_for_item(ListClipper* self, int item_index) @extern("ImGuiListClipper_SeekCursorForItem");
+
+extern fn bool ListClipper.step(ListClipper* self) @extern("ImGuiListClipper_Step");
+
+extern fn void ListClipper.destroy(ListClipper* self) @extern("ImGuiListClipper_destroy");
+
+extern fn OnceUponAFrame* new_once_upon_a_frame() @extern("ImGuiOnceUponAFrame_ImGuiOnceUponAFrame");
+
+extern fn void OnceUponAFrame.destroy(OnceUponAFrame* self) @extern("ImGuiOnceUponAFrame_destroy");
+
+extern fn void Payload.clear(Payload* self) @extern("ImGuiPayload_Clear");
+
+extern fn Payload* new_payload() @extern("ImGuiPayload_ImGuiPayload");
+
+extern fn bool Payload.is_data_type(Payload* self, ZString type) @extern("ImGuiPayload_IsDataType");
+
+extern fn bool Payload.is_delivery(Payload* self) @extern("ImGuiPayload_IsDelivery");
+
+extern fn bool Payload.is_preview(Payload* self) @extern("ImGuiPayload_IsPreview");
+
+extern fn void Payload.destroy(Payload* self) @extern("ImGuiPayload_destroy");
+
+extern fn PlatformIO* new_platform_io() @extern("ImGuiPlatformIO_ImGuiPlatformIO");
+
+extern fn PlatformImeData* new_platform_ime_data() @extern("ImGuiPlatformImeData_ImGuiPlatformImeData");
+
+extern fn void PlatformImeData.destroy(PlatformImeData* self) @extern("ImGuiPlatformImeData_destroy");
+
+extern fn PlatformMonitor* new_platform_monitor() @extern("ImGuiPlatformMonitor_ImGuiPlatformMonitor");
+
+extern fn void PlatformMonitor.destroy(PlatformMonitor* self) @extern("ImGuiPlatformMonitor_destroy");
+
+extern fn void SelectionBasicStorage.apply_requests(SelectionBasicStorage* self, MultiSelectIO* ms_io) @extern("ImGuiSelectionBasicStorage_ApplyRequests");
+
+extern fn void SelectionBasicStorage.clear(SelectionBasicStorage* self) @extern("ImGuiSelectionBasicStorage_Clear");
+
+extern fn bool SelectionBasicStorage.contains(SelectionBasicStorage* self, ImID id) @extern("ImGuiSelectionBasicStorage_Contains");
+
+extern fn bool SelectionBasicStorage.get_next_selected_item(SelectionBasicStorage* self, void** opaque_it, ImID* out_id) @extern("ImGuiSelectionBasicStorage_GetNextSelectedItem");
+
+extern fn ImID SelectionBasicStorage.get_storage_id_from_index(SelectionBasicStorage* self, int idx) @extern("ImGuiSelectionBasicStorage_GetStorageIdFromIndex");
+
+extern fn SelectionBasicStorage* new_selection_basic_storage() @extern("ImGuiSelectionBasicStorage_ImGuiSelectionBasicStorage");
+
+extern fn void SelectionBasicStorage.set_item_selected(SelectionBasicStorage* self, ImID id, bool selected) @extern("ImGuiSelectionBasicStorage_SetItemSelected");
+
+extern fn void SelectionBasicStorage.swap(SelectionBasicStorage* self, SelectionBasicStorage* r) @extern("ImGuiSelectionBasicStorage_Swap");
+
+extern fn void SelectionBasicStorage.destroy(SelectionBasicStorage* self) @extern("ImGuiSelectionBasicStorage_destroy");
+
+extern fn void SelectionExternalStorage.apply_requests(SelectionExternalStorage* self, MultiSelectIO* ms_io) @extern("ImGuiSelectionExternalStorage_ApplyRequests");
+
+extern fn SelectionExternalStorage* new_selection_external_storage() @extern("ImGuiSelectionExternalStorage_ImGuiSelectionExternalStorage");
+
+extern fn void SelectionExternalStorage.destroy(SelectionExternalStorage* self) @extern("ImGuiSelectionExternalStorage_destroy");
+
+extern fn StoragePair* new_storage_pair_int(ImID _key, int _val) @extern("ImGuiStoragePair_ImGuiStoragePair_Int");
+
+extern fn StoragePair* new_storage_pair_float(ImID _key, float _val) @extern("ImGuiStoragePair_ImGuiStoragePair_Float");
+
+extern fn StoragePair* new_storage_pair_ptr(ImID _key, void* _val) @extern("ImGuiStoragePair_ImGuiStoragePair_Ptr");
+
+extern fn void StoragePair.destroy(StoragePair* self) @extern("ImGuiStoragePair_destroy");
+
+extern fn void Storage.build_sort_by_key(Storage* self) @extern("ImGuiStorage_BuildSortByKey");
+
+extern fn void Storage.clear(Storage* self) @extern("ImGuiStorage_Clear");
+
+extern fn bool Storage.get_bool(Storage* self, ImID key, bool default_val = false) @extern("ImGuiStorage_GetBool");
+
+extern fn bool* Storage.get_bool_ref(Storage* self, ImID key, bool default_val = false) @extern("ImGuiStorage_GetBoolRef");
+
+extern fn float Storage.get_float(Storage* self, ImID key, float default_val = 0.0f) @extern("ImGuiStorage_GetFloat");
+
+extern fn float* Storage.get_float_ref(Storage* self, ImID key, float default_val = 0.0f) @extern("ImGuiStorage_GetFloatRef");
+
+extern fn int Storage.get_int(Storage* self, ImID key, int default_val = 0) @extern("ImGuiStorage_GetInt");
+
+extern fn int* Storage.get_int_ref(Storage* self, ImID key, int default_val = 0) @extern("ImGuiStorage_GetIntRef");
+
+extern fn void* Storage.get_void_ptr(Storage* self, ImID key) @extern("ImGuiStorage_GetVoidPtr");
+
+extern fn void** Storage.get_void_ptr_ref(Storage* self, ImID key, void* default_val = null) @extern("ImGuiStorage_GetVoidPtrRef");
+
+extern fn void Storage.set_all_int(Storage* self, int val) @extern("ImGuiStorage_SetAllInt");
+
+extern fn void Storage.set_bool(Storage* self, ImID key, bool val) @extern("ImGuiStorage_SetBool");
+
+extern fn void Storage.set_float(Storage* self, ImID key, float val) @extern("ImGuiStorage_SetFloat");
+
+extern fn void Storage.set_int(Storage* self, ImID key, int val) @extern("ImGuiStorage_SetInt");
+
+extern fn void Storage.set_void_ptr(Storage* self, ImID key, void* val) @extern("ImGuiStorage_SetVoidPtr");
+
+extern fn Style* new_style() @extern("ImGuiStyle_ImGuiStyle");
+
+extern fn void Style.scale_all_sizes(Style* self, float scale_factor) @extern("ImGuiStyle_ScaleAllSizes");
+
+extern fn void Style.destroy(Style* self) @extern("ImGuiStyle_destroy");
+
+extern fn TableColumnSortSpecs* new_table_column_sort_specs() @extern("ImGuiTableColumnSortSpecs_ImGuiTableColumnSortSpecs");
+
+extern fn void TableColumnSortSpecs.destroy(TableColumnSortSpecs* self) @extern("ImGuiTableColumnSortSpecs_destroy");
+
+extern fn TableSortSpecs* new_table_sort_specs() @extern("ImGuiTableSortSpecs_ImGuiTableSortSpecs");
+
+extern fn void TableSortSpecs.destroy(TableSortSpecs* self) @extern("ImGuiTableSortSpecs_destroy");
+
+extern fn TextBuffer* new_text_buffer() @extern("ImGuiTextBuffer_ImGuiTextBuffer");
+
+extern fn void TextBuffer.append(TextBuffer* self, ZString str, ZString str_end = null) @extern("ImGuiTextBuffer_append");
+
+extern fn void TextBuffer.appendf(TextBuffer* self, ZString fmt, ...) @extern("ImGuiTextBuffer_appendf");
+
+extern fn ZString TextBuffer.begin(TextBuffer* self) @extern("ImGuiTextBuffer_begin");
+
+extern fn ZString TextBuffer.c_str(TextBuffer* self) @extern("ImGuiTextBuffer_c_str");
+
+extern fn void TextBuffer.clear(TextBuffer* self) @extern("ImGuiTextBuffer_clear");
+
+extern fn void TextBuffer.destroy(TextBuffer* self) @extern("ImGuiTextBuffer_destroy");
+
+extern fn bool TextBuffer.empty(TextBuffer* self) @extern("ImGuiTextBuffer_empty");
+
+extern fn ZString TextBuffer.end(TextBuffer* self) @extern("ImGuiTextBuffer_end");
+
+extern fn void TextBuffer.reserve(TextBuffer* self, int capacity) @extern("ImGuiTextBuffer_reserve");
+
+extern fn int TextBuffer.size(TextBuffer* self) @extern("ImGuiTextBuffer_size");
+
+extern fn void TextFilter.build(TextFilter* self) @extern("ImGuiTextFilter_Build");
+
+extern fn void TextFilter.clear(TextFilter* self) @extern("ImGuiTextFilter_Clear");
+
+extern fn bool TextFilter.draw(TextFilter* self, ZString label = Filter(inc,-exc), float width = 0.0f) @extern("ImGuiTextFilter_Draw");
+
+extern fn TextFilter* new_text_filter(ZString default_filter = "") @extern("ImGuiTextFilter_ImGuiTextFilter");
+
+extern fn bool TextFilter.is_active(TextFilter* self) @extern("ImGuiTextFilter_IsActive");
+
+extern fn bool TextFilter.pass_filter(TextFilter* self, ZString text, ZString text_end = null) @extern("ImGuiTextFilter_PassFilter");
+
+extern fn void TextFilter.destroy(TextFilter* self) @extern("ImGuiTextFilter_destroy");
+
+extern fn TextRange* new_text_range() @extern("ImGuiTextRange_ImGuiTextRange_Nil");
+
+extern fn TextRange* new_text_range_str(ZString _b, ZString _e) @extern("ImGuiTextRange_ImGuiTextRange_Str");
+
+extern fn void TextRange.destroy(TextRange* self) @extern("ImGuiTextRange_destroy");
+
+extern fn bool TextRange.empty(TextRange* self) @extern("ImGuiTextRange_empty");
+
+extern fn void TextRange.split(TextRange* self, char separator, vector::Vector(<TextRange>)* out) @extern("ImGuiTextRange_split");
+
+extern fn void imGuiViewportGetCenter(Vec2* pOut, Viewport* self) @extern("ImGuiViewport_GetCenter");
+fn Vec2 Viewport.get_center(Viewport* self) @inline {
+	Vec2 pOut;
+	imGuiViewportGetCenter(&pOut, self);
+	return pOut;
+}
+
+extern fn void imGuiViewportGetWorkCenter(Vec2* pOut, Viewport* self) @extern("ImGuiViewport_GetWorkCenter");
+fn Vec2 Viewport.get_work_center(Viewport* self) @inline {
+	Vec2 pOut;
+	imGuiViewportGetWorkCenter(&pOut, self);
+	return pOut;
+}
+
+extern fn Viewport* new_viewport() @extern("ImGuiViewport_ImGuiViewport");
+
+extern fn void Viewport.destroy(Viewport* self) @extern("ImGuiViewport_destroy");
+
+extern fn WindowClass* new_window_class() @extern("ImGuiWindowClass_ImGuiWindowClass");
+
+extern fn void WindowClass.destroy(WindowClass* self) @extern("ImGuiWindowClass_destroy");
+
+extern fn Vec2* new_vec2() @extern("ImVec2_ImVec2_Nil");
+
+extern fn Vec2* new_vec2_float(float _x, float _y) @extern("ImVec2_ImVec2_Float");
+
+extern fn void Vec2.destroy(Vec2* self) @extern("ImVec2_destroy");
+
+extern fn Vec4* new_vec4() @extern("ImVec4_ImVec4_Nil");
+
+extern fn Vec4* new_vec4_float(float _x, float _y, float _z, float _w) @extern("ImVec4_ImVec4_Float");
+
+extern fn void Vec4.destroy(Vec4* self) @extern("ImVec4_destroy");
 
