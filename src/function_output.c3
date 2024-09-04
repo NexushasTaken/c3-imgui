@@ -71,49 +71,7 @@ fn void output_imgui_func(File* output, List(<Object*>) funcs) {
       List(<String>) callbacks;
 
       if (try udt_val = func.get_int("nonUDT")) {
-        Object* first_param = func.get("argsT")!!.get_at(0);
-
-        { // checks
-          DString temp;
-          temp.temp_init();
-          clean_type(&temp, func.get_string("ret")!!);
-          assert(temp.str_view() == "void");
-          assert(first_param.get_string("name")!! == "pOut");
-          usz ptr_count = 0;
-          clean_ptr(first_param.get_string("type")!!, &ptr_count);
-          assert(ptr_count == 1);
-        }
-
-        // extern function
-        sb.appendf("extern fn ");
-        clean_type(sb, func.get_string("ret")!!); // return type
-        sb.appendf(" %s(", func.get_string("ov_cimguiname")!!); // function name
-        clean_params_list(sb, func, true); // parameters
-        sb.appendf(") @extern(\"%s\") @local;\n", func.get_string("ov_cimguiname")!!); // link name
-
-        // function definition
-        sb.appendf("fn ");
-        clean_type(sb, clean_ptr(first_param.get_string("type")!!)); // return type
-        sb.appendf(" ");
-        to_snake_case(sb, func.get_string("ov_cimguiname")!!.strip("ig"), false);
-        sb.appendf("(");
-        clean_params_list(sb, func);
-        sb.appendf(") @inline {\n\t");
-
-        // temporary variable
-        clean_type(sb, clean_ptr(first_param.get_string("type")!!));
-        sb.appendf(" ");
-        sb.appendf("%s;\n\t", first_param.get_string("name")!!);
-
-        // extern function call
-        sb.appendf("%s(&%s", func.get_string("ov_cimguiname")!!, first_param.get_string("name")!!);
-        if (func.get_string("call_args")!! != "()") {
-          sb.appendf(", %s", func.get_string("call_args")!!.trim("()"));
-        }
-        sb.appendf(");\n\t");
-
-        sb.appendf("return %s;\n", first_param.get_string("name")!!);
-        sb.appendf("}\n");
+        make_non_udt_function(sb, func);
       } else {
         sb.appendf("extern fn ");
         clean_type(sb, func.get_string("ret")!!);
@@ -175,54 +133,7 @@ fn void output_struct_func(File* output, List(<Object*>) funcs) {
       } else if (try ret = func.get_string("ret")) {
         assert(func.has_key("ret"));
         if (try func.get_int("nonUDT")) {
-          sb.appendf("extern fn ");
-          clean_type(sb, func.get_string("ret")!!);
-          sb.appendf(" ");
-          to_camel_case(sb, func.get_string("ov_cimguiname")!!);
-          sb.appendf("(");
-          clean_params_list(sb, func, true);
-          sb.appendf(") @extern(\"%s\") @local;\n", func.get_string("ov_cimguiname")!!);
-
-          assert(func.has_key("argsT"));
-          Object* first_param = func.get("argsT").get_at(0)!!;
-          { // Checks
-            assert(first_param.get_string("name")!! == "pOut");
-            usz ptr_count = 0;
-            clean_ptr(first_param.get_string("type")!!, &ptr_count);
-            assert(ptr_count == 1);
-          }
-          sb.appendf("fn ");
-          clean_type(sb, clean_ptr(first_param.get_string("type")!!));
-          sb.appendf(" ");
-          if (try func.get_bool("is_static_function")) {
-            to_snake_case(sb, clean_imgui(func.get_string("ov_cimguiname")!!));
-          } else {
-            clean_type(sb, func.get_string("stname")!!);
-            sb.appendf("."); // method name
-            to_snake_case(sb, func.get_string("ov_cimguiname")!![func.get_string("stname")!!.len..]);
-          }
-          sb.appendf("(");
-          clean_params_list(sb, func);
-          sb.appendf(") @inline {\n\t");
-          clean_type(sb, clean_ptr(first_param.get_string("type")!!));
-          sb.appendf(" ");
-          sb.appendf("%s", first_param.get_string("name")!!);
-          sb.appendf(";\n\t");
-          to_camel_case(sb, func.get_string("ov_cimguiname")!!);
-          sb.appendf("(&");
-          sb.appendf("%s", first_param.get_string("name")!!);
-          if (!func.has_key("is_static_function")) {
-            sb.appendf(", self");
-          }
-          if (func.get_string("call_args")!! != "()") {
-            foreach (idx, arg : func.get_string("call_args")!!.trim("()").split(",")) {
-              sb.appendf(", ", arg);
-              sb.appendf("%s", arg);
-            }
-          }
-          sb.appendf(");\n\t");
-          sb.appendf("return %s;", first_param.get_string("name")!!);
-          sb.appendf("\n}\n");
+          make_non_udt_function(sb, func);
           sb.appendf("\n");
         } else {
           assert(func.has_key("ret"));
@@ -242,6 +153,79 @@ fn void output_struct_func(File* output, List(<Object*>) funcs) {
       }
     };
   }
+}
+
+fn DString* make_non_udt_function(DString* sb, Object* func) {
+  assert(func.has_key("argsT"));
+  Object* first_param = func.get("argsT")!!.get_at(0);
+  bool struct_method = func.get_string("stname")!! != "";
+  @pool() { // Check
+    if (!struct_method) {
+      DString temp;
+      temp.temp_init();
+      clean_type(&temp, func.get_string("ret")!!);
+      assert(temp.str_view() == "void");
+    }
+    usz ptr_count = 0;
+    clean_ptr(first_param.get_string("type")!!, &ptr_count);
+    assert(ptr_count == 1);
+    assert(first_param.get_string("name")!! == "pOut");
+  };
+
+  // extern function
+  sb.appendf("extern fn ");
+  clean_type(sb, func.get_string("ret")!!); // return type
+  sb.appendf(" ");
+  to_camel_case(sb, func.get_string("ov_cimguiname")!!); // method name
+  sb.appendf("(");
+  clean_params_list(sb, func, true); // parameters
+  sb.appendf(") @extern(\"%s\") @local;\n", func.get_string("ov_cimguiname")!!); // link name
+
+  // function definition
+  sb.appendf("fn ");
+  clean_type(sb, clean_ptr(first_param.get_string("type")!!)); // return type
+  sb.appendf(" ");
+  if (struct_method) {
+    if (try func.get_bool("is_static_function")) {
+      to_snake_case(sb, clean_imgui(func.get_string("ov_cimguiname")!!));
+    } else {
+      clean_type(sb, func.get_string("stname")!!);
+      sb.appendf("."); // method name
+      to_snake_case(sb, func.get_string("ov_cimguiname")!![func.get_string("stname")!!.len..]);
+    }
+  } else {
+    to_snake_case(sb, func.get_string("ov_cimguiname")!!.strip("ig"));
+  }
+  sb.appendf("(");
+  clean_params_list(sb, func);
+  sb.appendf(") @inline {\n\t");
+
+  // temporary variable
+  clean_type(sb, clean_ptr(first_param.get_string("type")!!));
+  sb.appendf(" %s;\n\t", first_param.get_string("name")!!);
+
+  // extern function call
+  if (struct_method) {
+    to_camel_case(sb, func.get_string("ov_cimguiname")!!);
+  } else {
+    sb.appendf("%s", func.get_string("ov_cimguiname")!!);
+  }
+  // function call arguments
+  sb.appendf("(&%s", first_param.get_string("name")!!);
+  if (struct_method && !func.has_key("is_static_function")) {
+    sb.appendf(", self");
+  }
+  if (func.get_string("call_args")!! != "()") {
+    foreach (idx, arg : func.get_string("call_args")!!.trim("()").split(",")) {
+      sb.appendf(", %s", arg);
+    }
+  }
+  sb.appendf(");\n\t");
+
+  // return statement
+  sb.appendf("return %s;\n", first_param.get_string("name")!!);
+  sb.appendf("}\n");
+  return sb;
 }
 
 fn DString* make_callback_name(DString* sb, Object* func, Object* param) {
@@ -277,7 +261,7 @@ fn String clean_params_list(DString* sb, Object* func, bool full = false) {
     i = 0;
     start = 0;
   }
-  
+
   for (; i < args.array.len(); i++) {
     Object* param = args.get_at(i);
     if (i != start) {

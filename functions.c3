@@ -438,7 +438,7 @@ extern fn void set_scroll_from_pos_y(float local_y, float center_y_ratio = 0.5f)
 extern fn void igCalcTextSize(Vec2* pOut, ZString text, ZString text_end = null, bool hide_text_after_double_hash = false, float wrap_width = -1.0f) @extern("igCalcTextSize") @local;
 fn Vec2 calc_text_size(ZString text, ZString text_end = null, bool hide_text_after_double_hash = false, float wrap_width = -1.0f) @inline {
 	Vec2 pOut;
-	igCalcTextSize(&pOut, text,text_end,hide_text_after_double_hash,wrap_width);
+	igCalcTextSize(&pOut, text, text_end, hide_text_after_double_hash, wrap_width);
 	return pOut;
 }
 
@@ -481,7 +481,7 @@ extern fn void end_combo() @extern("igEndCombo");
 extern fn void igGetMouseDragDelta(Vec2* pOut, MouseButton button = 0, float lock_threshold = -1.0f) @extern("igGetMouseDragDelta") @local;
 fn Vec2 get_mouse_drag_delta(MouseButton button = 0, float lock_threshold = -1.0f) @inline {
 	Vec2 pOut;
-	igGetMouseDragDelta(&pOut, button,lock_threshold);
+	igGetMouseDragDelta(&pOut, button, lock_threshold);
 	return pOut;
 }
 
