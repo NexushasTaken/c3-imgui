@@ -1,5 +1,5 @@
 {
-  "provides" : "imgui_c3",
+  "provides" : "imgui",
   "targets" : {
     "linux-x64" : {
       // Extra flags to the linker for this target:
@@ -7,7 +7,7 @@
       // C3 libraries this target depends on:
       "dependencies" : [],
       // The external libraries to link for this target:
-      "linked-libraries" : []
+      "linked-libraries" : [ "cimgui", "stdc++" ]
     }
   }
 }

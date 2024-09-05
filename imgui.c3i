@@ -10,15 +10,11 @@ extern fn void set_tab_item_closed(ZString tab_or_docked_window_label) @extern("
 
 extern fn void end_tab_bar() @extern("igEndTabBar");
 
-extern fn bool is_window_docked() @extern("igIsWindowDocked");
-
 extern fn void end_frame() @extern("igEndFrame");
 
 extern fn bool shortcut(KeyChord key_chord, InputFlags flags = 0) @extern("igShortcut");
 
 extern fn float get_text_line_height() @extern("igGetTextLineHeight");
-
-extern fn ImID get_window_dock_id() @extern("igGetWindowDockID");
 
 extern fn bool is_mouse_double_clicked(MouseButton button) @extern("igIsMouseDoubleClicked");
 
@@ -32,11 +28,11 @@ extern fn void show_metrics_window(bool* p_open = null) @extern("igShowMetricsWi
 
 extern fn void set_allocator_functions(MemAllocFunc alloc_func, MemFreeFunc free_func, void* user_data = null) @extern("igSetAllocatorFunctions");
 
-extern fn bool input_float3(ZString label, float[3] v, ZString format = "%.3f", InputTextFlags flags = 0) @extern("igInputFloat3");
+extern fn bool input_float3(ZString label, float[/*3*/] v, ZString format = "%.3f", InputTextFlags flags = 0) @extern("igInputFloat3");
 
-extern fn bool input_float2(ZString label, float[2] v, ZString format = "%.3f", InputTextFlags flags = 0) @extern("igInputFloat2");
+extern fn bool input_float2(ZString label, float[/*2*/] v, ZString format = "%.3f", InputTextFlags flags = 0) @extern("igInputFloat2");
 
-extern fn bool input_float4(ZString label, float[4] v, ZString format = "%.3f", InputTextFlags flags = 0) @extern("igInputFloat4");
+extern fn bool input_float4(ZString label, float[/*4*/] v, ZString format = "%.3f", InputTextFlags flags = 0) @extern("igInputFloat4");
 
 extern fn ZString get_key_name(Key key) @extern("igGetKeyName");
 
@@ -46,9 +42,9 @@ extern fn bool tab_item_button(ZString label, TabItemFlags flags = 0) @extern("i
 
 extern fn bool is_any_item_focused() @extern("igIsAnyItemFocused");
 
-extern fn bool slider_int3(ZString label, int[3] v, int v_min, int v_max, ZString format = "%d", SliderFlags flags = 0) @extern("igSliderInt3");
+extern fn bool slider_int3(ZString label, int[/*3*/] v, int v_min, int v_max, ZString format = "%d", SliderFlags flags = 0) @extern("igSliderInt3");
 
-extern fn bool slider_int2(ZString label, int[2] v, int v_min, int v_max, ZString format = "%d", SliderFlags flags = 0) @extern("igSliderInt2");
+extern fn bool slider_int2(ZString label, int[/*2*/] v, int v_min, int v_max, ZString format = "%d", SliderFlags flags = 0) @extern("igSliderInt2");
 
 extern fn void end_list_box() @extern("igEndListBox");
 
@@ -56,7 +52,7 @@ extern fn Font* get_font() @extern("igGetFont");
 
 extern fn bool begin_table(ZString str_id, int columns, TableFlags flags = 0, Vec2 outer_size = {0.0f, 0.0f}, float inner_width = 0.0f) @extern("igBeginTable");
 
-extern fn bool slider_int4(ZString label, int[4] v, int v_min, int v_max, ZString format = "%d", SliderFlags flags = 0) @extern("igSliderInt4");
+extern fn bool slider_int4(ZString label, int[/*4*/] v, int v_min, int v_max, ZString format = "%d", SliderFlags flags = 0) @extern("igSliderInt4");
 
 extern fn float get_text_line_height_with_spacing() @extern("igGetTextLineHeightWithSpacing");
 
@@ -80,7 +76,7 @@ extern fn bool tree_node_ex_str_str(ZString str_id, TreeNodeFlags flags, ZString
 
 extern fn bool tree_node_ex_ptr(void* ptr_id, TreeNodeFlags flags, ZString fmt, ...) @extern("igTreeNodeEx_Ptr");
 
-extern fn void table_setup_column(ZString label, TableColumnFlags flags = 0, float init_width_or_weight = 0.0f, ImID user_id = 0) @extern("igTableSetupColumn");
+extern fn void table_setup_column(ZString label, TableColumnFlags flags = 0, float init_width_or_weight = 0.0f, ImGuiID user_id = 0) @extern("igTableSetupColumn");
 
 extern fn void set_color_edit_options(ColorEditFlags flags) @extern("igSetColorEditOptions");
 
@@ -102,8 +98,6 @@ extern fn bool drag_float(ZString label, float* v, float v_speed = 1.0f, float v
 
 extern fn void show_about_window(bool* p_open = null) @extern("igShowAboutWindow");
 
-extern fn void render_platform_windows_default(void* platform_render_arg = null, void* renderer_render_arg = null) @extern("igRenderPlatformWindowsDefault");
-
 extern fn void push_id_str(ZString str_id) @extern("igPushID_Str");
 
 extern fn void push_id_str_str(ZString str_id_begin, ZString str_id_end) @extern("igPushID_StrStr");
@@ -121,8 +115,6 @@ extern fn int table_get_column_index() @extern("igTableGetColumnIndex");
 extern fn TableSortSpecs* table_get_sort_specs() @extern("igTableGetSortSpecs");
 
 extern fn void show_font_selector(ZString label) @extern("igShowFontSelector");
-
-extern fn Viewport* find_viewport_by_id(ImID id) @extern("igFindViewportByID");
 
 extern fn bool is_mouse_down(MouseButton button) @extern("igIsMouseDown");
 
@@ -165,8 +157,6 @@ extern fn bool is_key_released(Key key) @extern("igIsKeyReleased");
 
 extern fn void push_item_width(float item_width) @extern("igPushItemWidth");
 
-extern fn Viewport* find_viewport_by_platform_handle(void* platform_handle) @extern("igFindViewportByPlatformHandle");
-
 extern fn void show_demo_window(bool* p_open = null) @extern("igShowDemoWindow");
 
 extern fn Vec4* get_style_color_vec4(Col idx) @extern("igGetStyleColorVec4");
@@ -182,11 +172,9 @@ extern fn bool arrow_button(ZString str_id, Dir dir) @extern("igArrowButton");
 
 extern fn DrawList* get_window_draw_list() @extern("igGetWindowDrawList");
 
-extern fn void set_next_item_storage_id(ImID storage_id) @extern("igSetNextItemStorageID");
+extern fn void set_next_item_storage_id(ImGuiID storage_id) @extern("igSetNextItemStorageID");
 
 extern fn bool is_mouse_pos_valid(Vec2* mouse_pos = null) @extern("igIsMousePosValid");
-
-extern fn ImID dock_space(ImID dockspace_id, Vec2 size = {0, 0}, DockNodeFlags flags = 0, WindowClass* window_class = null) @extern("igDockSpace");
 
 extern fn void text_link_open_url(ZString label, ZString url = null) @extern("igTextLinkOpenURL");
 
@@ -198,15 +186,11 @@ extern fn bool is_item_deactivated() @extern("igIsItemDeactivated");
 
 extern fn bool input_text(ZString label, char* buf, usz buf_size, InputTextFlags flags = 0, InputTextCallback callback = null, void* user_data = null) @extern("igInputText");
 
-extern fn float get_window_dpi_scale() @extern("igGetWindowDpiScale");
-
 extern fn void begin_disabled(bool disabled = true) @extern("igBeginDisabled");
 
 extern fn void separator() @extern("igSeparator");
 
 extern fn Payload* accept_drag_drop_payload(ZString type, DragDropFlags flags = 0) @extern("igAcceptDragDropPayload");
-
-extern fn void set_next_window_viewport(ImID viewport_id) @extern("igSetNextWindowViewport");
 
 extern fn ImU32 get_color_u32_col(Col idx, float alpha_mul = 1.0f) @extern("igGetColorU32_Col");
 
@@ -220,7 +204,7 @@ extern fn bool checkbox_flags_uint_ptr(ZString label, uint* flags, uint flags_va
 
 extern fn void pop_font() @extern("igPopFont");
 
-extern fn bool slider_float4(ZString label, float[4] v, float v_min, float v_max, ZString format = "%.3f", SliderFlags flags = 0) @extern("igSliderFloat4");
+extern fn bool slider_float4(ZString label, float[/*4*/] v, float v_min, float v_max, ZString format = "%.3f", SliderFlags flags = 0) @extern("igSliderFloat4");
 
 extern fn float get_tree_node_to_label_spacing() @extern("igGetTreeNodeToLabelSpacing");
 
@@ -234,17 +218,17 @@ extern fn bool table_set_column_index(int column_n) @extern("igTableSetColumnInd
 
 extern fn void set_scroll_y(float scroll_y) @extern("igSetScrollY");
 
-extern fn ImIO* get_io() @extern("igGetIO");
+extern fn ImGuiIO* get_io() @extern("igGetIO");
 
 extern fn void set_scroll_x(float scroll_x) @extern("igSetScrollX");
 
 extern fn int table_get_hovered_column() @extern("igTableGetHoveredColumn");
 
-extern fn bool slider_float3(ZString label, float[3] v, float v_min, float v_max, ZString format = "%.3f", SliderFlags flags = 0) @extern("igSliderFloat3");
+extern fn bool slider_float3(ZString label, float[/*3*/] v, float v_min, float v_max, ZString format = "%.3f", SliderFlags flags = 0) @extern("igSliderFloat3");
 
 extern fn void set_item_key_owner(Key key) @extern("igSetItemKeyOwner");
 
-extern fn bool slider_float2(ZString label, float[2] v, float v_min, float v_max, ZString format = "%.3f", SliderFlags flags = 0) @extern("igSliderFloat2");
+extern fn bool slider_float2(ZString label, float[/*2*/] v, float v_min, float v_max, ZString format = "%.3f", SliderFlags flags = 0) @extern("igSliderFloat2");
 
 extern fn bool is_window_focused(FocusedFlags flags = 0) @extern("igIsWindowFocused");
 
@@ -252,39 +236,39 @@ extern fn void set_next_item_allow_overlap() @extern("igSetNextItemAllowOverlap"
 
 extern fn bool image_button(ZString str_id, TextureID user_texture_id, Vec2 image_size, Vec2 uv0 = {0, 0}, Vec2 uv1 = {1, 1}, Vec4 bg_col = {0, 0, 0, 0}, Vec4 tint_col = {1, 1, 1, 1}) @extern("igImageButton");
 
-extern fn ImID get_id_str(ZString str_id) @extern("igGetID_Str");
+extern fn ImGuiID get_id_str(ZString str_id) @extern("igGetID_Str");
 
-extern fn ImID get_id_str_str(ZString str_id_begin, ZString str_id_end) @extern("igGetID_StrStr");
+extern fn ImGuiID get_id_str_str(ZString str_id_begin, ZString str_id_end) @extern("igGetID_StrStr");
 
-extern fn ImID get_id_ptr(void* ptr_id) @extern("igGetID_Ptr");
+extern fn ImGuiID get_id_ptr(void* ptr_id) @extern("igGetID_Ptr");
 
-extern fn ImID get_id_int(int int_id) @extern("igGetID_Int");
+extern fn ImGuiID get_id_int(int int_id) @extern("igGetID_Int");
 
 extern fn float get_scroll_y() @extern("igGetScrollY");
 
 extern fn float get_scroll_x() @extern("igGetScrollX");
 
-extern fn bool color_picker4(ZString label, float[4] col, ColorEditFlags flags = 0, float* ref_col = null) @extern("igColorPicker4");
+extern fn bool color_picker4(ZString label, float[/*4*/] col, ColorEditFlags flags = 0, float* ref_col = null) @extern("igColorPicker4");
 
 extern fn bool is_item_deactivated_after_edit() @extern("igIsItemDeactivatedAfterEdit");
 
-extern fn bool color_picker3(ZString label, float[3] col, ColorEditFlags flags = 0) @extern("igColorPicker3");
+extern fn bool color_picker3(ZString label, float[/*3*/] col, ColorEditFlags flags = 0) @extern("igColorPicker3");
 
 extern fn bool drag_float_range2(ZString label, float* v_current_min, float* v_current_max, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, ZString format = "%.3f", ZString format_max = null, SliderFlags flags = 0) @extern("igDragFloatRange2");
 
-extern fn bool drag_float3(ZString label, float[3] v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, ZString format = "%.3f", SliderFlags flags = 0) @extern("igDragFloat3");
+extern fn bool drag_float3(ZString label, float[/*3*/] v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, ZString format = "%.3f", SliderFlags flags = 0) @extern("igDragFloat3");
 
-extern fn bool drag_float2(ZString label, float[2] v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, ZString format = "%.3f", SliderFlags flags = 0) @extern("igDragFloat2");
+extern fn bool drag_float2(ZString label, float[/*2*/] v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, ZString format = "%.3f", SliderFlags flags = 0) @extern("igDragFloat2");
 
-extern fn bool drag_float4(ZString label, float[4] v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, ZString format = "%.3f", SliderFlags flags = 0) @extern("igDragFloat4");
+extern fn bool drag_float4(ZString label, float[/*4*/] v, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, ZString format = "%.3f", SliderFlags flags = 0) @extern("igDragFloat4");
 
 extern fn ZString get_version() @extern("igGetVersion");
 
-extern fn bool input_int4(ZString label, int[4] v, InputTextFlags flags = 0) @extern("igInputInt4");
+extern fn bool input_int4(ZString label, int[/*4*/] v, InputTextFlags flags = 0) @extern("igInputInt4");
 
-extern fn bool input_int3(ZString label, int[3] v, InputTextFlags flags = 0) @extern("igInputInt3");
+extern fn bool input_int3(ZString label, int[/*3*/] v, InputTextFlags flags = 0) @extern("igInputInt3");
 
-extern fn bool input_int2(ZString label, int[2] v, InputTextFlags flags = 0) @extern("igInputInt2");
+extern fn bool input_int2(ZString label, int[/*2*/] v, InputTextFlags flags = 0) @extern("igInputInt2");
 
 extern fn bool begin_combo(ZString label, ZString preview_value, ComboFlags flags = 0) @extern("igBeginCombo");
 
@@ -313,8 +297,6 @@ extern fn void begin_group() @extern("igBeginGroup");
 extern fn void table_header(ZString label) @extern("igTableHeader");
 
 extern fn void log_buttons() @extern("igLogButtons");
-
-extern fn Viewport* get_window_viewport() @extern("igGetWindowViewport");
 
 extern fn void log_to_file(int auto_open_depth = -1, ZString filename = null) @extern("igLogToFile");
 
@@ -356,7 +338,7 @@ extern fn void set_window_focus_str(ZString name) @extern("igSetWindowFocus_Str"
 
 extern fn void style_colors_classic(Style* dst = null) @extern("igStyleColorsClassic");
 
-extern fn DrawList* get_foreground_draw_list(Viewport* viewport = null) @extern("igGetForegroundDrawList");
+extern fn DrawList* get_foreground_draw_list() @extern("igGetForegroundDrawList");
 
 extern fn void debug_text_encoding(ZString text) @extern("igDebugTextEncoding");
 
@@ -384,7 +366,7 @@ extern fn float get_cursor_pos_y() @extern("igGetCursorPosY");
 
 extern fn void open_popup_str(ZString str_id, PopupFlags popup_flags = 0) @extern("igOpenPopup_Str");
 
-extern fn void open_popup_id(ImID id, PopupFlags popup_flags = 0) @extern("igOpenPopup_ID");
+extern fn void open_popup_id(ImGuiID id, PopupFlags popup_flags = 0) @extern("igOpenPopup_ID");
 
 extern fn void* get_draw_list_shared_data() @extern("igGetDrawListSharedData");
 
@@ -406,7 +388,7 @@ extern fn float get_frame_height() @extern("igGetFrameHeight");
 
 extern fn void end_main_menu_bar() @extern("igEndMainMenuBar");
 
-extern fn ImID get_item_id() @extern("igGetItemID");
+extern fn ImGuiID get_item_id() @extern("igGetItemID");
 
 extern fn bool slider_scalar_n(ZString label, DataType data_type, void* p_data, int components, void* p_min, void* p_max, ZString format = null, SliderFlags flags = 0) @extern("igSliderScalarN");
 
@@ -450,11 +432,11 @@ extern fn void load_ini_settings_from_disk(ZString ini_filename) @extern("igLoad
 
 extern fn bool drag_scalar_n(ZString label, DataType data_type, void* p_data, int components, float v_speed = 1.0f, void* p_min = null, void* p_max = null, ZString format = null, SliderFlags flags = 0) @extern("igDragScalarN");
 
-extern fn bool drag_int4(ZString label, int[4] v, float v_speed = 1.0f, int v_min = 0, int v_max = 0, ZString format = "%d", SliderFlags flags = 0) @extern("igDragInt4");
+extern fn bool drag_int4(ZString label, int[/*4*/] v, float v_speed = 1.0f, int v_min = 0, int v_max = 0, ZString format = "%d", SliderFlags flags = 0) @extern("igDragInt4");
 
-extern fn bool drag_int3(ZString label, int[3] v, float v_speed = 1.0f, int v_min = 0, int v_max = 0, ZString format = "%d", SliderFlags flags = 0) @extern("igDragInt3");
+extern fn bool drag_int3(ZString label, int[/*3*/] v, float v_speed = 1.0f, int v_min = 0, int v_max = 0, ZString format = "%d", SliderFlags flags = 0) @extern("igDragInt3");
 
-extern fn bool drag_int2(ZString label, int[2] v, float v_speed = 1.0f, int v_min = 0, int v_max = 0, ZString format = "%d", SliderFlags flags = 0) @extern("igDragInt2");
+extern fn bool drag_int2(ZString label, int[/*2*/] v, float v_speed = 1.0f, int v_min = 0, int v_max = 0, ZString format = "%d", SliderFlags flags = 0) @extern("igDragInt2");
 
 extern fn void show_debug_log_window(bool* p_open = null) @extern("igShowDebugLogWindow");
 
@@ -468,8 +450,6 @@ extern fn bool is_item_active() @extern("igIsItemActive");
 
 extern fn float get_column_width(int column_index = -1) @extern("igGetColumnWidth");
 
-extern fn void update_platform_windows() @extern("igUpdatePlatformWindows");
-
 extern fn bool begin_main_menu_bar() @extern("igBeginMainMenuBar");
 
 extern fn float get_frame_height_with_spacing() @extern("igGetFrameHeightWithSpacing");
@@ -478,11 +458,11 @@ extern fn float get_font_size() @extern("igGetFontSize");
 
 extern fn void text_wrapped(ZString fmt, ...) @extern("igTextWrapped");
 
-extern fn bool color_edit4(ZString label, float[4] col, ColorEditFlags flags = 0) @extern("igColorEdit4");
+extern fn bool color_edit4(ZString label, float[/*4*/] col, ColorEditFlags flags = 0) @extern("igColorEdit4");
 
-extern fn bool color_edit3(ZString label, float[3] col, ColorEditFlags flags = 0) @extern("igColorEdit3");
+extern fn bool color_edit3(ZString label, float[/*3*/] col, ColorEditFlags flags = 0) @extern("igColorEdit3");
 
-extern fn DrawList* get_background_draw_list(Viewport* viewport = null) @extern("igGetBackgroundDrawList");
+extern fn DrawList* get_background_draw_list() @extern("igGetBackgroundDrawList");
 
 extern fn bool begin_popup_context_window(ZString str_id = null, PopupFlags popup_flags = 1) @extern("igBeginPopupContextWindow");
 
@@ -499,6 +479,10 @@ extern fn bool selectable_bool_ptr(ZString label, bool* p_selected, SelectableFl
 extern fn bool input_scalar_n(ZString label, DataType data_type, void* p_data, int components, void* p_step = null, void* p_step_fast = null, ZString format = null, InputTextFlags flags = 0) @extern("igInputScalarN");
 
 extern fn bool begin_list_box(ZString label, Vec2 size = {0, 0}) @extern("igBeginListBox");
+
+extern fn void push_style_var_y(StyleVar idx, float val_y) @extern("igPushStyleVarY");
+
+extern fn void push_style_var_x(StyleVar idx, float val_x) @extern("igPushStyleVarX");
 
 extern fn void set_next_item_selection_user_data(SelectionUserData selection_user_data) @extern("igSetNextItemSelectionUserData");
 
@@ -546,7 +530,7 @@ extern fn bool input_float(ZString label, float* v, float step = 0.0f, float ste
 
 extern fn bool begin_child_str(ZString str_id, Vec2 size = {0, 0}, ChildFlags child_flags = 0, WindowFlags window_flags = 0) @extern("igBeginChild_Str");
 
-extern fn bool begin_child_id(ImID id, Vec2 size = {0, 0}, ChildFlags child_flags = 0, WindowFlags window_flags = 0) @extern("igBeginChild_ID");
+extern fn bool begin_child_id(ImGuiID id, Vec2 size = {0, 0}, ChildFlags child_flags = 0, WindowFlags window_flags = 0) @extern("igBeginChild_ID");
 
 extern fn bool slider_int(ZString label, int* v, int v_min, int v_max, ZString format = "%d", SliderFlags flags = 0) @extern("igSliderInt");
 
@@ -560,8 +544,6 @@ extern fn void reset_mouse_drag_delta(MouseButton button = 0) @extern("igResetMo
 
 extern fn bool is_mouse_released(MouseButton button) @extern("igIsMouseReleased");
 
-extern fn void set_next_window_class(WindowClass* window_class) @extern("igSetNextWindowClass");
-
 extern fn void style_colors_dark(Style* dst = null) @extern("igStyleColorsDark");
 
 extern fn void set_next_item_width(float item_width) @extern("igSetNextItemWidth");
@@ -573,8 +555,6 @@ extern fn void set_clipboard_text(ZString text) @extern("igSetClipboardText");
 extern fn bool begin_menu(ZString label, bool enabled = true) @extern("igBeginMenu");
 
 extern fn void close_current_popup() @extern("igCloseCurrentPopup");
-
-extern fn void destroy_platform_windows() @extern("igDestroyPlatformWindows");
 
 extern fn void set_keyboard_focus_here(int offset = 0) @extern("igSetKeyboardFocusHere");
 
@@ -633,11 +613,11 @@ extern fn void indent(float indent_w = 0.0f) @extern("igIndent");
 
 extern fn bool is_item_visible() @extern("igIsItemVisible");
 
-extern fn ZString get_clipboard_text() @extern("igGetClipboardText");
+extern fn void* create_context(FontAtlas* shared_font_atlas = null) @extern("igCreateContext");
 
 extern fn void end_tooltip() @extern("igEndTooltip");
 
-extern fn void* create_context(FontAtlas* shared_font_atlas = null) @extern("igCreateContext");
+extern fn ZString get_clipboard_text() @extern("igGetClipboardText");
 
 extern fn int table_get_row_index() @extern("igTableGetRowIndex");
 
@@ -649,7 +629,7 @@ extern fn void progress_bar(float fraction, Vec2 size_arg = {-FLT_MIN, 0}, ZStri
 
 extern fn void pop_style_color(int count = 1) @extern("igPopStyleColor");
 
-extern fn void columns(int count = 1, ZString id = null, bool border = true) @extern("igColumns");
+extern fn void columns(int count = 1, ZString id = null, bool borders = true) @extern("igColumns");
 
 extern fn void tree_pop() @extern("igTreePop");
 
@@ -681,8 +661,6 @@ extern fn void debug_flash_style_color(Col idx) @extern("igDebugFlashStyleColor"
 extern fn bool table_next_column() @extern("igTableNextColumn");
 
 extern fn void set_column_width(int column_index, float width) @extern("igSetColumnWidth");
-
-extern fn ImID dock_space_over_viewport(ImID dockspace_id = 0, Viewport* viewport = null, DockNodeFlags flags = 0, WindowClass* window_class = null) @extern("igDockSpaceOverViewport");
 
 extern fn void label_text(ZString label, ZString fmt, ...) @extern("igLabelText");
 
@@ -725,8 +703,6 @@ extern fn TableColumnFlags table_get_column_flags(int column_n = -1) @extern("ig
 extern fn void same_line(float offset_from_start_x = 0.0f, float spacing = -1.0f) @extern("igSameLine");
 
 extern fn bool is_mouse_hovering_rect(Vec2 r_min, Vec2 r_max, bool clip = true) @extern("igIsMouseHoveringRect");
-
-extern fn void set_next_window_dock_id(ImID dock_id, Cond cond = 0) @extern("igSetNextWindowDockID");
 
 extern fn void set_current_context(void* ctx) @extern("igSetCurrentContext");
 
@@ -934,6 +910,8 @@ extern fn void DrawList.pop_unused_draw_cmd(DrawList* self) @extern("ImDrawList_
 
 extern fn void DrawList.reset_for_new_frame(DrawList* self) @extern("ImDrawList__ResetForNewFrame");
 
+extern fn void DrawList.set_texture_id(DrawList* self, TextureID texture_id) @extern("ImDrawList__SetTextureID");
+
 extern fn void DrawList.try_merge_draw_cmds(DrawList* self) @extern("ImDrawList__TryMergeDrawCmds");
 
 extern fn void DrawList.destroy(DrawList* self) @extern("ImDrawList_destroy");
@@ -954,9 +932,9 @@ extern fn Font* FontAtlas.add_font_default(FontAtlas* self, FontConfig* font_cfg
 
 extern fn Font* FontAtlas.add_font_from_file_ttf(FontAtlas* self, ZString filename, float size_pixels, FontConfig* font_cfg = null, Wchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromFileTTF");
 
-extern fn Font* FontAtlas.add_font_from_memory_compressed_base85_ttf(FontAtlas* self, ZString compressed_font_data_base85, float size_pixels, FontConfig* font_cfg = null, Wchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryCompressedBase85TTF");
-
 extern fn void PlatformIO.destroy(PlatformIO* self) @extern("ImGuiPlatformIO_destroy");
+
+extern fn Font* FontAtlas.add_font_from_memory_compressed_base85_ttf(FontAtlas* self, ZString compressed_font_data_base85, float size_pixels, FontConfig* font_cfg = null, Wchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryCompressedBase85TTF");
 
 extern fn Font* FontAtlas.add_font_from_memory_compressed_ttf(FontAtlas* self, void* compressed_font_data, int compressed_font_data_size, float size_pixels, FontConfig* font_cfg = null, Wchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryCompressedTTF");
 
@@ -1064,41 +1042,39 @@ extern fn void Font.set_glyph_visible(Font* self, Wchar c, bool visible) @extern
 
 extern fn void Font.destroy(Font* self) @extern("ImFont_destroy");
 
-extern fn void ImIO.add_focus_event(ImIO* self, bool focused) @extern("ImGuiIO_AddFocusEvent");
+extern fn void ImGuiIO.add_focus_event(ImGuiIO* self, bool focused) @extern("ImGuiIO_AddFocusEvent");
 
-extern fn void ImIO.add_input_character(ImIO* self, uint c) @extern("ImGuiIO_AddInputCharacter");
+extern fn void ImGuiIO.add_input_character(ImGuiIO* self, uint c) @extern("ImGuiIO_AddInputCharacter");
 
-extern fn void ImIO.add_input_character_utf16(ImIO* self, Wchar16 c) @extern("ImGuiIO_AddInputCharacterUTF16");
+extern fn void ImGuiIO.add_input_character_utf16(ImGuiIO* self, Wchar16 c) @extern("ImGuiIO_AddInputCharacterUTF16");
 
-extern fn void ImIO.add_input_characters_utf8(ImIO* self, ZString str) @extern("ImGuiIO_AddInputCharactersUTF8");
+extern fn void ImGuiIO.add_input_characters_utf8(ImGuiIO* self, ZString str) @extern("ImGuiIO_AddInputCharactersUTF8");
 
-extern fn void ImIO.add_key_analog_event(ImIO* self, Key key, bool down, float v) @extern("ImGuiIO_AddKeyAnalogEvent");
+extern fn void ImGuiIO.add_key_analog_event(ImGuiIO* self, Key key, bool down, float v) @extern("ImGuiIO_AddKeyAnalogEvent");
 
-extern fn void ImIO.add_key_event(ImIO* self, Key key, bool down) @extern("ImGuiIO_AddKeyEvent");
+extern fn void ImGuiIO.add_key_event(ImGuiIO* self, Key key, bool down) @extern("ImGuiIO_AddKeyEvent");
 
-extern fn void ImIO.add_mouse_button_event(ImIO* self, int button, bool down) @extern("ImGuiIO_AddMouseButtonEvent");
+extern fn void ImGuiIO.add_mouse_button_event(ImGuiIO* self, int button, bool down) @extern("ImGuiIO_AddMouseButtonEvent");
 
-extern fn void ImIO.add_mouse_pos_event(ImIO* self, float x, float y) @extern("ImGuiIO_AddMousePosEvent");
+extern fn void ImGuiIO.add_mouse_pos_event(ImGuiIO* self, float x, float y) @extern("ImGuiIO_AddMousePosEvent");
 
-extern fn void ImIO.add_mouse_source_event(ImIO* self, MouseSource source) @extern("ImGuiIO_AddMouseSourceEvent");
+extern fn void ImGuiIO.add_mouse_source_event(ImGuiIO* self, MouseSource source) @extern("ImGuiIO_AddMouseSourceEvent");
 
-extern fn void ImIO.add_mouse_viewport_event(ImIO* self, ImID id) @extern("ImGuiIO_AddMouseViewportEvent");
+extern fn void ImGuiIO.add_mouse_wheel_event(ImGuiIO* self, float wheel_x, float wheel_y) @extern("ImGuiIO_AddMouseWheelEvent");
 
-extern fn void ImIO.add_mouse_wheel_event(ImIO* self, float wheel_x, float wheel_y) @extern("ImGuiIO_AddMouseWheelEvent");
+extern fn void ImGuiIO.clear_events_queue(ImGuiIO* self) @extern("ImGuiIO_ClearEventsQueue");
 
-extern fn void ImIO.clear_events_queue(ImIO* self) @extern("ImGuiIO_ClearEventsQueue");
+extern fn void ImGuiIO.clear_input_keys(ImGuiIO* self) @extern("ImGuiIO_ClearInputKeys");
 
-extern fn void ImIO.clear_input_keys(ImIO* self) @extern("ImGuiIO_ClearInputKeys");
+extern fn void ImGuiIO.clear_input_mouse(ImGuiIO* self) @extern("ImGuiIO_ClearInputMouse");
 
-extern fn void ImIO.clear_input_mouse(ImIO* self) @extern("ImGuiIO_ClearInputMouse");
+extern fn ImGuiIO* new_io() @extern("ImGuiIO_ImGuiIO");
 
-extern fn ImIO* new_io() @extern("ImGuiIO_ImGuiIO");
+extern fn void ImGuiIO.set_app_accepting_events(ImGuiIO* self, bool accepting_events) @extern("ImGuiIO_SetAppAcceptingEvents");
 
-extern fn void ImIO.set_app_accepting_events(ImIO* self, bool accepting_events) @extern("ImGuiIO_SetAppAcceptingEvents");
+extern fn void ImGuiIO.set_key_event_native_data(ImGuiIO* self, Key key, int native_keycode, int native_scancode, int native_legacy_index = -1) @extern("ImGuiIO_SetKeyEventNativeData");
 
-extern fn void ImIO.set_key_event_native_data(ImIO* self, Key key, int native_keycode, int native_scancode, int native_legacy_index = -1) @extern("ImGuiIO_SetKeyEventNativeData");
-
-extern fn void ImIO.destroy(ImIO* self) @extern("ImGuiIO_destroy");
+extern fn void ImGuiIO.destroy(ImGuiIO* self) @extern("ImGuiIO_destroy");
 
 extern fn void InputTextCallbackData.clear_selection(InputTextCallbackData* self) @extern("ImGuiInputTextCallbackData_ClearSelection");
 
@@ -1152,23 +1128,19 @@ extern fn PlatformImeData* new_platform_ime_data() @extern("ImGuiPlatformImeData
 
 extern fn void PlatformImeData.destroy(PlatformImeData* self) @extern("ImGuiPlatformImeData_destroy");
 
-extern fn PlatformMonitor* new_platform_monitor() @extern("ImGuiPlatformMonitor_ImGuiPlatformMonitor");
-
-extern fn void PlatformMonitor.destroy(PlatformMonitor* self) @extern("ImGuiPlatformMonitor_destroy");
-
 extern fn void SelectionBasicStorage.apply_requests(SelectionBasicStorage* self, MultiSelectIO* ms_io) @extern("ImGuiSelectionBasicStorage_ApplyRequests");
 
 extern fn void SelectionBasicStorage.clear(SelectionBasicStorage* self) @extern("ImGuiSelectionBasicStorage_Clear");
 
-extern fn bool SelectionBasicStorage.contains(SelectionBasicStorage* self, ImID id) @extern("ImGuiSelectionBasicStorage_Contains");
+extern fn bool SelectionBasicStorage.contains(SelectionBasicStorage* self, ImGuiID id) @extern("ImGuiSelectionBasicStorage_Contains");
 
-extern fn bool SelectionBasicStorage.get_next_selected_item(SelectionBasicStorage* self, void** opaque_it, ImID* out_id) @extern("ImGuiSelectionBasicStorage_GetNextSelectedItem");
+extern fn bool SelectionBasicStorage.get_next_selected_item(SelectionBasicStorage* self, void** opaque_it, ImGuiID* out_id) @extern("ImGuiSelectionBasicStorage_GetNextSelectedItem");
 
-extern fn ImID SelectionBasicStorage.get_storage_id_from_index(SelectionBasicStorage* self, int idx) @extern("ImGuiSelectionBasicStorage_GetStorageIdFromIndex");
+extern fn ImGuiID SelectionBasicStorage.get_storage_id_from_index(SelectionBasicStorage* self, int idx) @extern("ImGuiSelectionBasicStorage_GetStorageIdFromIndex");
 
 extern fn SelectionBasicStorage* new_selection_basic_storage() @extern("ImGuiSelectionBasicStorage_ImGuiSelectionBasicStorage");
 
-extern fn void SelectionBasicStorage.set_item_selected(SelectionBasicStorage* self, ImID id, bool selected) @extern("ImGuiSelectionBasicStorage_SetItemSelected");
+extern fn void SelectionBasicStorage.set_item_selected(SelectionBasicStorage* self, ImGuiID id, bool selected) @extern("ImGuiSelectionBasicStorage_SetItemSelected");
 
 extern fn void SelectionBasicStorage.swap(SelectionBasicStorage* self, SelectionBasicStorage* r) @extern("ImGuiSelectionBasicStorage_Swap");
 
@@ -1180,11 +1152,11 @@ extern fn SelectionExternalStorage* new_selection_external_storage() @extern("Im
 
 extern fn void SelectionExternalStorage.destroy(SelectionExternalStorage* self) @extern("ImGuiSelectionExternalStorage_destroy");
 
-extern fn StoragePair* new_storage_pair_int(ImID _key, int _val) @extern("ImGuiStoragePair_ImGuiStoragePair_Int");
+extern fn StoragePair* new_storage_pair_int(ImGuiID _key, int _val) @extern("ImGuiStoragePair_ImGuiStoragePair_Int");
 
-extern fn StoragePair* new_storage_pair_float(ImID _key, float _val) @extern("ImGuiStoragePair_ImGuiStoragePair_Float");
+extern fn StoragePair* new_storage_pair_float(ImGuiID _key, float _val) @extern("ImGuiStoragePair_ImGuiStoragePair_Float");
 
-extern fn StoragePair* new_storage_pair_ptr(ImID _key, void* _val) @extern("ImGuiStoragePair_ImGuiStoragePair_Ptr");
+extern fn StoragePair* new_storage_pair_ptr(ImGuiID _key, void* _val) @extern("ImGuiStoragePair_ImGuiStoragePair_Ptr");
 
 extern fn void StoragePair.destroy(StoragePair* self) @extern("ImGuiStoragePair_destroy");
 
@@ -1192,31 +1164,31 @@ extern fn void Storage.build_sort_by_key(Storage* self) @extern("ImGuiStorage_Bu
 
 extern fn void Storage.clear(Storage* self) @extern("ImGuiStorage_Clear");
 
-extern fn bool Storage.get_bool(Storage* self, ImID key, bool default_val = false) @extern("ImGuiStorage_GetBool");
+extern fn bool Storage.get_bool(Storage* self, ImGuiID key, bool default_val = false) @extern("ImGuiStorage_GetBool");
 
-extern fn bool* Storage.get_bool_ref(Storage* self, ImID key, bool default_val = false) @extern("ImGuiStorage_GetBoolRef");
+extern fn bool* Storage.get_bool_ref(Storage* self, ImGuiID key, bool default_val = false) @extern("ImGuiStorage_GetBoolRef");
 
-extern fn float Storage.get_float(Storage* self, ImID key, float default_val = 0.0f) @extern("ImGuiStorage_GetFloat");
+extern fn float Storage.get_float(Storage* self, ImGuiID key, float default_val = 0.0f) @extern("ImGuiStorage_GetFloat");
 
-extern fn float* Storage.get_float_ref(Storage* self, ImID key, float default_val = 0.0f) @extern("ImGuiStorage_GetFloatRef");
+extern fn float* Storage.get_float_ref(Storage* self, ImGuiID key, float default_val = 0.0f) @extern("ImGuiStorage_GetFloatRef");
 
-extern fn int Storage.get_int(Storage* self, ImID key, int default_val = 0) @extern("ImGuiStorage_GetInt");
+extern fn int Storage.get_int(Storage* self, ImGuiID key, int default_val = 0) @extern("ImGuiStorage_GetInt");
 
-extern fn int* Storage.get_int_ref(Storage* self, ImID key, int default_val = 0) @extern("ImGuiStorage_GetIntRef");
+extern fn int* Storage.get_int_ref(Storage* self, ImGuiID key, int default_val = 0) @extern("ImGuiStorage_GetIntRef");
 
-extern fn void* Storage.get_void_ptr(Storage* self, ImID key) @extern("ImGuiStorage_GetVoidPtr");
+extern fn void* Storage.get_void_ptr(Storage* self, ImGuiID key) @extern("ImGuiStorage_GetVoidPtr");
 
-extern fn void** Storage.get_void_ptr_ref(Storage* self, ImID key, void* default_val = null) @extern("ImGuiStorage_GetVoidPtrRef");
+extern fn void** Storage.get_void_ptr_ref(Storage* self, ImGuiID key, void* default_val = null) @extern("ImGuiStorage_GetVoidPtrRef");
 
 extern fn void Storage.set_all_int(Storage* self, int val) @extern("ImGuiStorage_SetAllInt");
 
-extern fn void Storage.set_bool(Storage* self, ImID key, bool val) @extern("ImGuiStorage_SetBool");
+extern fn void Storage.set_bool(Storage* self, ImGuiID key, bool val) @extern("ImGuiStorage_SetBool");
 
-extern fn void Storage.set_float(Storage* self, ImID key, float val) @extern("ImGuiStorage_SetFloat");
+extern fn void Storage.set_float(Storage* self, ImGuiID key, float val) @extern("ImGuiStorage_SetFloat");
 
-extern fn void Storage.set_int(Storage* self, ImID key, int val) @extern("ImGuiStorage_SetInt");
+extern fn void Storage.set_int(Storage* self, ImGuiID key, int val) @extern("ImGuiStorage_SetInt");
 
-extern fn void Storage.set_void_ptr(Storage* self, ImID key, void* val) @extern("ImGuiStorage_SetVoidPtr");
+extern fn void Storage.set_void_ptr(Storage* self, ImGuiID key, void* val) @extern("ImGuiStorage_SetVoidPtr");
 
 extern fn Style* new_style() @extern("ImGuiStyle_ImGuiStyle");
 
@@ -1281,10 +1253,6 @@ extern fn void TextRange.split(TextRange* self, char separator, vector::Vector(<
 extern fn Viewport* new_viewport() @extern("ImGuiViewport_ImGuiViewport");
 
 extern fn void Viewport.destroy(Viewport* self) @extern("ImGuiViewport_destroy");
-
-extern fn WindowClass* new_window_class() @extern("ImGuiWindowClass_ImGuiWindowClass");
-
-extern fn void WindowClass.destroy(WindowClass* self) @extern("ImGuiWindowClass_destroy");
 
 extern fn Vec2* new_vec2() @extern("ImVec2_ImVec2_Nil");
 

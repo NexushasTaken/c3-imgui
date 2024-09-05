@@ -1,7 +1,7 @@
 module imgui;
 
 // ImDrawFlags_
-distinct DrawFlags = int;
+def DrawFlags = int;
 const DrawFlags DRAW_FLAGS_NONE                       = 0;
 const DrawFlags DRAW_FLAGS_CLOSED                     = 1 << 0;
 const DrawFlags DRAW_FLAGS_ROUND_CORNERS_TOP_LEFT     = 1 << 4;
@@ -18,7 +18,7 @@ const DrawFlags DRAW_FLAGS_ROUND_CORNERS_DEFAULT      = DRAW_FLAGS_ROUND_CORNERS
 const DrawFlags DRAW_FLAGS_ROUND_CORNERS_MASK         = DRAW_FLAGS_ROUND_CORNERS_ALL | DRAW_FLAGS_ROUND_CORNERS_NONE;
 
 // ImGuiButtonFlags_
-distinct ButtonFlags = int;
+def ButtonFlags = int;
 const ButtonFlags BUTTON_FLAGS_NONE                = 0;
 const ButtonFlags BUTTON_FLAGS_MOUSE_BUTTON_LEFT   = 1 << 0;
 const ButtonFlags BUTTON_FLAGS_MOUSE_BUTTON_RIGHT  = 1 << 1;
@@ -26,19 +26,19 @@ const ButtonFlags BUTTON_FLAGS_MOUSE_BUTTON_MIDDLE = 1 << 2;
 const ButtonFlags BUTTON_FLAGS_MOUSE_BUTTON_MASK   = BUTTON_FLAGS_MOUSE_BUTTON_LEFT | BUTTON_FLAGS_MOUSE_BUTTON_RIGHT | BUTTON_FLAGS_MOUSE_BUTTON_MIDDLE;
 
 // ImFontAtlasFlags_
-distinct FontAtlasFlags = int;
+def FontAtlasFlags = int;
 const FontAtlasFlags FONT_ATLAS_FLAGS_NONE                   = 0;
 const FontAtlasFlags FONT_ATLAS_FLAGS_NO_POWER_OF_TWO_HEIGHT = 1 << 0;
 const FontAtlasFlags FONT_ATLAS_FLAGS_NO_MOUSE_CURSORS       = 1 << 1;
 const FontAtlasFlags FONT_ATLAS_FLAGS_NO_BAKED_LINES         = 1 << 2;
 
 // ImGuiTableRowFlags_
-distinct TableRowFlags = int;
+def TableRowFlags = int;
 const TableRowFlags TABLE_ROW_FLAGS_NONE    = 0;
 const TableRowFlags TABLE_ROW_FLAGS_HEADERS = 1 << 0;
 
 // ImGuiCond_
-distinct Cond = int;
+def Cond = int;
 const Cond COND_NONE           = 0;
 const Cond COND_ALWAYS         = 1 << 0;
 const Cond COND_ONCE           = 1 << 1;
@@ -46,7 +46,7 @@ const Cond COND_FIRST_USE_EVER = 1 << 2;
 const Cond COND_APPEARING      = 1 << 3;
 
 // ImGuiPopupFlags_
-distinct PopupFlags = int;
+def PopupFlags = int;
 const PopupFlags POPUP_FLAGS_NONE                        = 0;
 const PopupFlags POPUP_FLAGS_MOUSE_BUTTON_LEFT           = 0;
 const PopupFlags POPUP_FLAGS_MOUSE_BUTTON_RIGHT          = 1;
@@ -61,13 +61,13 @@ const PopupFlags POPUP_FLAGS_ANY_POPUP_LEVEL             = 1 << 11;
 const PopupFlags POPUP_FLAGS_ANY_POPUP                   = POPUP_FLAGS_ANY_POPUP_ID | POPUP_FLAGS_ANY_POPUP_LEVEL;
 
 // ImGuiSelectionRequestType
-distinct SelectionRequestType = int;
+def SelectionRequestType = int;
 const SelectionRequestType SELECTION_REQUEST_TYPE_NONE      = 0;
 const SelectionRequestType SELECTION_REQUEST_TYPE_SET_ALL   = 1;
 const SelectionRequestType SELECTION_REQUEST_TYPE_SET_RANGE = 2;
 
 // ImGuiDragDropFlags_
-distinct DragDropFlags = int;
+def DragDropFlags = int;
 const DragDropFlags DRAG_DROP_FLAGS_NONE                          = 0;
 const DragDropFlags DRAG_DROP_FLAGS_SOURCE_NO_PREVIEW_TOOLTIP     = 1 << 0;
 const DragDropFlags DRAG_DROP_FLAGS_SOURCE_NO_DISABLE_HOVER       = 1 << 1;
@@ -83,18 +83,15 @@ const DragDropFlags DRAG_DROP_FLAGS_ACCEPT_NO_PREVIEW_TOOLTIP     = 1 << 12;
 const DragDropFlags DRAG_DROP_FLAGS_ACCEPT_PEEK_ONLY              = DRAG_DROP_FLAGS_ACCEPT_BEFORE_DELIVERY | DRAG_DROP_FLAGS_ACCEPT_NO_DRAW_DEFAULT_RECT;
 
 // ImGuiBackendFlags_
-distinct BackendFlags = int;
-const BackendFlags BACKEND_FLAGS_NONE                       = 0;
-const BackendFlags BACKEND_FLAGS_HAS_GAMEPAD                = 1 << 0;
-const BackendFlags BACKEND_FLAGS_HAS_MOUSE_CURSORS          = 1 << 1;
-const BackendFlags BACKEND_FLAGS_HAS_SET_MOUSE_POS          = 1 << 2;
-const BackendFlags BACKEND_FLAGS_RENDERER_HAS_VTX_OFFSET    = 1 << 3;
-const BackendFlags BACKEND_FLAGS_PLATFORM_HAS_VIEWPORTS     = 1 << 10;
-const BackendFlags BACKEND_FLAGS_HAS_MOUSE_HOVERED_VIEWPORT = 1 << 11;
-const BackendFlags BACKEND_FLAGS_RENDERER_HAS_VIEWPORTS     = 1 << 12;
+def BackendFlags = int;
+const BackendFlags BACKEND_FLAGS_NONE                    = 0;
+const BackendFlags BACKEND_FLAGS_HAS_GAMEPAD             = 1 << 0;
+const BackendFlags BACKEND_FLAGS_HAS_MOUSE_CURSORS       = 1 << 1;
+const BackendFlags BACKEND_FLAGS_HAS_SET_MOUSE_POS       = 1 << 2;
+const BackendFlags BACKEND_FLAGS_RENDERER_HAS_VTX_OFFSET = 1 << 3;
 
 // ImGuiTableColumnFlags_
-distinct TableColumnFlags = int;
+def TableColumnFlags = int;
 const TableColumnFlags TABLE_COLUMN_FLAGS_NONE                   = 0;
 const TableColumnFlags TABLE_COLUMN_FLAGS_DISABLED               = 1 << 0;
 const TableColumnFlags TABLE_COLUMN_FLAGS_DEFAULT_HIDE           = 1 << 1;
@@ -125,7 +122,7 @@ const TableColumnFlags TABLE_COLUMN_FLAGS_STATUS_MASK            = TABLE_COLUMN_
 const TableColumnFlags TABLE_COLUMN_FLAGS_NO_DIRECT_RESIZE       = 1 << 30;
 
 // ImGuiStyleVar_
-distinct StyleVar = int;
+def StyleVar = int;
 const StyleVar STYLE_VAR_ALPHA                           = 0;
 const StyleVar STYLE_VAR_DISABLED_ALPHA                  = 1;
 const StyleVar STYLE_VAR_WINDOW_PADDING                  = 2;
@@ -159,11 +156,10 @@ const StyleVar STYLE_VAR_SELECTABLE_TEXT_ALIGN           = 29;
 const StyleVar STYLE_VAR_SEPARATOR_TEXT_BORDER_SIZE      = 30;
 const StyleVar STYLE_VAR_SEPARATOR_TEXT_ALIGN            = 31;
 const StyleVar STYLE_VAR_SEPARATOR_TEXT_PADDING          = 32;
-const StyleVar STYLE_VAR_DOCKING_SEPARATOR_SIZE          = 33;
-const StyleVar STYLE_VAR_COUNT                           = 34;
+const StyleVar STYLE_VAR_COUNT                           = 33;
 
 // ImGuiTabBarFlags_
-distinct TabBarFlags = int;
+def TabBarFlags = int;
 const TabBarFlags TAB_BAR_FLAGS_NONE                              = 0;
 const TabBarFlags TAB_BAR_FLAGS_REORDERABLE                       = 1 << 0;
 const TabBarFlags TAB_BAR_FLAGS_AUTO_SELECT_NEW_TABS              = 1 << 1;
@@ -178,9 +174,9 @@ const TabBarFlags TAB_BAR_FLAGS_FITTING_POLICY_MASK               = TAB_BAR_FLAG
 const TabBarFlags TAB_BAR_FLAGS_FITTING_POLICY_DEFAULT            = TAB_BAR_FLAGS_FITTING_POLICY_RESIZE_DOWN;
 
 // ImGuiChildFlags_
-distinct ChildFlags = int;
+def ChildFlags = int;
 const ChildFlags CHILD_FLAGS_NONE                      = 0;
-const ChildFlags CHILD_FLAGS_BORDER                    = 1 << 0;
+const ChildFlags CHILD_FLAGS_BORDERS                   = 1 << 0;
 const ChildFlags CHILD_FLAGS_ALWAYS_USE_WINDOW_PADDING = 1 << 1;
 const ChildFlags CHILD_FLAGS_RESIZE_X                  = 1 << 2;
 const ChildFlags CHILD_FLAGS_RESIZE_Y                  = 1 << 3;
@@ -191,7 +187,7 @@ const ChildFlags CHILD_FLAGS_FRAME_STYLE               = 1 << 7;
 const ChildFlags CHILD_FLAGS_NAV_FLATTENED             = 1 << 8;
 
 // ImGuiMultiSelectFlags_
-distinct MultiSelectFlags = int;
+def MultiSelectFlags = int;
 const MultiSelectFlags MULTI_SELECT_FLAGS_NONE                      = 0;
 const MultiSelectFlags MULTI_SELECT_FLAGS_SINGLE_SELECT             = 1 << 0;
 const MultiSelectFlags MULTI_SELECT_FLAGS_NO_SELECT_ALL             = 1 << 1;
@@ -211,7 +207,7 @@ const MultiSelectFlags MULTI_SELECT_FLAGS_SELECT_ON_CLICK_RELEASE   = 1 << 14;
 const MultiSelectFlags MULTI_SELECT_FLAGS_NAV_WRAP_X                = 1 << 16;
 
 // ImGuiSelectableFlags_
-distinct SelectableFlags = int;
+def SelectableFlags = int;
 const SelectableFlags SELECTABLE_FLAGS_NONE                 = 0;
 const SelectableFlags SELECTABLE_FLAGS_NO_AUTO_CLOSE_POPUPS = 1 << 0;
 const SelectableFlags SELECTABLE_FLAGS_SPAN_ALL_COLUMNS     = 1 << 1;
@@ -221,7 +217,7 @@ const SelectableFlags SELECTABLE_FLAGS_ALLOW_OVERLAP        = 1 << 4;
 const SelectableFlags SELECTABLE_FLAGS_HIGHLIGHT            = 1 << 5;
 
 // ImGuiDir
-distinct Dir = int;
+def Dir = int;
 const Dir DIR_NONE  = -1;
 const Dir DIR_LEFT  = 0;
 const Dir DIR_RIGHT = 1;
@@ -230,7 +226,7 @@ const Dir DIR_DOWN  = 3;
 const Dir DIR_COUNT = 4;
 
 // ImGuiTableFlags_
-distinct TableFlags = int;
+def TableFlags = int;
 const TableFlags TABLE_FLAGS_NONE                            = 0;
 const TableFlags TABLE_FLAGS_RESIZABLE                       = 1 << 0;
 const TableFlags TABLE_FLAGS_REORDERABLE                     = 1 << 1;
@@ -270,7 +266,7 @@ const TableFlags TABLE_FLAGS_HIGHLIGHT_HOVERED_COLUMN        = 1 << 28;
 const TableFlags TABLE_FLAGS_SIZING_MASK                     = TABLE_FLAGS_SIZING_FIXED_FIT | TABLE_FLAGS_SIZING_FIXED_SAME | TABLE_FLAGS_SIZING_STRETCH_PROP | TABLE_FLAGS_SIZING_STRETCH_SAME;
 
 // ImGuiColorEditFlags_
-distinct ColorEditFlags = int;
+def ColorEditFlags = int;
 const ColorEditFlags COLOR_EDIT_FLAGS_NONE               = 0;
 const ColorEditFlags COLOR_EDIT_FLAGS_NO_ALPHA           = 1 << 1;
 const ColorEditFlags COLOR_EDIT_FLAGS_NO_PICKER          = 1 << 2;
@@ -301,25 +297,13 @@ const ColorEditFlags COLOR_EDIT_FLAGS_DATA_TYPE_MASK     = COLOR_EDIT_FLAGS_UINT
 const ColorEditFlags COLOR_EDIT_FLAGS_PICKER_MASK        = COLOR_EDIT_FLAGS_PICKER_HUE_WHEEL | COLOR_EDIT_FLAGS_PICKER_HUE_BAR;
 const ColorEditFlags COLOR_EDIT_FLAGS_INPUT_MASK         = COLOR_EDIT_FLAGS_INPUT_RGB | COLOR_EDIT_FLAGS_INPUT_HSV;
 
-// ImGuiDockNodeFlags_
-distinct DockNodeFlags = int;
-const DockNodeFlags DOCK_NODE_FLAGS_NONE                         = 0;
-const DockNodeFlags DOCK_NODE_FLAGS_KEEP_ALIVE_ONLY              = 1 << 0;
-const DockNodeFlags DOCK_NODE_FLAGS_NO_DOCKING_OVER_CENTRAL_NODE = 1 << 2;
-const DockNodeFlags DOCK_NODE_FLAGS_PASSTHRU_CENTRAL_NODE        = 1 << 3;
-const DockNodeFlags DOCK_NODE_FLAGS_NO_DOCKING_SPLIT             = 1 << 4;
-const DockNodeFlags DOCK_NODE_FLAGS_NO_RESIZE                    = 1 << 5;
-const DockNodeFlags DOCK_NODE_FLAGS_AUTO_HIDE_TAB_BAR            = 1 << 6;
-const DockNodeFlags DOCK_NODE_FLAGS_NO_UNDOCKING                 = 1 << 7;
-
 // ImGuiHoveredFlags_
-distinct HoveredFlags = int;
+def HoveredFlags = int;
 const HoveredFlags HOVERED_FLAGS_NONE                              = 0;
 const HoveredFlags HOVERED_FLAGS_CHILD_WINDOWS                     = 1 << 0;
 const HoveredFlags HOVERED_FLAGS_ROOT_WINDOW                       = 1 << 1;
 const HoveredFlags HOVERED_FLAGS_ANY_WINDOW                        = 1 << 2;
 const HoveredFlags HOVERED_FLAGS_NO_POPUP_HIERARCHY                = 1 << 3;
-const HoveredFlags HOVERED_FLAGS_DOCK_HIERARCHY                    = 1 << 4;
 const HoveredFlags HOVERED_FLAGS_ALLOW_WHEN_BLOCKED_BY_POPUP       = 1 << 5;
 const HoveredFlags HOVERED_FLAGS_ALLOW_WHEN_BLOCKED_BY_ACTIVE_ITEM = 1 << 7;
 const HoveredFlags HOVERED_FLAGS_ALLOW_WHEN_OVERLAPPED_BY_ITEM     = 1 << 8;
@@ -337,7 +321,7 @@ const HoveredFlags HOVERED_FLAGS_DELAY_NORMAL                      = 1 << 16;
 const HoveredFlags HOVERED_FLAGS_NO_SHARED_DELAY                   = 1 << 17;
 
 // ImGuiInputFlags_
-distinct InputFlags = int;
+def InputFlags = int;
 const InputFlags INPUT_FLAGS_NONE                    = 0;
 const InputFlags INPUT_FLAGS_REPEAT                  = 1 << 0;
 const InputFlags INPUT_FLAGS_ROUTE_ACTIVE            = 1 << 10;
@@ -351,41 +335,29 @@ const InputFlags INPUT_FLAGS_ROUTE_FROM_ROOT_WINDOW  = 1 << 17;
 const InputFlags INPUT_FLAGS_TOOLTIP                 = 1 << 18;
 
 // ImGuiViewportFlags_
-distinct ViewportFlags = int;
-const ViewportFlags VIEWPORT_FLAGS_NONE                   = 0;
-const ViewportFlags VIEWPORT_FLAGS_IS_PLATFORM_WINDOW     = 1 << 0;
-const ViewportFlags VIEWPORT_FLAGS_IS_PLATFORM_MONITOR    = 1 << 1;
-const ViewportFlags VIEWPORT_FLAGS_OWNED_BY_APP           = 1 << 2;
-const ViewportFlags VIEWPORT_FLAGS_NO_DECORATION          = 1 << 3;
-const ViewportFlags VIEWPORT_FLAGS_NO_TASK_BAR_ICON       = 1 << 4;
-const ViewportFlags VIEWPORT_FLAGS_NO_FOCUS_ON_APPEARING  = 1 << 5;
-const ViewportFlags VIEWPORT_FLAGS_NO_FOCUS_ON_CLICK      = 1 << 6;
-const ViewportFlags VIEWPORT_FLAGS_NO_INPUTS              = 1 << 7;
-const ViewportFlags VIEWPORT_FLAGS_NO_RENDERER_CLEAR      = 1 << 8;
-const ViewportFlags VIEWPORT_FLAGS_NO_AUTO_MERGE          = 1 << 9;
-const ViewportFlags VIEWPORT_FLAGS_TOP_MOST               = 1 << 10;
-const ViewportFlags VIEWPORT_FLAGS_CAN_HOST_OTHER_WINDOWS = 1 << 11;
-const ViewportFlags VIEWPORT_FLAGS_IS_MINIMIZED           = 1 << 12;
-const ViewportFlags VIEWPORT_FLAGS_IS_FOCUSED             = 1 << 13;
+def ViewportFlags = int;
+const ViewportFlags VIEWPORT_FLAGS_NONE                = 0;
+const ViewportFlags VIEWPORT_FLAGS_IS_PLATFORM_WINDOW  = 1 << 0;
+const ViewportFlags VIEWPORT_FLAGS_IS_PLATFORM_MONITOR = 1 << 1;
+const ViewportFlags VIEWPORT_FLAGS_OWNED_BY_APP        = 1 << 2;
 
 // ImGuiFocusedFlags_
-distinct FocusedFlags = int;
+def FocusedFlags = int;
 const FocusedFlags FOCUSED_FLAGS_NONE                   = 0;
 const FocusedFlags FOCUSED_FLAGS_CHILD_WINDOWS          = 1 << 0;
 const FocusedFlags FOCUSED_FLAGS_ROOT_WINDOW            = 1 << 1;
 const FocusedFlags FOCUSED_FLAGS_ANY_WINDOW             = 1 << 2;
 const FocusedFlags FOCUSED_FLAGS_NO_POPUP_HIERARCHY     = 1 << 3;
-const FocusedFlags FOCUSED_FLAGS_DOCK_HIERARCHY         = 1 << 4;
 const FocusedFlags FOCUSED_FLAGS_ROOT_AND_CHILD_WINDOWS = FOCUSED_FLAGS_ROOT_WINDOW | FOCUSED_FLAGS_CHILD_WINDOWS;
 
 // ImGuiSortDirection
-distinct SortDirection = ImU8;
+def SortDirection = ImU8;
 const SortDirection SORT_DIRECTION_NONE       = 0;
 const SortDirection SORT_DIRECTION_ASCENDING  = 1;
 const SortDirection SORT_DIRECTION_DESCENDING = 2;
 
 // ImGuiInputTextFlags_
-distinct InputTextFlags = int;
+def InputTextFlags = int;
 const InputTextFlags INPUT_TEXT_FLAGS_NONE                    = 0;
 const InputTextFlags INPUT_TEXT_FLAGS_CHARS_DECIMAL           = 1 << 0;
 const InputTextFlags INPUT_TEXT_FLAGS_CHARS_HEXADECIMAL       = 1 << 1;
@@ -412,14 +384,14 @@ const InputTextFlags INPUT_TEXT_FLAGS_CALLBACK_RESIZE         = 1 << 21;
 const InputTextFlags INPUT_TEXT_FLAGS_CALLBACK_EDIT           = 1 << 22;
 
 // ImGuiMouseButton_
-distinct MouseButton = int;
+def MouseButton = int;
 const MouseButton MOUSE_BUTTON_LEFT   = 0;
 const MouseButton MOUSE_BUTTON_RIGHT  = 1;
 const MouseButton MOUSE_BUTTON_MIDDLE = 2;
 const MouseButton MOUSE_BUTTON_COUNT  = 5;
 
 // ImGuiSliderFlags_
-distinct SliderFlags = int;
+def SliderFlags = int;
 const SliderFlags SLIDER_FLAGS_NONE               = 0;
 const SliderFlags SLIDER_FLAGS_ALWAYS_CLAMP       = 1 << 4;
 const SliderFlags SLIDER_FLAGS_LOGARITHMIC        = 1 << 5;
@@ -429,7 +401,7 @@ const SliderFlags SLIDER_FLAGS_WRAP_AROUND        = 1 << 8;
 const SliderFlags SLIDER_FLAGS_INVALID_MASK       = 0x7000000F;
 
 // ImGuiItemFlags_
-distinct ItemFlags = int;
+def ItemFlags = int;
 const ItemFlags ITEM_FLAGS_NONE                 = 0;
 const ItemFlags ITEM_FLAGS_NO_TAB_STOP          = 1 << 0;
 const ItemFlags ITEM_FLAGS_NO_NAV               = 1 << 1;
@@ -438,7 +410,7 @@ const ItemFlags ITEM_FLAGS_BUTTON_REPEAT        = 1 << 3;
 const ItemFlags ITEM_FLAGS_AUTO_CLOSE_POPUPS    = 1 << 4;
 
 // ImGuiDataType_
-distinct DataType = int;
+def DataType = int;
 const DataType DATA_TYPE_S8     = 0;
 const DataType DATA_TYPE_U8     = 1;
 const DataType DATA_TYPE_S16    = 2;
@@ -453,7 +425,7 @@ const DataType DATA_TYPE_BOOL   = 10;
 const DataType DATA_TYPE_COUNT  = 11;
 
 // ImGuiTreeNodeFlags_
-distinct TreeNodeFlags = int;
+def TreeNodeFlags = int;
 const TreeNodeFlags TREE_NODE_FLAGS_NONE                     = 0;
 const TreeNodeFlags TREE_NODE_FLAGS_SELECTED                 = 1 << 0;
 const TreeNodeFlags TREE_NODE_FLAGS_FRAMED                   = 1 << 1;
@@ -474,31 +446,27 @@ const TreeNodeFlags TREE_NODE_FLAGS_NAV_LEFT_JUMPS_BACK_HERE = 1 << 15;
 const TreeNodeFlags TREE_NODE_FLAGS_COLLAPSING_HEADER        = TREE_NODE_FLAGS_FRAMED | TREE_NODE_FLAGS_NO_TREE_PUSH_ON_OPEN | TREE_NODE_FLAGS_NO_AUTO_OPEN_ON_LOG;
 
 // ImGuiTableBgTarget_
-distinct TableBgTarget = int;
+def TableBgTarget = int;
 const TableBgTarget TABLE_BG_TARGET_NONE    = 0;
 const TableBgTarget TABLE_BG_TARGET_ROW_BG0 = 1;
 const TableBgTarget TABLE_BG_TARGET_ROW_BG1 = 2;
 const TableBgTarget TABLE_BG_TARGET_CELL_BG = 3;
 
 // ImGuiConfigFlags_
-distinct ConfigFlags = int;
-const ConfigFlags CONFIG_FLAGS_NONE                       = 0;
-const ConfigFlags CONFIG_FLAGS_NAV_ENABLE_KEYBOARD        = 1 << 0;
-const ConfigFlags CONFIG_FLAGS_NAV_ENABLE_GAMEPAD         = 1 << 1;
-const ConfigFlags CONFIG_FLAGS_NAV_ENABLE_SET_MOUSE_POS   = 1 << 2;
-const ConfigFlags CONFIG_FLAGS_NAV_NO_CAPTURE_KEYBOARD    = 1 << 3;
-const ConfigFlags CONFIG_FLAGS_NO_MOUSE                   = 1 << 4;
-const ConfigFlags CONFIG_FLAGS_NO_MOUSE_CURSOR_CHANGE     = 1 << 5;
-const ConfigFlags CONFIG_FLAGS_NO_KEYBOARD                = 1 << 6;
-const ConfigFlags CONFIG_FLAGS_DOCKING_ENABLE             = 1 << 7;
-const ConfigFlags CONFIG_FLAGS_VIEWPORTS_ENABLE           = 1 << 10;
-const ConfigFlags CONFIG_FLAGS_DPI_ENABLE_SCALE_VIEWPORTS = 1 << 14;
-const ConfigFlags CONFIG_FLAGS_DPI_ENABLE_SCALE_FONTS     = 1 << 15;
-const ConfigFlags CONFIG_FLAGS_IS_SRGB                    = 1 << 20;
-const ConfigFlags CONFIG_FLAGS_IS_TOUCH_SCREEN            = 1 << 21;
+def ConfigFlags = int;
+const ConfigFlags CONFIG_FLAGS_NONE                     = 0;
+const ConfigFlags CONFIG_FLAGS_NAV_ENABLE_KEYBOARD      = 1 << 0;
+const ConfigFlags CONFIG_FLAGS_NAV_ENABLE_GAMEPAD       = 1 << 1;
+const ConfigFlags CONFIG_FLAGS_NAV_ENABLE_SET_MOUSE_POS = 1 << 2;
+const ConfigFlags CONFIG_FLAGS_NAV_NO_CAPTURE_KEYBOARD  = 1 << 3;
+const ConfigFlags CONFIG_FLAGS_NO_MOUSE                 = 1 << 4;
+const ConfigFlags CONFIG_FLAGS_NO_MOUSE_CURSOR_CHANGE   = 1 << 5;
+const ConfigFlags CONFIG_FLAGS_NO_KEYBOARD              = 1 << 6;
+const ConfigFlags CONFIG_FLAGS_IS_SRGB                  = 1 << 20;
+const ConfigFlags CONFIG_FLAGS_IS_TOUCH_SCREEN          = 1 << 21;
 
 // ImGuiCol_
-distinct Col = int;
+def Col = int;
 const Col COL_TEXT                         = 0;
 const Col COL_TEXT_DISABLED                = 1;
 const Col COL_WINDOW_BG                    = 2;
@@ -539,28 +507,26 @@ const Col COL_TAB_SELECTED_OVERLINE        = 36;
 const Col COL_TAB_DIMMED                   = 37;
 const Col COL_TAB_DIMMED_SELECTED          = 38;
 const Col COL_TAB_DIMMED_SELECTED_OVERLINE = 39;
-const Col COL_DOCKING_PREVIEW              = 40;
-const Col COL_DOCKING_EMPTY_BG             = 41;
-const Col COL_PLOT_LINES                   = 42;
-const Col COL_PLOT_LINES_HOVERED           = 43;
-const Col COL_PLOT_HISTOGRAM               = 44;
-const Col COL_PLOT_HISTOGRAM_HOVERED       = 45;
-const Col COL_TABLE_HEADER_BG              = 46;
-const Col COL_TABLE_BORDER_STRONG          = 47;
-const Col COL_TABLE_BORDER_LIGHT           = 48;
-const Col COL_TABLE_ROW_BG                 = 49;
-const Col COL_TABLE_ROW_BG_ALT             = 50;
-const Col COL_TEXT_LINK                    = 51;
-const Col COL_TEXT_SELECTED_BG             = 52;
-const Col COL_DRAG_DROP_TARGET             = 53;
-const Col COL_NAV_HIGHLIGHT                = 54;
-const Col COL_NAV_WINDOWING_HIGHLIGHT      = 55;
-const Col COL_NAV_WINDOWING_DIM_BG         = 56;
-const Col COL_MODAL_WINDOW_DIM_BG          = 57;
-const Col COL_COUNT                        = 58;
+const Col COL_PLOT_LINES                   = 40;
+const Col COL_PLOT_LINES_HOVERED           = 41;
+const Col COL_PLOT_HISTOGRAM               = 42;
+const Col COL_PLOT_HISTOGRAM_HOVERED       = 43;
+const Col COL_TABLE_HEADER_BG              = 44;
+const Col COL_TABLE_BORDER_STRONG          = 45;
+const Col COL_TABLE_BORDER_LIGHT           = 46;
+const Col COL_TABLE_ROW_BG                 = 47;
+const Col COL_TABLE_ROW_BG_ALT             = 48;
+const Col COL_TEXT_LINK                    = 49;
+const Col COL_TEXT_SELECTED_BG             = 50;
+const Col COL_DRAG_DROP_TARGET             = 51;
+const Col COL_NAV_HIGHLIGHT                = 52;
+const Col COL_NAV_WINDOWING_HIGHLIGHT      = 53;
+const Col COL_NAV_WINDOWING_DIM_BG         = 54;
+const Col COL_MODAL_WINDOW_DIM_BG          = 55;
+const Col COL_COUNT                        = 56;
 
 // ImGuiKey
-distinct Key = int;
+def Key = int;
 const Key KEY_NONE                   = 0;
 const Key KEY_TAB                    = 512;
 const Key KEY_LEFT_ARROW             = 513;
@@ -730,7 +696,7 @@ const Key KEY_KEYS_DATA_SIZE         = KEY_NAMED_KEY_COUNT;
 const Key KEY_KEYS_DATA_OFFSET       = KEY_NAMED_KEY_BEGIN;
 
 // ImGuiWindowFlags_
-distinct WindowFlags = int;
+def WindowFlags = int;
 const WindowFlags WINDOW_FLAGS_NONE                        = 0;
 const WindowFlags WINDOW_FLAGS_NO_TITLE_BAR                = 1 << 0;
 const WindowFlags WINDOW_FLAGS_NO_RESIZE                   = 1 << 1;
@@ -751,7 +717,6 @@ const WindowFlags WINDOW_FLAGS_ALWAYS_HORIZONTAL_SCROLLBAR = 1<< 15;
 const WindowFlags WINDOW_FLAGS_NO_NAV_INPUTS               = 1 << 16;
 const WindowFlags WINDOW_FLAGS_NO_NAV_FOCUS                = 1 << 17;
 const WindowFlags WINDOW_FLAGS_UNSAVED_DOCUMENT            = 1 << 18;
-const WindowFlags WINDOW_FLAGS_NO_DOCKING                  = 1 << 19;
 const WindowFlags WINDOW_FLAGS_NO_NAV                      = WINDOW_FLAGS_NO_NAV_INPUTS | WINDOW_FLAGS_NO_NAV_FOCUS;
 const WindowFlags WINDOW_FLAGS_NO_DECORATION               = WINDOW_FLAGS_NO_TITLE_BAR | WINDOW_FLAGS_NO_RESIZE | WINDOW_FLAGS_NO_SCROLLBAR | WINDOW_FLAGS_NO_COLLAPSE;
 const WindowFlags WINDOW_FLAGS_NO_INPUTS                   = WINDOW_FLAGS_NO_MOUSE_INPUTS | WINDOW_FLAGS_NO_NAV_INPUTS | WINDOW_FLAGS_NO_NAV_FOCUS;
@@ -760,10 +725,9 @@ const WindowFlags WINDOW_FLAGS_TOOLTIP                     = 1 << 25;
 const WindowFlags WINDOW_FLAGS_POPUP                       = 1 << 26;
 const WindowFlags WINDOW_FLAGS_MODAL                       = 1 << 27;
 const WindowFlags WINDOW_FLAGS_CHILD_MENU                  = 1 << 28;
-const WindowFlags WINDOW_FLAGS_DOCK_NODE_HOST              = 1 << 29;
 
 // ImGuiMouseCursor_
-distinct MouseCursor = int;
+def MouseCursor = int;
 const MouseCursor MOUSE_CURSOR_NONE        = -1;
 const MouseCursor MOUSE_CURSOR_ARROW       = 0;
 const MouseCursor MOUSE_CURSOR_TEXT_INPUT  = 1;
@@ -777,7 +741,7 @@ const MouseCursor MOUSE_CURSOR_NOT_ALLOWED = 8;
 const MouseCursor MOUSE_CURSOR_COUNT       = 9;
 
 // ImGuiComboFlags_
-distinct ComboFlags = int;
+def ComboFlags = int;
 const ComboFlags COMBO_FLAGS_NONE              = 0;
 const ComboFlags COMBO_FLAGS_POPUP_ALIGN_LEFT  = 1 << 0;
 const ComboFlags COMBO_FLAGS_HEIGHT_SMALL      = 1 << 1;
@@ -790,7 +754,7 @@ const ComboFlags COMBO_FLAGS_WIDTH_FIT_PREVIEW = 1 << 7;
 const ComboFlags COMBO_FLAGS_HEIGHT_MASK       = COMBO_FLAGS_HEIGHT_SMALL | COMBO_FLAGS_HEIGHT_REGULAR | COMBO_FLAGS_HEIGHT_LARGE | COMBO_FLAGS_HEIGHT_LARGEST;
 
 // ImDrawListFlags_
-distinct DrawListFlags = int;
+def DrawListFlags = int;
 const DrawListFlags DRAW_LIST_FLAGS_NONE                       = 0;
 const DrawListFlags DRAW_LIST_FLAGS_ANTI_ALIASED_LINES         = 1 << 0;
 const DrawListFlags DRAW_LIST_FLAGS_ANTI_ALIASED_LINES_USE_TEX = 1 << 1;
@@ -798,14 +762,14 @@ const DrawListFlags DRAW_LIST_FLAGS_ANTI_ALIASED_FILL          = 1 << 2;
 const DrawListFlags DRAW_LIST_FLAGS_ALLOW_VTX_OFFSET           = 1 << 3;
 
 // ImGuiMouseSource
-distinct MouseSource = int;
+def MouseSource = int;
 const MouseSource MOUSE_SOURCE_MOUSE        = 0;
 const MouseSource MOUSE_SOURCE_TOUCH_SCREEN = 1;
 const MouseSource MOUSE_SOURCE_PEN          = 2;
 const MouseSource MOUSE_SOURCE_COUNT        = 3;
 
 // ImGuiTabItemFlags_
-distinct TabItemFlags = int;
+def TabItemFlags = int;
 const TabItemFlags TAB_ITEM_FLAGS_NONE                              = 0;
 const TabItemFlags TAB_ITEM_FLAGS_UNSAVED_DOCUMENT                  = 1 << 0;
 const TabItemFlags TAB_ITEM_FLAGS_SET_SELECTED                      = 1 << 1;

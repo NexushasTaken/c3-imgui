@@ -6,7 +6,7 @@
   // Directories where C3 library files may be found.
   "dependency-search-paths": [ ".." ],
   // Libraries to use for all targets.
-  "dependencies": [ "imgui_c3" ],
+  "dependencies": [ "imgui" ],
   // Authors, optionally with email.
   "authors": [ "NexushasTaken <nexushastaken@gmail.com>" ],
   // Version using semantic versioning.

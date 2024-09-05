@@ -48,17 +48,17 @@ macro String! find_type_starts_with(String needle) {
 fn void init_type_map() @init {
   type_map.set("void"          , "void");
   type_map.set("char"          , "char"); // TODO: C char as C3 char?
-  type_map.set("signed char"   , "ichar"); 
-  type_map.set("unsigned char" , "char"); 
-  type_map.set("unsigned short", "ushort"); 
-  type_map.set("short"         , "short"); 
-  type_map.set("signed short"  , "short"); 
-  type_map.set("unsigned int"  , "uint"); 
-  type_map.set("signed int"    , "int"); 
-  type_map.set("int"           , "int"); 
-  type_map.set("float"         , "float"); 
-  type_map.set("size_t"        , "usz"); 
-  type_map.set("bool"          , "bool"); 
+  type_map.set("signed char"   , "ichar");
+  type_map.set("unsigned char" , "char");
+  type_map.set("unsigned short", "ushort");
+  type_map.set("short"         , "short");
+  type_map.set("signed short"  , "short");
+  type_map.set("unsigned int"  , "uint");
+  type_map.set("signed int"    , "int");
+  type_map.set("int"           , "int");
+  type_map.set("float"         , "float");
+  type_map.set("size_t"        , "usz");
+  type_map.set("bool"          , "bool");
   type_map.set("long long"     , "long");
   type_map.set("unsigned long long", "ulong");
   type_map.set("signed long long", "long");
@@ -83,40 +83,40 @@ fn void init_type_map() @init {
   type_map.set("ImS64", "ImU64");
   type_map.set("ImU64", "ImU64");
 
-  type_map.set("ImChunkStream_ImGuiWindowSettings", "ImChunkStream(<WindowSettings>)"); 
+  type_map.set("ImChunkStream_ImGuiWindowSettings", "ImChunkStream(<WindowSettings>)");
 
-  type_map.set("ImPool_ImGuiTabBar", "ImPool(<TabBar>)"); 
+  type_map.set("ImPool_ImGuiTabBar", "ImPool(<TabBar>)");
 
-  //type_map.set("ImVector_ImGuiWindowPtr"       , "ImVector(<ImWindow*>)"); 
-  //type_map.set("ImVector_ImGuiPtrOrIndex"      , "ImVector(<PtrOrIndex>)"); 
-  type_map.set("ImVector_ImGuiSettingsHandler" , "vector::Vector(<SettingsHandler>)"); 
-  type_map.set("ImVector_ImGuiID"              , "vector::Vector(<ImID>)"); 
-  type_map.set("ImVector_ImGuiItemFlags"       , "vector::Vector(<ItemFlags>)"); 
-  type_map.set("ImVector_ImDrawListPtr"        , "vector::Vector(<DrawList*>)"); 
-  type_map.set("ImVector_ImTextureID"          , "vector::Vector(<TextureID>)"); 
-  type_map.set("ImVector_ImWchar"              , "vector::Vector(<Wchar>)"); 
-  type_map.set("ImVector_ImVec2"               , "vector::Vector(<Vec2>)"); 
-  type_map.set("ImVector_ImVec4"               , "vector::Vector(<Vec4>)"); 
-  type_map.set("ImVector_ImGuiTextRange"       , "vector::Vector(<TextRange>)"); 
-  type_map.set("ImVector_ImGuiStoragePair"     , "vector::Vector(<StoragePair>)"); 
-  type_map.set("ImVector_ImFontConfig"         , "vector::Vector(<FontConfig>)"); 
-  type_map.set("ImVector_ImFontAtlasCustomRect", "vector::Vector(<FontAtlasCustomRect>)"); 
-  type_map.set("ImVector_ImFontPtr"            , "vector::Vector(<Font*>)"); 
-  type_map.set("ImVector_ImFontGlyph"          , "vector::Vector(<FontGlyph>)"); 
-  type_map.set("ImVector_ImDrawChannel"        , "vector::Vector(<DrawChannel>)"); 
-  type_map.set("ImVector_ImDrawCmd"            , "vector::Vector(<DrawCmd>)"); 
-  type_map.set("ImVector_ImDrawIdx"            , "vector::Vector(<DrawIdx>)"); 
-  type_map.set("ImVector_ImDrawVert"           , "vector::Vector(<DrawVert>)"); 
-  type_map.set("ImVector_ImGuiViewportPtr"     , "vector::Vector(<Viewport*>)"); 
-  type_map.set("ImVector_ImGuiPlatformMonitor" , "vector::Vector(<PlatformMonitor>)"); 
-  type_map.set("ImVector_ImGuiSelectionRequest", "vector::Vector(<SelectionRequest>)"); 
-  type_map.set("ImVector_ImU32"                , "vector::Vector(<uint>)"); 
-  type_map.set("ImVector_float"                , "vector::Vector(<float>)"); 
-  type_map.set("ImVector_char"                 , "vector::Vector(<char>)"); 
-  type_map.set("ImVector_unsigned_char"        , "vector::Vector(<char>)"); 
+  //type_map.set("ImVector_ImGuiWindowPtr"       , "ImVector(<ImWindow*>)");
+  //type_map.set("ImVector_ImGuiPtrOrIndex"      , "ImVector(<PtrOrIndex>)");
+  type_map.set("ImVector_ImGuiSettingsHandler" , "vector::Vector(<SettingsHandler>)");
+  type_map.set("ImVector_ImGuiID"              , "vector::Vector(<ImGuiID>)");
+  type_map.set("ImVector_ImGuiItemFlags"       , "vector::Vector(<ItemFlags>)");
+  type_map.set("ImVector_ImDrawListPtr"        , "vector::Vector(<DrawList*>)");
+  type_map.set("ImVector_ImTextureID"          , "vector::Vector(<TextureID>)");
+  type_map.set("ImVector_ImWchar"              , "vector::Vector(<Wchar>)");
+  type_map.set("ImVector_ImVec2"               , "vector::Vector(<Vec2>)");
+  type_map.set("ImVector_ImVec4"               , "vector::Vector(<Vec4>)");
+  type_map.set("ImVector_ImGuiTextRange"       , "vector::Vector(<TextRange>)");
+  type_map.set("ImVector_ImGuiStoragePair"     , "vector::Vector(<StoragePair>)");
+  type_map.set("ImVector_ImFontConfig"         , "vector::Vector(<FontConfig>)");
+  type_map.set("ImVector_ImFontAtlasCustomRect", "vector::Vector(<FontAtlasCustomRect>)");
+  type_map.set("ImVector_ImFontPtr"            , "vector::Vector(<Font*>)");
+  type_map.set("ImVector_ImFontGlyph"          , "vector::Vector(<FontGlyph>)");
+  type_map.set("ImVector_ImDrawChannel"        , "vector::Vector(<DrawChannel>)");
+  type_map.set("ImVector_ImDrawCmd"            , "vector::Vector(<DrawCmd>)");
+  type_map.set("ImVector_ImDrawIdx"            , "vector::Vector(<DrawIdx>)");
+  type_map.set("ImVector_ImDrawVert"           , "vector::Vector(<DrawVert>)");
+  type_map.set("ImVector_ImGuiViewportPtr"     , "vector::Vector(<Viewport*>)");
+  type_map.set("ImVector_ImGuiPlatformMonitor" , "vector::Vector(<PlatformMonitor>)");
+  type_map.set("ImVector_ImGuiSelectionRequest", "vector::Vector(<SelectionRequest>)");
+  type_map.set("ImVector_ImU32"                , "vector::Vector(<uint>)");
+  type_map.set("ImVector_float"                , "vector::Vector(<float>)");
+  type_map.set("ImVector_char"                 , "vector::Vector(<char>)");
+  type_map.set("ImVector_unsigned_char"        , "vector::Vector(<char>)");
 
-  type_map.set("ImGuiIO", "ImIO");
-  type_map.set("ImGuiID", "ImID");
+  type_map.set("ImGuiIO", "ImGuiIO");
+  type_map.set("ImGuiID", "ImGuiID");
 
   // Opaque Structs
   type_map.set("ImGuiContext*", "void*");
@@ -139,12 +139,12 @@ fn void init_blacklist_structs() @init {
 }
 
 fn void init_struct_map() @init {
-  struct_map.set("ImGuiIO", "ImIO");
-  struct_map.set("ImGuiID", "ImID");
+  struct_map.set("ImGuiIO", "ImGuiIO");
+  struct_map.set("ImGuiID", "ImGuiID");
 }
 
 fn void init_typedef_names_map() @init {
-  typedef_names_map.set("ImGuiID", "ImID");
+  typedef_names_map.set("ImGuiID", "ImGuiID");
 
   typedef_names_map.set("ImS16", "ImS16");
   typedef_names_map.set("ImS8" , "ImS8");
@@ -241,7 +241,14 @@ fn DString* clean_type(DString* sb, String orig_type) {
       } else if (try type = find_type_starts_with(orig_type)) {
         String after = orig_type[type.len..];
         String before = type_map.get(type)!!;
-        sb.appendf("%s%s", before, after);
+        sb.appendf("%s", before);
+        if (try s = after.index_of_char('[')) {
+          usz e = after.index_of_char(']')!!;
+          assert(e-s == 2 && after[1].is_digit(), "[clean_type] unknown value: %s", orig_type);
+          sb.appendf("[/*%s*/]", after[s..e].trim("[]"));
+        } else {
+          sb.appendf("%s", after);
+        }
       } else {
         sb.append_chars(clean_imgui(orig_type));
       }
@@ -392,7 +399,7 @@ fn String match_capitalized(String str) @local {
 }
 
 // HELLO -> HELLO
-// HELLo -> 
+// HELLo ->
 fn String match_uppercased_whole(String str) @local {
   if (str.len == 0) {
     return str;

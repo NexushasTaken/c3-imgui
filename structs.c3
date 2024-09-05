@@ -70,7 +70,6 @@ struct Style {
 	Vec2 separator_text_padding;
 	Vec2 display_window_padding;
 	Vec2 display_safe_area_padding;
-	float docking_separator_size;
 	float mouse_cursor_scale;
 	bool anti_aliased_lines;
 	bool anti_aliased_lines_use_tex;
@@ -138,56 +137,20 @@ struct DrawData {
 
 // ImGuiPlatformIO
 struct PlatformIO {
-	PlatformCreateWindow_Func platform_create_window;
-	PlatformDestroyWindow_Func platform_destroy_window;
-	PlatformShowWindow_Func platform_show_window;
-	PlatformSetWindowPos_Func platform_set_window_pos;
-	PlatformGetWindowPos_Func platform_get_window_pos;
-	PlatformSetWindowSize_Func platform_set_window_size;
-	PlatformGetWindowSize_Func platform_get_window_size;
-	PlatformSetWindowFocus_Func platform_set_window_focus;
-	PlatformGetWindowFocus_Func platform_get_window_focus;
-	PlatformGetWindowMinimized_Func platform_get_window_minimized;
-	PlatformSetWindowTitle_Func platform_set_window_title;
-	PlatformSetWindowAlpha_Func platform_set_window_alpha;
-	PlatformUpdateWindow_Func platform_update_window;
-	PlatformRenderWindow_Func platform_render_window;
-	PlatformSwapBuffers_Func platform_swap_buffers;
-	PlatformGetWindowDpiScale_Func platform_get_window_dpi_scale;
-	PlatformOnChangedViewport_Func platform_on_changed_viewport;
-	PlatformCreateVkSurface_Func platform_create_vk_surface;
-	RendererCreateWindow_Func renderer_create_window;
-	RendererDestroyWindow_Func renderer_destroy_window;
-	RendererSetWindowSize_Func renderer_set_window_size;
-	RendererRenderWindow_Func renderer_render_window;
-	RendererSwapBuffers_Func renderer_swap_buffers;
-	vector::Vector(<PlatformMonitor>) monitors;
-	vector::Vector(<Viewport*>) viewports;
+	PlatformGetClipboardTextFn_Func platform_get_clipboard_text_fn;
+	PlatformSetClipboardTextFn_Func platform_set_clipboard_text_fn;
+	void* platform_clipboard_user_data;
+	PlatformOpenInShellFn_Func platform_open_in_shell_fn;
+	void* platform_open_in_shell_user_data;
+	PlatformSetImeDataFn_Func platform_set_ime_data_fn;
+	void* platform_ime_user_data;
+	Wchar platform_locale_decimal_point;
 }
 
-def PlatformCreateWindow_Func = fn void(Viewport* vp);
-def PlatformDestroyWindow_Func = fn void(Viewport* vp);
-def PlatformShowWindow_Func = fn void(Viewport* vp);
-def PlatformSetWindowPos_Func = fn void(Viewport* vp, Vec2 pos);
-def PlatformGetWindowPos_Func = fn Vec2(Viewport* vp);
-def PlatformSetWindowSize_Func = fn void(Viewport* vp, Vec2 size);
-def PlatformGetWindowSize_Func = fn Vec2(Viewport* vp);
-def PlatformSetWindowFocus_Func = fn void(Viewport* vp);
-def PlatformGetWindowFocus_Func = fn bool(Viewport* vp);
-def PlatformGetWindowMinimized_Func = fn bool(Viewport* vp);
-def PlatformSetWindowTitle_Func = fn void(Viewport* vp, ZString str);
-def PlatformSetWindowAlpha_Func = fn void(Viewport* vp, float alpha);
-def PlatformUpdateWindow_Func = fn void(Viewport* vp);
-def PlatformRenderWindow_Func = fn void(Viewport* vp, void* render_arg);
-def PlatformSwapBuffers_Func = fn void(Viewport* vp, void* render_arg);
-def PlatformGetWindowDpiScale_Func = fn float(Viewport* vp);
-def PlatformOnChangedViewport_Func = fn void(Viewport* vp);
-def PlatformCreateVkSurface_Func = fn int(Viewport* vp, ImU64 vk_inst, void* vk_allocators, ImU64* out_vk_surface);
-def RendererCreateWindow_Func = fn void(Viewport* vp);
-def RendererDestroyWindow_Func = fn void(Viewport* vp);
-def RendererSetWindowSize_Func = fn void(Viewport* vp, Vec2 size);
-def RendererRenderWindow_Func = fn void(Viewport* vp, void* render_arg);
-def RendererSwapBuffers_Func = fn void(Viewport* vp, void* render_arg);
+def PlatformGetClipboardTextFn_Func = fn ZString(void* ctx);
+def PlatformSetClipboardTextFn_Func = fn void(void* ctx, ZString text);
+def PlatformOpenInShellFn_Func = fn bool(void* ctx, ZString path);
+def PlatformSetImeDataFn_Func = fn void(void* ctx, Viewport* viewport, PlatformImeData* data);
 
 // ImFontGlyph
 struct FontGlyph {
@@ -306,7 +269,7 @@ struct FontConfig {
 }
 
 // ImGuiIO
-struct ImIO {
+struct ImGuiIO {
 	ConfigFlags config_flags;
 	BackendFlags backend_flags;
 	Vec2 display_size;
@@ -320,14 +283,6 @@ struct ImIO {
 	bool font_allow_user_scaling;
 	Font* font_default;
 	Vec2 display_framebuffer_scale;
-	bool config_docking_no_split;
-	bool config_docking_with_shift;
-	bool config_docking_always_tab_bar;
-	bool config_docking_transparent_payload;
-	bool config_viewports_no_auto_merge;
-	bool config_viewports_no_task_bar_icon;
-	bool config_viewports_no_decoration;
-	bool config_viewports_no_default_parent;
 	bool mouse_draw_cursor;
 	bool config_mac_osx_behaviors;
 	bool config_nav_swap_gamepad_buttons;
@@ -353,13 +308,6 @@ struct ImIO {
 	void* backend_platform_user_data;
 	void* backend_renderer_user_data;
 	void* backend_language_user_data;
-	GetClipboardTextFn_Func get_clipboard_text_fn;
-	SetClipboardTextFn_Func set_clipboard_text_fn;
-	void* clipboard_user_data;
-	PlatformOpenInShellFn_Func platform_open_in_shell_fn;
-	void* platform_open_in_shell_user_data;
-	PlatformSetImeDataFn_Func platform_set_ime_data_fn;
-	Wchar platform_locale_decimal_point;
 	bool want_capture_mouse;
 	bool want_capture_keyboard;
 	bool want_text_input;
@@ -379,7 +327,6 @@ struct ImIO {
 	float mouse_wheel;
 	float mouse_wheel_h;
 	MouseSource mouse_source;
-	ImID mouse_hovered_viewport;
 	bool key_ctrl;
 	bool key_shift;
 	bool key_alt;
@@ -401,7 +348,6 @@ struct ImIO {
 	bool mouse_ctrl_left_as_right_click;
 	float[(usz)(5)] mouse_down_duration;
 	float[(usz)(5)] mouse_down_duration_prev;
-	Vec2[(usz)(5)] mouse_drag_max_distance_abs;
 	float[(usz)(5)] mouse_drag_max_distance_sqr;
 	float pen_pressure;
 	bool app_focus_lost;
@@ -411,11 +357,6 @@ struct ImIO {
 	Wchar16 input_queue_surrogate;
 	vector::Vector(<Wchar>) input_queue_characters;
 }
-
-def GetClipboardTextFn_Func = fn ZString(void* user_data);
-def SetClipboardTextFn_Func = fn void(void* user_data, ZString text);
-def PlatformOpenInShellFn_Func = fn bool(void* ctx, ZString path);
-def PlatformSetImeDataFn_Func = fn void(void* ctx, Viewport* viewport, PlatformImeData* data);
 
 // ImDrawListSplitter
 struct DrawListSplitter {
@@ -427,16 +368,6 @@ struct DrawListSplitter {
 // ImGuiTextBuffer
 struct TextBuffer {
 	vector::Vector(<char>) buf;
-}
-
-// ImGuiPlatformMonitor
-struct PlatformMonitor {
-	Vec2 main_pos;
-	Vec2 main_size;
-	Vec2 work_pos;
-	Vec2 work_size;
-	float dpi_scale;
-	void* platform_handle;
 }
 
 // ImFontAtlas
@@ -467,7 +398,7 @@ struct FontAtlas {
 
 // ImGuiStoragePair
 struct StoragePair {
-	ImID key;
+	ImGuiID key;
 	union { int val_i; float val_f; void* val_p;}
 }
 
@@ -475,19 +406,6 @@ struct StoragePair {
 struct TextRange {
 	ZString b;
 	ZString e;
-}
-
-// ImGuiWindowClass
-struct WindowClass {
-	ImID class_id;
-	ImID parent_viewport_id;
-	ImID focus_route_parent_window_id;
-	ViewportFlags viewport_flags_override_set;
-	ViewportFlags viewport_flags_override_clear;
-	TabItemFlags tab_item_flags_override_set;
-	DockNodeFlags dock_node_flags_override_set;
-	bool docking_always_tab_bar;
-	bool docking_allow_unclassed;
 }
 
 // ImGuiSelectionBasicStorage
@@ -500,7 +418,7 @@ struct SelectionBasicStorage {
 	Storage _storage;
 }
 
-def AdapterIndexToStorageId_Func = fn ImID(SelectionBasicStorage* self, int idx);
+def AdapterIndexToStorageId_Func = fn ImGuiID(SelectionBasicStorage* self, int idx);
 
 // ImGuiListClipper
 struct ListClipper {
@@ -518,8 +436,8 @@ struct ListClipper {
 struct Payload {
 	void* data;
 	int data_size;
-	ImID source_id;
-	ImID source_parent_id;
+	ImGuiID source_id;
+	ImGuiID source_parent_id;
 	int data_frame_count;
 	char[(usz)(32+1)] data_type;
 	bool preview;
@@ -571,28 +489,19 @@ struct DrawList {
 
 // ImGuiViewport
 struct Viewport {
-	ImID id;
+	ImGuiID id;
 	ViewportFlags flags;
 	Vec2 pos;
 	Vec2 size;
 	Vec2 work_pos;
 	Vec2 work_size;
-	float dpi_scale;
-	ImID parent_viewport_id;
-	DrawData* draw_data;
-	void* renderer_user_data;
-	void* platform_user_data;
 	void* platform_handle;
 	void* platform_handle_raw;
-	bool platform_window_created;
-	bool platform_request_move;
-	bool platform_request_resize;
-	bool platform_request_close;
 }
 
 // ImGuiTableColumnSortSpecs
 struct TableColumnSortSpecs {
-	ImID column_user_id;
+	ImGuiID column_user_id;
 	ImU16 column_index;
 	ImU16 sort_order;
 	SortDirection sort_direction;

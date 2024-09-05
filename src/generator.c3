@@ -32,7 +32,7 @@ fn int main(String[] args) {
   digest_types(types_json);
   output_enums(types_json, "enums.c3");
   output_structs(types_json, "structs.c3");
-  output_templated_structs(types_json, "templated_structs.c3");
+  //output_templated_structs(types_json, "templated_structs.c3");
   output_typedefs(typedefs_json, "typedefs.c3");
   output_functions(functions_json, "wrappers.c3", "imgui.c3i");
 
@@ -69,7 +69,7 @@ fn void output_enums(Object* json_obj, String output_path) {
       sb.appendf("// %s\n", name);
 
       // distinct enum declaration
-      sb.appendf("distinct %s = ", enum_map.get(name)!!);
+      sb.appendf("def %s = ", enum_map.get(name)!!);
       if (try ctype = json_obj.get("enumtypes")!!.get_string(name)) { // typed enum
         sb.appendf("%s", type_map.get(ctype)!!);
       } else {
