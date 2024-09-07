@@ -1,5 +1,5 @@
 init:
-  #git submodule update --recursive --init --depth 1
+  git submodule update --recursive --init --depth 1
 
 generate-cimgui: init
   cd ./cimgui/generator && ./generator.sh --target "noimstrv" --cflags ""
@@ -12,6 +12,9 @@ build-cimgui: generate-cimgui
 # see 'c3c --list-targets' for available targets
 build TARGET: build-cimgui
   mkdir -p ./{{TARGET}} && cp -vf ./cimgui/libcimgui.a ./{{TARGET}}/libcimgui.a
+
+generate-build: build-cimgui
+  c3c run generator
 
 generate:
   c3c run generator

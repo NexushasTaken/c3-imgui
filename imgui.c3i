@@ -10,11 +10,15 @@ extern fn void set_tab_item_closed(ZString tab_or_docked_window_label) @extern("
 
 extern fn void end_tab_bar() @extern("igEndTabBar");
 
+extern fn bool is_window_docked() @extern("igIsWindowDocked");
+
 extern fn void end_frame() @extern("igEndFrame");
 
 extern fn bool shortcut(KeyChord key_chord, InputFlags flags = 0) @extern("igShortcut");
 
 extern fn float get_text_line_height() @extern("igGetTextLineHeight");
+
+extern fn ImGuiID get_window_dock_id() @extern("igGetWindowDockID");
 
 extern fn bool is_mouse_double_clicked(MouseButton button) @extern("igIsMouseDoubleClicked");
 
@@ -98,6 +102,8 @@ extern fn bool drag_float(ZString label, float* v, float v_speed = 1.0f, float v
 
 extern fn void show_about_window(bool* p_open = null) @extern("igShowAboutWindow");
 
+extern fn void render_platform_windows_default(void* platform_render_arg = null, void* renderer_render_arg = null) @extern("igRenderPlatformWindowsDefault");
+
 extern fn void push_id_str(ZString str_id) @extern("igPushID_Str");
 
 extern fn void push_id_str_str(ZString str_id_begin, ZString str_id_end) @extern("igPushID_StrStr");
@@ -115,6 +121,8 @@ extern fn int table_get_column_index() @extern("igTableGetColumnIndex");
 extern fn TableSortSpecs* table_get_sort_specs() @extern("igTableGetSortSpecs");
 
 extern fn void show_font_selector(ZString label) @extern("igShowFontSelector");
+
+extern fn Viewport* find_viewport_by_id(ImGuiID id) @extern("igFindViewportByID");
 
 extern fn bool is_mouse_down(MouseButton button) @extern("igIsMouseDown");
 
@@ -157,6 +165,8 @@ extern fn bool is_key_released(Key key) @extern("igIsKeyReleased");
 
 extern fn void push_item_width(float item_width) @extern("igPushItemWidth");
 
+extern fn Viewport* find_viewport_by_platform_handle(void* platform_handle) @extern("igFindViewportByPlatformHandle");
+
 extern fn void show_demo_window(bool* p_open = null) @extern("igShowDemoWindow");
 
 extern fn Vec4* get_style_color_vec4(Col idx) @extern("igGetStyleColorVec4");
@@ -176,6 +186,8 @@ extern fn void set_next_item_storage_id(ImGuiID storage_id) @extern("igSetNextIt
 
 extern fn bool is_mouse_pos_valid(Vec2* mouse_pos = null) @extern("igIsMousePosValid");
 
+extern fn ImGuiID dock_space(ImGuiID dockspace_id, Vec2 size = {0, 0}, DockNodeFlags flags = 0, WindowClass* window_class = null) @extern("igDockSpace");
+
 extern fn void text_link_open_url(ZString label, ZString url = null) @extern("igTextLinkOpenURL");
 
 extern fn void set_column_offset(int column_index, float offset_x) @extern("igSetColumnOffset");
@@ -186,11 +198,15 @@ extern fn bool is_item_deactivated() @extern("igIsItemDeactivated");
 
 extern fn bool input_text(ZString label, char* buf, usz buf_size, InputTextFlags flags = 0, InputTextCallback callback = null, void* user_data = null) @extern("igInputText");
 
+extern fn float get_window_dpi_scale() @extern("igGetWindowDpiScale");
+
 extern fn void begin_disabled(bool disabled = true) @extern("igBeginDisabled");
 
 extern fn void separator() @extern("igSeparator");
 
 extern fn Payload* accept_drag_drop_payload(ZString type, DragDropFlags flags = 0) @extern("igAcceptDragDropPayload");
+
+extern fn void set_next_window_viewport(ImGuiID viewport_id) @extern("igSetNextWindowViewport");
 
 extern fn ImU32 get_color_u32_col(Col idx, float alpha_mul = 1.0f) @extern("igGetColorU32_Col");
 
@@ -298,6 +314,8 @@ extern fn void table_header(ZString label) @extern("igTableHeader");
 
 extern fn void log_buttons() @extern("igLogButtons");
 
+extern fn Viewport* get_window_viewport() @extern("igGetWindowViewport");
+
 extern fn void log_to_file(int auto_open_depth = -1, ZString filename = null) @extern("igLogToFile");
 
 extern fn void set_next_window_size(Vec2 size, Cond cond = 0) @extern("igSetNextWindowSize");
@@ -338,7 +356,7 @@ extern fn void set_window_focus_str(ZString name) @extern("igSetWindowFocus_Str"
 
 extern fn void style_colors_classic(Style* dst = null) @extern("igStyleColorsClassic");
 
-extern fn DrawList* get_foreground_draw_list() @extern("igGetForegroundDrawList");
+extern fn DrawList* get_foreground_draw_list(Viewport* viewport = null) @extern("igGetForegroundDrawList");
 
 extern fn void debug_text_encoding(ZString text) @extern("igDebugTextEncoding");
 
@@ -450,6 +468,8 @@ extern fn bool is_item_active() @extern("igIsItemActive");
 
 extern fn float get_column_width(int column_index = -1) @extern("igGetColumnWidth");
 
+extern fn void update_platform_windows() @extern("igUpdatePlatformWindows");
+
 extern fn bool begin_main_menu_bar() @extern("igBeginMainMenuBar");
 
 extern fn float get_frame_height_with_spacing() @extern("igGetFrameHeightWithSpacing");
@@ -462,7 +482,7 @@ extern fn bool color_edit4(ZString label, float[/*4*/] col, ColorEditFlags flags
 
 extern fn bool color_edit3(ZString label, float[/*3*/] col, ColorEditFlags flags = 0) @extern("igColorEdit3");
 
-extern fn DrawList* get_background_draw_list() @extern("igGetBackgroundDrawList");
+extern fn DrawList* get_background_draw_list(Viewport* viewport = null) @extern("igGetBackgroundDrawList");
 
 extern fn bool begin_popup_context_window(ZString str_id = null, PopupFlags popup_flags = 1) @extern("igBeginPopupContextWindow");
 
@@ -479,10 +499,6 @@ extern fn bool selectable_bool_ptr(ZString label, bool* p_selected, SelectableFl
 extern fn bool input_scalar_n(ZString label, DataType data_type, void* p_data, int components, void* p_step = null, void* p_step_fast = null, ZString format = null, InputTextFlags flags = 0) @extern("igInputScalarN");
 
 extern fn bool begin_list_box(ZString label, Vec2 size = {0, 0}) @extern("igBeginListBox");
-
-extern fn void push_style_var_y(StyleVar idx, float val_y) @extern("igPushStyleVarY");
-
-extern fn void push_style_var_x(StyleVar idx, float val_x) @extern("igPushStyleVarX");
 
 extern fn void set_next_item_selection_user_data(SelectionUserData selection_user_data) @extern("igSetNextItemSelectionUserData");
 
@@ -544,6 +560,8 @@ extern fn void reset_mouse_drag_delta(MouseButton button = 0) @extern("igResetMo
 
 extern fn bool is_mouse_released(MouseButton button) @extern("igIsMouseReleased");
 
+extern fn void set_next_window_class(WindowClass* window_class) @extern("igSetNextWindowClass");
+
 extern fn void style_colors_dark(Style* dst = null) @extern("igStyleColorsDark");
 
 extern fn void set_next_item_width(float item_width) @extern("igSetNextItemWidth");
@@ -555,6 +573,8 @@ extern fn void set_clipboard_text(ZString text) @extern("igSetClipboardText");
 extern fn bool begin_menu(ZString label, bool enabled = true) @extern("igBeginMenu");
 
 extern fn void close_current_popup() @extern("igCloseCurrentPopup");
+
+extern fn void destroy_platform_windows() @extern("igDestroyPlatformWindows");
 
 extern fn void set_keyboard_focus_here(int offset = 0) @extern("igSetKeyboardFocusHere");
 
@@ -613,11 +633,11 @@ extern fn void indent(float indent_w = 0.0f) @extern("igIndent");
 
 extern fn bool is_item_visible() @extern("igIsItemVisible");
 
-extern fn void* create_context(FontAtlas* shared_font_atlas = null) @extern("igCreateContext");
+extern fn ZString get_clipboard_text() @extern("igGetClipboardText");
 
 extern fn void end_tooltip() @extern("igEndTooltip");
 
-extern fn ZString get_clipboard_text() @extern("igGetClipboardText");
+extern fn void* create_context(FontAtlas* shared_font_atlas = null) @extern("igCreateContext");
 
 extern fn int table_get_row_index() @extern("igTableGetRowIndex");
 
@@ -629,7 +649,7 @@ extern fn void progress_bar(float fraction, Vec2 size_arg = {-FLT_MIN, 0}, ZStri
 
 extern fn void pop_style_color(int count = 1) @extern("igPopStyleColor");
 
-extern fn void columns(int count = 1, ZString id = null, bool borders = true) @extern("igColumns");
+extern fn void columns(int count = 1, ZString id = null, bool border = true) @extern("igColumns");
 
 extern fn void tree_pop() @extern("igTreePop");
 
@@ -661,6 +681,8 @@ extern fn void debug_flash_style_color(Col idx) @extern("igDebugFlashStyleColor"
 extern fn bool table_next_column() @extern("igTableNextColumn");
 
 extern fn void set_column_width(int column_index, float width) @extern("igSetColumnWidth");
+
+extern fn ImGuiID dock_space_over_viewport(ImGuiID dockspace_id = 0, Viewport* viewport = null, DockNodeFlags flags = 0, WindowClass* window_class = null) @extern("igDockSpaceOverViewport");
 
 extern fn void label_text(ZString label, ZString fmt, ...) @extern("igLabelText");
 
@@ -703,6 +725,8 @@ extern fn TableColumnFlags table_get_column_flags(int column_n = -1) @extern("ig
 extern fn void same_line(float offset_from_start_x = 0.0f, float spacing = -1.0f) @extern("igSameLine");
 
 extern fn bool is_mouse_hovering_rect(Vec2 r_min, Vec2 r_max, bool clip = true) @extern("igIsMouseHoveringRect");
+
+extern fn void set_next_window_dock_id(ImGuiID dock_id, Cond cond = 0) @extern("igSetNextWindowDockID");
 
 extern fn void set_current_context(void* ctx) @extern("igSetCurrentContext");
 
@@ -910,8 +934,6 @@ extern fn void DrawList.pop_unused_draw_cmd(DrawList* self) @extern("ImDrawList_
 
 extern fn void DrawList.reset_for_new_frame(DrawList* self) @extern("ImDrawList__ResetForNewFrame");
 
-extern fn void DrawList.set_texture_id(DrawList* self, TextureID texture_id) @extern("ImDrawList__SetTextureID");
-
 extern fn void DrawList.try_merge_draw_cmds(DrawList* self) @extern("ImDrawList__TryMergeDrawCmds");
 
 extern fn void DrawList.destroy(DrawList* self) @extern("ImDrawList_destroy");
@@ -932,9 +954,9 @@ extern fn Font* FontAtlas.add_font_default(FontAtlas* self, FontConfig* font_cfg
 
 extern fn Font* FontAtlas.add_font_from_file_ttf(FontAtlas* self, ZString filename, float size_pixels, FontConfig* font_cfg = null, Wchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromFileTTF");
 
-extern fn void PlatformIO.destroy(PlatformIO* self) @extern("ImGuiPlatformIO_destroy");
-
 extern fn Font* FontAtlas.add_font_from_memory_compressed_base85_ttf(FontAtlas* self, ZString compressed_font_data_base85, float size_pixels, FontConfig* font_cfg = null, Wchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryCompressedBase85TTF");
+
+extern fn void PlatformIO.destroy(PlatformIO* self) @extern("ImGuiPlatformIO_destroy");
 
 extern fn Font* FontAtlas.add_font_from_memory_compressed_ttf(FontAtlas* self, void* compressed_font_data, int compressed_font_data_size, float size_pixels, FontConfig* font_cfg = null, Wchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryCompressedTTF");
 
@@ -1060,6 +1082,8 @@ extern fn void ImGuiIO.add_mouse_pos_event(ImGuiIO* self, float x, float y) @ext
 
 extern fn void ImGuiIO.add_mouse_source_event(ImGuiIO* self, MouseSource source) @extern("ImGuiIO_AddMouseSourceEvent");
 
+extern fn void ImGuiIO.add_mouse_viewport_event(ImGuiIO* self, ImGuiID id) @extern("ImGuiIO_AddMouseViewportEvent");
+
 extern fn void ImGuiIO.add_mouse_wheel_event(ImGuiIO* self, float wheel_x, float wheel_y) @extern("ImGuiIO_AddMouseWheelEvent");
 
 extern fn void ImGuiIO.clear_events_queue(ImGuiIO* self) @extern("ImGuiIO_ClearEventsQueue");
@@ -1127,6 +1151,10 @@ extern fn PlatformIO* new_platform_io() @extern("ImGuiPlatformIO_ImGuiPlatformIO
 extern fn PlatformImeData* new_platform_ime_data() @extern("ImGuiPlatformImeData_ImGuiPlatformImeData");
 
 extern fn void PlatformImeData.destroy(PlatformImeData* self) @extern("ImGuiPlatformImeData_destroy");
+
+extern fn PlatformMonitor* new_platform_monitor() @extern("ImGuiPlatformMonitor_ImGuiPlatformMonitor");
+
+extern fn void PlatformMonitor.destroy(PlatformMonitor* self) @extern("ImGuiPlatformMonitor_destroy");
 
 extern fn void SelectionBasicStorage.apply_requests(SelectionBasicStorage* self, MultiSelectIO* ms_io) @extern("ImGuiSelectionBasicStorage_ApplyRequests");
 
@@ -1253,6 +1281,10 @@ extern fn void TextRange.split(TextRange* self, char separator, vector::Vector(<
 extern fn Viewport* new_viewport() @extern("ImGuiViewport_ImGuiViewport");
 
 extern fn void Viewport.destroy(Viewport* self) @extern("ImGuiViewport_destroy");
+
+extern fn WindowClass* new_window_class() @extern("ImGuiWindowClass_ImGuiWindowClass");
+
+extern fn void WindowClass.destroy(WindowClass* self) @extern("ImGuiWindowClass_destroy");
 
 extern fn Vec2* new_vec2() @extern("ImVec2_ImVec2_Nil");
 
