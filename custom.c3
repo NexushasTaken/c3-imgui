@@ -1,7 +1,7 @@
 module imgui;
 
 // TODO: Handle these constants properly
-const IMGUI_VERSION = "1.91.1 WIP";
+const IMGUI_VERSION = "1.91.0";
 const IMGUI_VERSION_NUM = 19104;
 const IMGUI_HAS_TABLE = true;
 
