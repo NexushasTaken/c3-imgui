@@ -7,6 +7,12 @@ init() {
   git submodule update --recursive --init --depth 1
 }
 
+clean() {
+  make clean -C cimgui
+  [[ -x './target' ]] && rm ./target
+  [[ -d './build' ]] && rm -r ./build
+}
+
 # original: "glfw opengl3 opengl2 sdl2"
 # all possible flags: "allegro5 android dx10 dx11 dx12 dx9 glfw glut opengl2 opengl3 sdl2 sdl3 sdlrenderer2 sdlrenderer3 vulkan wgpu win32"
 generate-cimgui() {
@@ -26,6 +32,7 @@ usage() {
   cat <<EOF
 Usage of build.sh:
    -i --init          initialize and update submodules
+   -c --clean         clean builds
    -g --generate      generate cimgui wrappers
    -b --build-cimgui  compile cimgui wrappers static library
    -B --build         generate and compile cimgui wrappers and copy static library
@@ -47,6 +54,10 @@ while [[ $# -gt 0 ]]; do
   case $1 in
     -i|--init)
       init
+      shift # past argument
+      ;;
+    -c|--clean)
+      clean
       shift # past argument
       ;;
     -g|--generate)
