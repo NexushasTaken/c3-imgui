@@ -22,7 +22,7 @@ build() {
 }
 
 usage() {
-        cat <<EOF
+  cat <<EOF
 Usage of build.sh:
    -i --init          initialize and update submodules
    -g --generate      generate cimgui wrappers
