@@ -14,6 +14,10 @@ just build <target>
 
 Using `build.sh`
 ```sh
+./build.sh --build
+```
+The command above might now work as expected, so specify the correct target
+```sh
 ./build.sh --build --target <target>
 ```
 
