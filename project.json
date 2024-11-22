@@ -37,6 +37,10 @@
         "src/function_output.c3",
       ],
     },
+    "target": {
+      "type": "executable",
+      "sources": ["src/target.c3"],
+    },
   },
   // Global settings.
   // CPU name, used for optimizations in the LLVM backend.

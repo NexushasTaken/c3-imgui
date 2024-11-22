@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-TARGET='linux-x64'
+[[ -x './target' ]] || c3c compile ./src/target.c3 -O4
+TARGET="$(./target)"
 
 init() {
   git submodule update --recursive --init --depth 1
@@ -30,7 +31,7 @@ Usage of build.sh:
    -B --build         generate and compile cimgui wrappers and copy static library
                       to its target directory
    -t --target        specify the build target and where static library should be copied
-                      (default: $TARGET
+                      (default: $TARGET)
    -h --help          show this message and exit
 EOF
 }
