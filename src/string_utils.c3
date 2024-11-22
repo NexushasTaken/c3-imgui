@@ -111,6 +111,7 @@ fn void init_type_map() @init {
   type_map.set("ImVector_ImGuiPlatformMonitor" , "vector::Vector(<PlatformMonitor>)");
   type_map.set("ImVector_ImGuiSelectionRequest", "vector::Vector(<SelectionRequest>)");
   type_map.set("ImVector_ImU32"                , "vector::Vector(<uint>)");
+  type_map.set("ImVector_ImU8"                 , "vector::Vector(<char>)");
   type_map.set("ImVector_float"                , "vector::Vector(<float>)");
   type_map.set("ImVector_char"                 , "vector::Vector(<char>)");
   type_map.set("ImVector_unsigned_char"        , "vector::Vector(<char>)");
@@ -235,6 +236,7 @@ fn DString* clean_type(DString* sb, String orig_type) {
     } else {
       assert(!orig_type.contains("[]"));
       orig_type = orig_type.strip("const ");
+      orig_type = orig_type.strip("struct ");
 
       if (try type = type_map.get(orig_type)) {
         sb.append_chars(type);
@@ -303,7 +305,7 @@ fn DString* clean_arguments(DString* sb, String args, String prefix = "") {
 }
 
 fn void clean_value(DString* sb, String s, String type) {
-  if (s == "NULL") {
+  if (s == "NULL" || s == "nullptr") {
     sb.append_chars("null");
   } else if (type == "bool") {
     sb.appendf("%s", s);
@@ -314,7 +316,7 @@ fn void clean_value(DString* sb, String s, String type) {
     clean_arguments(sb, s[s.index_of_char('(')!!..s.index_of_char(')')!!]);
     sb.appendf("}");
   } else if (type == "ZString") {
-    sb.appendf("\"%s\"", s);
+    sb.appendf("%s", s);
   } else if (try s.to_float() && type == "float") {
     sb.appendf("%s", s);
   } else if (type == "float" && s.starts_with("FLT_")) {

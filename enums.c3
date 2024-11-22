@@ -24,6 +24,7 @@ const ButtonFlags BUTTON_FLAGS_MOUSE_BUTTON_LEFT   = 1 << 0;
 const ButtonFlags BUTTON_FLAGS_MOUSE_BUTTON_RIGHT  = 1 << 1;
 const ButtonFlags BUTTON_FLAGS_MOUSE_BUTTON_MIDDLE = 1 << 2;
 const ButtonFlags BUTTON_FLAGS_MOUSE_BUTTON_MASK   = BUTTON_FLAGS_MOUSE_BUTTON_LEFT | BUTTON_FLAGS_MOUSE_BUTTON_RIGHT | BUTTON_FLAGS_MOUSE_BUTTON_MIDDLE;
+const ButtonFlags BUTTON_FLAGS_ENABLE_NAV          = 1 << 3;
 
 // ImFontAtlasFlags_
 def FontAtlasFlags = int;
@@ -84,14 +85,11 @@ const DragDropFlags DRAG_DROP_FLAGS_ACCEPT_PEEK_ONLY              = DRAG_DROP_FL
 
 // ImGuiBackendFlags_
 def BackendFlags = int;
-const BackendFlags BACKEND_FLAGS_NONE                       = 0;
-const BackendFlags BACKEND_FLAGS_HAS_GAMEPAD                = 1 << 0;
-const BackendFlags BACKEND_FLAGS_HAS_MOUSE_CURSORS          = 1 << 1;
-const BackendFlags BACKEND_FLAGS_HAS_SET_MOUSE_POS          = 1 << 2;
-const BackendFlags BACKEND_FLAGS_RENDERER_HAS_VTX_OFFSET    = 1 << 3;
-const BackendFlags BACKEND_FLAGS_PLATFORM_HAS_VIEWPORTS     = 1 << 10;
-const BackendFlags BACKEND_FLAGS_HAS_MOUSE_HOVERED_VIEWPORT = 1 << 11;
-const BackendFlags BACKEND_FLAGS_RENDERER_HAS_VIEWPORTS     = 1 << 12;
+const BackendFlags BACKEND_FLAGS_NONE                    = 0;
+const BackendFlags BACKEND_FLAGS_HAS_GAMEPAD             = 1 << 0;
+const BackendFlags BACKEND_FLAGS_HAS_MOUSE_CURSORS       = 1 << 1;
+const BackendFlags BACKEND_FLAGS_HAS_SET_MOUSE_POS       = 1 << 2;
+const BackendFlags BACKEND_FLAGS_RENDERER_HAS_VTX_OFFSET = 1 << 3;
 
 // ImGuiTableColumnFlags_
 def TableColumnFlags = int;
@@ -159,8 +157,7 @@ const StyleVar STYLE_VAR_SELECTABLE_TEXT_ALIGN           = 29;
 const StyleVar STYLE_VAR_SEPARATOR_TEXT_BORDER_SIZE      = 30;
 const StyleVar STYLE_VAR_SEPARATOR_TEXT_ALIGN            = 31;
 const StyleVar STYLE_VAR_SEPARATOR_TEXT_PADDING          = 32;
-const StyleVar STYLE_VAR_DOCKING_SEPARATOR_SIZE          = 33;
-const StyleVar STYLE_VAR_COUNT                           = 34;
+const StyleVar STYLE_VAR_COUNT                           = 33;
 
 // ImGuiTabBarFlags_
 def TabBarFlags = int;
@@ -180,7 +177,7 @@ const TabBarFlags TAB_BAR_FLAGS_FITTING_POLICY_DEFAULT            = TAB_BAR_FLAG
 // ImGuiChildFlags_
 def ChildFlags = int;
 const ChildFlags CHILD_FLAGS_NONE                      = 0;
-const ChildFlags CHILD_FLAGS_BORDER                    = 1 << 0;
+const ChildFlags CHILD_FLAGS_BORDERS                   = 1 << 0;
 const ChildFlags CHILD_FLAGS_ALWAYS_USE_WINDOW_PADDING = 1 << 1;
 const ChildFlags CHILD_FLAGS_RESIZE_X                  = 1 << 2;
 const ChildFlags CHILD_FLAGS_RESIZE_Y                  = 1 << 3;
@@ -189,6 +186,19 @@ const ChildFlags CHILD_FLAGS_AUTO_RESIZE_Y             = 1 << 5;
 const ChildFlags CHILD_FLAGS_ALWAYS_AUTO_RESIZE        = 1 << 6;
 const ChildFlags CHILD_FLAGS_FRAME_STYLE               = 1 << 7;
 const ChildFlags CHILD_FLAGS_NAV_FLATTENED             = 1 << 8;
+
+// ImGuiFreeTypeBuilderFlags
+def FreeTypeBuilderFlags = int;
+const FreeTypeBuilderFlags FREE_TYPE_BUILDER_FLAGS_NO_HINTING      = 1 << 0;
+const FreeTypeBuilderFlags FREE_TYPE_BUILDER_FLAGS_NO_AUTO_HINT    = 1 << 1;
+const FreeTypeBuilderFlags FREE_TYPE_BUILDER_FLAGS_FORCE_AUTO_HINT = 1 << 2;
+const FreeTypeBuilderFlags FREE_TYPE_BUILDER_FLAGS_LIGHT_HINTING   = 1 << 3;
+const FreeTypeBuilderFlags FREE_TYPE_BUILDER_FLAGS_MONO_HINTING    = 1 << 4;
+const FreeTypeBuilderFlags FREE_TYPE_BUILDER_FLAGS_BOLD            = 1 << 5;
+const FreeTypeBuilderFlags FREE_TYPE_BUILDER_FLAGS_OBLIQUE         = 1 << 6;
+const FreeTypeBuilderFlags FREE_TYPE_BUILDER_FLAGS_MONOCHROME      = 1 << 7;
+const FreeTypeBuilderFlags FREE_TYPE_BUILDER_FLAGS_LOAD_COLOR      = 1 << 8;
+const FreeTypeBuilderFlags FREE_TYPE_BUILDER_FLAGS_BITMAP          = 1 << 9;
 
 // ImGuiMultiSelectFlags_
 def MultiSelectFlags = int;
@@ -301,17 +311,6 @@ const ColorEditFlags COLOR_EDIT_FLAGS_DATA_TYPE_MASK     = COLOR_EDIT_FLAGS_UINT
 const ColorEditFlags COLOR_EDIT_FLAGS_PICKER_MASK        = COLOR_EDIT_FLAGS_PICKER_HUE_WHEEL | COLOR_EDIT_FLAGS_PICKER_HUE_BAR;
 const ColorEditFlags COLOR_EDIT_FLAGS_INPUT_MASK         = COLOR_EDIT_FLAGS_INPUT_RGB | COLOR_EDIT_FLAGS_INPUT_HSV;
 
-// ImGuiDockNodeFlags_
-def DockNodeFlags = int;
-const DockNodeFlags DOCK_NODE_FLAGS_NONE                         = 0;
-const DockNodeFlags DOCK_NODE_FLAGS_KEEP_ALIVE_ONLY              = 1 << 0;
-const DockNodeFlags DOCK_NODE_FLAGS_NO_DOCKING_OVER_CENTRAL_NODE = 1 << 2;
-const DockNodeFlags DOCK_NODE_FLAGS_PASSTHRU_CENTRAL_NODE        = 1 << 3;
-const DockNodeFlags DOCK_NODE_FLAGS_NO_DOCKING_SPLIT             = 1 << 4;
-const DockNodeFlags DOCK_NODE_FLAGS_NO_RESIZE                    = 1 << 5;
-const DockNodeFlags DOCK_NODE_FLAGS_AUTO_HIDE_TAB_BAR            = 1 << 6;
-const DockNodeFlags DOCK_NODE_FLAGS_NO_UNDOCKING                 = 1 << 7;
-
 // ImGuiHoveredFlags_
 def HoveredFlags = int;
 const HoveredFlags HOVERED_FLAGS_NONE                              = 0;
@@ -319,7 +318,6 @@ const HoveredFlags HOVERED_FLAGS_CHILD_WINDOWS                     = 1 << 0;
 const HoveredFlags HOVERED_FLAGS_ROOT_WINDOW                       = 1 << 1;
 const HoveredFlags HOVERED_FLAGS_ANY_WINDOW                        = 1 << 2;
 const HoveredFlags HOVERED_FLAGS_NO_POPUP_HIERARCHY                = 1 << 3;
-const HoveredFlags HOVERED_FLAGS_DOCK_HIERARCHY                    = 1 << 4;
 const HoveredFlags HOVERED_FLAGS_ALLOW_WHEN_BLOCKED_BY_POPUP       = 1 << 5;
 const HoveredFlags HOVERED_FLAGS_ALLOW_WHEN_BLOCKED_BY_ACTIVE_ITEM = 1 << 7;
 const HoveredFlags HOVERED_FLAGS_ALLOW_WHEN_OVERLAPPED_BY_ITEM     = 1 << 8;
@@ -352,21 +350,10 @@ const InputFlags INPUT_FLAGS_TOOLTIP                 = 1 << 18;
 
 // ImGuiViewportFlags_
 def ViewportFlags = int;
-const ViewportFlags VIEWPORT_FLAGS_NONE                   = 0;
-const ViewportFlags VIEWPORT_FLAGS_IS_PLATFORM_WINDOW     = 1 << 0;
-const ViewportFlags VIEWPORT_FLAGS_IS_PLATFORM_MONITOR    = 1 << 1;
-const ViewportFlags VIEWPORT_FLAGS_OWNED_BY_APP           = 1 << 2;
-const ViewportFlags VIEWPORT_FLAGS_NO_DECORATION          = 1 << 3;
-const ViewportFlags VIEWPORT_FLAGS_NO_TASK_BAR_ICON       = 1 << 4;
-const ViewportFlags VIEWPORT_FLAGS_NO_FOCUS_ON_APPEARING  = 1 << 5;
-const ViewportFlags VIEWPORT_FLAGS_NO_FOCUS_ON_CLICK      = 1 << 6;
-const ViewportFlags VIEWPORT_FLAGS_NO_INPUTS              = 1 << 7;
-const ViewportFlags VIEWPORT_FLAGS_NO_RENDERER_CLEAR      = 1 << 8;
-const ViewportFlags VIEWPORT_FLAGS_NO_AUTO_MERGE          = 1 << 9;
-const ViewportFlags VIEWPORT_FLAGS_TOP_MOST               = 1 << 10;
-const ViewportFlags VIEWPORT_FLAGS_CAN_HOST_OTHER_WINDOWS = 1 << 11;
-const ViewportFlags VIEWPORT_FLAGS_IS_MINIMIZED           = 1 << 12;
-const ViewportFlags VIEWPORT_FLAGS_IS_FOCUSED             = 1 << 13;
+const ViewportFlags VIEWPORT_FLAGS_NONE                = 0;
+const ViewportFlags VIEWPORT_FLAGS_IS_PLATFORM_WINDOW  = 1 << 0;
+const ViewportFlags VIEWPORT_FLAGS_IS_PLATFORM_MONITOR = 1 << 1;
+const ViewportFlags VIEWPORT_FLAGS_OWNED_BY_APP        = 1 << 2;
 
 // ImGuiFocusedFlags_
 def FocusedFlags = int;
@@ -375,7 +362,6 @@ const FocusedFlags FOCUSED_FLAGS_CHILD_WINDOWS          = 1 << 0;
 const FocusedFlags FOCUSED_FLAGS_ROOT_WINDOW            = 1 << 1;
 const FocusedFlags FOCUSED_FLAGS_ANY_WINDOW             = 1 << 2;
 const FocusedFlags FOCUSED_FLAGS_NO_POPUP_HIERARCHY     = 1 << 3;
-const FocusedFlags FOCUSED_FLAGS_DOCK_HIERARCHY         = 1 << 4;
 const FocusedFlags FOCUSED_FLAGS_ROOT_AND_CHILD_WINDOWS = FOCUSED_FLAGS_ROOT_WINDOW | FOCUSED_FLAGS_CHILD_WINDOWS;
 
 // ImGuiSortDirection
@@ -421,11 +407,13 @@ const MouseButton MOUSE_BUTTON_COUNT  = 5;
 // ImGuiSliderFlags_
 def SliderFlags = int;
 const SliderFlags SLIDER_FLAGS_NONE               = 0;
-const SliderFlags SLIDER_FLAGS_ALWAYS_CLAMP       = 1 << 4;
 const SliderFlags SLIDER_FLAGS_LOGARITHMIC        = 1 << 5;
 const SliderFlags SLIDER_FLAGS_NO_ROUND_TO_FORMAT = 1 << 6;
 const SliderFlags SLIDER_FLAGS_NO_INPUT           = 1 << 7;
 const SliderFlags SLIDER_FLAGS_WRAP_AROUND        = 1 << 8;
+const SliderFlags SLIDER_FLAGS_CLAMP_ON_INPUT     = 1 << 9;
+const SliderFlags SLIDER_FLAGS_CLAMP_ZERO_RANGE   = 1 << 10;
+const SliderFlags SLIDER_FLAGS_ALWAYS_CLAMP       = SLIDER_FLAGS_CLAMP_ON_INPUT | SLIDER_FLAGS_CLAMP_ZERO_RANGE;
 const SliderFlags SLIDER_FLAGS_INVALID_MASK       = 0x7000000F;
 
 // ImGuiItemFlags_
@@ -436,6 +424,7 @@ const ItemFlags ITEM_FLAGS_NO_NAV               = 1 << 1;
 const ItemFlags ITEM_FLAGS_NO_NAV_DEFAULT_FOCUS = 1 << 2;
 const ItemFlags ITEM_FLAGS_BUTTON_REPEAT        = 1 << 3;
 const ItemFlags ITEM_FLAGS_AUTO_CLOSE_POPUPS    = 1 << 4;
+const ItemFlags ITEM_FLAGS_ALLOW_DUPLICATE_ID   = 1 << 5;
 
 // ImGuiDataType_
 def DataType = int;
@@ -482,20 +471,14 @@ const TableBgTarget TABLE_BG_TARGET_CELL_BG = 3;
 
 // ImGuiConfigFlags_
 def ConfigFlags = int;
-const ConfigFlags CONFIG_FLAGS_NONE                       = 0;
-const ConfigFlags CONFIG_FLAGS_NAV_ENABLE_KEYBOARD        = 1 << 0;
-const ConfigFlags CONFIG_FLAGS_NAV_ENABLE_GAMEPAD         = 1 << 1;
-const ConfigFlags CONFIG_FLAGS_NAV_ENABLE_SET_MOUSE_POS   = 1 << 2;
-const ConfigFlags CONFIG_FLAGS_NAV_NO_CAPTURE_KEYBOARD    = 1 << 3;
-const ConfigFlags CONFIG_FLAGS_NO_MOUSE                   = 1 << 4;
-const ConfigFlags CONFIG_FLAGS_NO_MOUSE_CURSOR_CHANGE     = 1 << 5;
-const ConfigFlags CONFIG_FLAGS_NO_KEYBOARD                = 1 << 6;
-const ConfigFlags CONFIG_FLAGS_DOCKING_ENABLE             = 1 << 7;
-const ConfigFlags CONFIG_FLAGS_VIEWPORTS_ENABLE           = 1 << 10;
-const ConfigFlags CONFIG_FLAGS_DPI_ENABLE_SCALE_VIEWPORTS = 1 << 14;
-const ConfigFlags CONFIG_FLAGS_DPI_ENABLE_SCALE_FONTS     = 1 << 15;
-const ConfigFlags CONFIG_FLAGS_IS_SRGB                    = 1 << 20;
-const ConfigFlags CONFIG_FLAGS_IS_TOUCH_SCREEN            = 1 << 21;
+const ConfigFlags CONFIG_FLAGS_NONE                   = 0;
+const ConfigFlags CONFIG_FLAGS_NAV_ENABLE_KEYBOARD    = 1 << 0;
+const ConfigFlags CONFIG_FLAGS_NAV_ENABLE_GAMEPAD     = 1 << 1;
+const ConfigFlags CONFIG_FLAGS_NO_MOUSE               = 1 << 4;
+const ConfigFlags CONFIG_FLAGS_NO_MOUSE_CURSOR_CHANGE = 1 << 5;
+const ConfigFlags CONFIG_FLAGS_NO_KEYBOARD            = 1 << 6;
+const ConfigFlags CONFIG_FLAGS_IS_SRGB                = 1 << 20;
+const ConfigFlags CONFIG_FLAGS_IS_TOUCH_SCREEN        = 1 << 21;
 
 // ImGuiCol_
 def Col = int;
@@ -539,29 +522,28 @@ const Col COL_TAB_SELECTED_OVERLINE        = 36;
 const Col COL_TAB_DIMMED                   = 37;
 const Col COL_TAB_DIMMED_SELECTED          = 38;
 const Col COL_TAB_DIMMED_SELECTED_OVERLINE = 39;
-const Col COL_DOCKING_PREVIEW              = 40;
-const Col COL_DOCKING_EMPTY_BG             = 41;
-const Col COL_PLOT_LINES                   = 42;
-const Col COL_PLOT_LINES_HOVERED           = 43;
-const Col COL_PLOT_HISTOGRAM               = 44;
-const Col COL_PLOT_HISTOGRAM_HOVERED       = 45;
-const Col COL_TABLE_HEADER_BG              = 46;
-const Col COL_TABLE_BORDER_STRONG          = 47;
-const Col COL_TABLE_BORDER_LIGHT           = 48;
-const Col COL_TABLE_ROW_BG                 = 49;
-const Col COL_TABLE_ROW_BG_ALT             = 50;
-const Col COL_TEXT_LINK                    = 51;
-const Col COL_TEXT_SELECTED_BG             = 52;
-const Col COL_DRAG_DROP_TARGET             = 53;
-const Col COL_NAV_HIGHLIGHT                = 54;
-const Col COL_NAV_WINDOWING_HIGHLIGHT      = 55;
-const Col COL_NAV_WINDOWING_DIM_BG         = 56;
-const Col COL_MODAL_WINDOW_DIM_BG          = 57;
-const Col COL_COUNT                        = 58;
+const Col COL_PLOT_LINES                   = 40;
+const Col COL_PLOT_LINES_HOVERED           = 41;
+const Col COL_PLOT_HISTOGRAM               = 42;
+const Col COL_PLOT_HISTOGRAM_HOVERED       = 43;
+const Col COL_TABLE_HEADER_BG              = 44;
+const Col COL_TABLE_BORDER_STRONG          = 45;
+const Col COL_TABLE_BORDER_LIGHT           = 46;
+const Col COL_TABLE_ROW_BG                 = 47;
+const Col COL_TABLE_ROW_BG_ALT             = 48;
+const Col COL_TEXT_LINK                    = 49;
+const Col COL_TEXT_SELECTED_BG             = 50;
+const Col COL_DRAG_DROP_TARGET             = 51;
+const Col COL_NAV_CURSOR                   = 52;
+const Col COL_NAV_WINDOWING_HIGHLIGHT      = 53;
+const Col COL_NAV_WINDOWING_DIM_BG         = 54;
+const Col COL_MODAL_WINDOW_DIM_BG          = 55;
+const Col COL_COUNT                        = 56;
 
 // ImGuiKey
 def Key = int;
 const Key KEY_NONE                   = 0;
+const Key KEY_NAMED_KEY_BEGIN        = 512;
 const Key KEY_TAB                    = 512;
 const Key KEY_LEFT_ARROW             = 513;
 const Key KEY_RIGHT_ARROW            = 514;
@@ -716,18 +698,14 @@ const Key KEY_RESERVED_FOR_MOD_CTRL  = 662;
 const Key KEY_RESERVED_FOR_MOD_SHIFT = 663;
 const Key KEY_RESERVED_FOR_MOD_ALT   = 664;
 const Key KEY_RESERVED_FOR_MOD_SUPER = 665;
-const Key KEY_COUNT                  = 666;
+const Key KEY_NAMED_KEY_END          = 666;
 const Key MOD_NONE                   = 0;
 const Key MOD_CTRL                   = 1 << 12;
 const Key MOD_SHIFT                  = 1 << 13;
 const Key MOD_ALT                    = 1 << 14;
 const Key MOD_SUPER                  = 1 << 15;
 const Key MOD_MASK                   = 0xF000;
-const Key KEY_NAMED_KEY_BEGIN        = 512;
-const Key KEY_NAMED_KEY_END          = KEY_COUNT;
 const Key KEY_NAMED_KEY_COUNT        = 154;
-const Key KEY_KEYS_DATA_SIZE         = KEY_NAMED_KEY_COUNT;
-const Key KEY_KEYS_DATA_OFFSET       = KEY_NAMED_KEY_BEGIN;
 
 // ImGuiWindowFlags_
 def WindowFlags = int;
@@ -751,7 +729,6 @@ const WindowFlags WINDOW_FLAGS_ALWAYS_HORIZONTAL_SCROLLBAR = 1<< 15;
 const WindowFlags WINDOW_FLAGS_NO_NAV_INPUTS               = 1 << 16;
 const WindowFlags WINDOW_FLAGS_NO_NAV_FOCUS                = 1 << 17;
 const WindowFlags WINDOW_FLAGS_UNSAVED_DOCUMENT            = 1 << 18;
-const WindowFlags WINDOW_FLAGS_NO_DOCKING                  = 1 << 19;
 const WindowFlags WINDOW_FLAGS_NO_NAV                      = WINDOW_FLAGS_NO_NAV_INPUTS | WINDOW_FLAGS_NO_NAV_FOCUS;
 const WindowFlags WINDOW_FLAGS_NO_DECORATION               = WINDOW_FLAGS_NO_TITLE_BAR | WINDOW_FLAGS_NO_RESIZE | WINDOW_FLAGS_NO_SCROLLBAR | WINDOW_FLAGS_NO_COLLAPSE;
 const WindowFlags WINDOW_FLAGS_NO_INPUTS                   = WINDOW_FLAGS_NO_MOUSE_INPUTS | WINDOW_FLAGS_NO_NAV_INPUTS | WINDOW_FLAGS_NO_NAV_FOCUS;
@@ -760,7 +737,6 @@ const WindowFlags WINDOW_FLAGS_TOOLTIP                     = 1 << 25;
 const WindowFlags WINDOW_FLAGS_POPUP                       = 1 << 26;
 const WindowFlags WINDOW_FLAGS_MODAL                       = 1 << 27;
 const WindowFlags WINDOW_FLAGS_CHILD_MENU                  = 1 << 28;
-const WindowFlags WINDOW_FLAGS_DOCK_NODE_HOST              = 1 << 29;
 
 // ImGuiMouseCursor_
 def MouseCursor = int;

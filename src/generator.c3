@@ -92,6 +92,7 @@ fn void output_enums(Object* json_obj, String output_path) {
             if (i != 0) {
               type_value.appendf(" | ");
             }
+            io::printfn("%s", v.trim());
             type_value.appendf("%s", enum_value_map.get(v.trim())!!);
           }
         } else {
@@ -182,24 +183,30 @@ fn void output_structs(Object* json_obj, String output_path) {
         DString callbacks;
         callbacks.temp_init();
 
-        usz bitfield_count = 0;
         assert(members.is_array());
-        foreach (member : members.array) {
+        for (int i = 0; i < members.array.len(); i += 1) {
+          Object* member = members.array[i];
           String member_name = member.get_string("name")!!;
 
           // WARNING: for now, lets stick with this implementation
           if (try size = member.get("bitfield")) {
-            assert(name == "ImFontGlyph");
             assert(member.get_string("type")!! == "unsigned int");
-            if (bitfield_count < 2) {
-              bitfield_count += 1;
-              continue;
+            if (name == "ImFontGlyph") {
+              sb.appendf("\tbitstruct : uint {\n");
+              sb.appendf("\t\tuint colored : 0..0;\n");
+              sb.appendf("\t\tuint visible : 1..1;\n");
+              sb.appendf("\t\tuint codepoint : 2..31;\n");
+              sb.appendf("\t}\n");
+              i += 3;
+            } else if (name == "ImFontAtlasCustomRect") {
+              sb.appendf("\tbitstruct : uint {\n");
+              sb.appendf("\t\tuint glyph_id : 0..30;\n");
+              sb.appendf("\t\tuint glyph_colored : 31..31;\n");
+              sb.appendf("\t}\n");
+              i += 2;
+            } else {
+              unreachable("[output_structs]: unhandled struct %s", name);
             }
-            sb.appendf("\tbitstruct : uint {\n");
-            sb.appendf("\t\tuint colored : 0..0;\n");
-            sb.appendf("\t\tuint visible : 1..1;\n");
-            sb.appendf("\t\tuint codepoint : 2..31;\n");
-            sb.appendf("\t}\n");
             continue;
           }
 

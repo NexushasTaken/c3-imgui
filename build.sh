@@ -4,6 +4,24 @@ IMGUI_VERSION='v1.91.5'
 [[ -x './target' ]] || c3c compile ./src/target.c3 -O4
 TARGET="$(./target)"
 
+check() {
+  pushd ${PWD}
+  cd ./cimgui/imgui
+
+  if [[ -n $(git branch | grep "* (HEAD detached at ${IMGUI_VERSION})") ]]; then
+    popd
+    return 0
+  fi
+
+  set -x
+  git fetch origin "refs/tags/${IMGUI_VERSION}:refs/tags/${IMGUI_VERSION}" --depth 1 || exit $?
+  git checkout ${IMGUI_VERSION}
+  set +x
+
+  popd
+}
+check
+
 init() {
   git submodule update --recursive --init --depth 1
 }
@@ -17,23 +35,7 @@ clean() {
 # original: "glfw opengl3 opengl2 sdl2"
 # all possible flags: "allegro5 android dx10 dx11 dx12 dx9 glfw glut opengl2 opengl3 sdl2 sdl3 sdlrenderer2 sdlrenderer3 vulkan wgpu win32"
 generate-cimgui() {
-  init && pushd ${PWD} && cd ./cimgui/generator && ./generator.sh --target "noimstrv" --cflags "" && popd
-}
-
-fetch-imgui-version() {
-  pushd ${PWD}
-  cd ./cimgui/imgui
-
-  if [[ -n $(git branch | grep "* (HEAD detached at ${IMGUI_VERSION})") ]]; then
-    exit
-  fi
-
-  set -x
-  git fetch origin "refs/tags/${IMGUI_VERSION}:refs/tags/${IMGUI_VERSION}" --depth 1 || exit $?
-  git checkout ${IMGUI_VERSION}
-  set +x
-
-  popd
+  pushd ${PWD} && cd ./cimgui/generator && ./generator.sh --target "noimstrv" --cflags "" && popd
 }
 
 build-cimgui() {
@@ -42,7 +44,7 @@ build-cimgui() {
 
 # see 'c3c --list-targets' for available targets
 build() {
-  fetch-imgui-version && build-cimgui && mkdir -p ./${TARGET} && cp -vf ./cimgui/libcimgui.a ./${TARGET}/libcimgui.a
+  generate-cimgui && build-cimgui && mkdir -p ./${TARGET} && cp -vf ./cimgui/libcimgui.a ./${TARGET}/libcimgui.a
 }
 
 usage() {
