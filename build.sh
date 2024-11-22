@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+IMGUI_VERSION='v1.91.5'
 
 [[ -x './target' ]] || c3c compile ./src/target.c3 -O4
 TARGET="$(./target)"
@@ -19,13 +20,21 @@ generate-cimgui() {
   init && pushd ${PWD} && cd ./cimgui/generator && ./generator.sh --target "noimstrv" --cflags "" && popd
 }
 
+fetch-imgui-version() {
+  pushd ${PWD}
+  cd ./cimgui/imgui
+  git fetch origin "refs/tags/${IMGUI_VERSION}:refs/tags/${IMGUI_VERSION}" --depth 1
+  git checkout ${IMGUI_VERSION}
+  popd
+}
+
 build-cimgui() {
   make static -C cimgui CXXFLAGS='-DIMGUI_DISABLE_OBSOLETE_KEYIO -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS'
 }
 
 # see 'c3c --list-targets' for available targets
 build() {
-  build-cimgui && mkdir -p ./${TARGET} && cp -vf ./cimgui/libcimgui.a ./${TARGET}/libcimgui.a
+  fetch-imgui-version && build-cimgui && mkdir -p ./${TARGET} && cp -vf ./cimgui/libcimgui.a ./${TARGET}/libcimgui.a
 }
 
 usage() {
@@ -33,6 +42,7 @@ usage() {
 Usage of build.sh:
    -i --init          initialize and update submodules
    -c --clean         clean builds
+   -f --fetch-imgui   switch submodule imgui version
    -g --generate      generate cimgui wrappers
    -b --build-cimgui  compile cimgui wrappers static library
    -B --build         generate and compile cimgui wrappers and copy static library
@@ -59,6 +69,10 @@ while [[ $# -gt 0 ]]; do
     -c|--clean)
       clean
       shift # past argument
+      ;;
+    -f|--fetch)
+      fetch-imgui-version
+      shift
       ;;
     -g|--generate)
       generate-cimgui
