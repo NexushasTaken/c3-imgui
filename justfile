@@ -6,7 +6,7 @@ generate-cimgui: init
 # original: "glfw opengl3 opengl2 sdl2"
 # all possible flags: "allegro5 android dx10 dx11 dx12 dx9 glfw glut opengl2 opengl3 sdl2 sdl3 sdlrenderer2 sdlrenderer3 vulkan wgpu win32"
 
-build-cimgui: generate-cimgui
+build-cimgui:
   make static -C cimgui CXXFLAGS='-DIMGUI_DISABLE_OBSOLETE_KEYIO -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS'
 
 # see 'c3c --list-targets' for available targets

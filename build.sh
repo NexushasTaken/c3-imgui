@@ -13,7 +13,7 @@ generate-cimgui() {
 }
 
 build-cimgui() {
-  generate-cimgui && make static -C cimgui
+  make static -C cimgui CXXFLAGS='-DIMGUI_DISABLE_OBSOLETE_KEYIO -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS'
 }
 
 # see 'c3c --list-targets' for available targets
@@ -34,6 +34,11 @@ Usage of build.sh:
    -h --help          show this message and exit
 EOF
 }
+
+if [[ $# -eq 0 ]]; then
+  usage
+  exit 1
+fi
 
 # parse command line arguments
 # ref: https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
