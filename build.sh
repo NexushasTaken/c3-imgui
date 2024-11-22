@@ -23,8 +23,16 @@ generate-cimgui() {
 fetch-imgui-version() {
   pushd ${PWD}
   cd ./cimgui/imgui
-  git fetch origin "refs/tags/${IMGUI_VERSION}:refs/tags/${IMGUI_VERSION}" --depth 1
+
+  if [[ -n $(git branch | grep "* (HEAD detached at ${IMGUI_VERSION})") ]]; then
+    exit
+  fi
+
+  set -x
+  git fetch origin "refs/tags/${IMGUI_VERSION}:refs/tags/${IMGUI_VERSION}" --depth 1 || exit $?
   git checkout ${IMGUI_VERSION}
+  set +x
+
   popd
 }
 
