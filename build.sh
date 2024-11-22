@@ -13,9 +13,15 @@ check() {
     return 0
   fi
 
+  if [[ -n $(git tag | grep "^${IMGUI_VERSION}$") ]]; then
+    popd
+    git checkout "${IMGUI_VERSION}"
+    return 0
+  fi
+
   set -x
   git fetch origin "refs/tags/${IMGUI_VERSION}:refs/tags/${IMGUI_VERSION}" --depth 1 || exit $?
-  git checkout ${IMGUI_VERSION}
+  git checkout "${IMGUI_VERSION}"
   set +x
 
   popd
