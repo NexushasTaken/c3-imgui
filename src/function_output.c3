@@ -65,8 +65,10 @@ fn void output_imgui_func(File* output, File* output_interface, List(<Object*>) 
   output.flush()!!;
 }
 
+def ListObject = List(<Object*>);
+
 fn void output_struct_func(File* output, File* output_interface, List(<Object*>) funcs) {
-  HashMap(<String, List(<Object*>)>) struct_funcs;
+  HashMap(<String, ListObject>) struct_funcs;
 
   sort::quicksort(funcs);
 

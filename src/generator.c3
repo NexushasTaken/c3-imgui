@@ -57,6 +57,8 @@ fn void digest_types(Object* json_obj) {
   };
 }
 
+def TupleDString = Tuple(<String, DString>);
+
 fn void output_enums(Object* json_obj, String output_path) {
   io::printf("Outputting enums...\n");
   File output = file::open(output_path, "w")!!;
@@ -78,7 +80,7 @@ fn void output_enums(Object* json_obj, String output_path) {
       sb.appendf(";\n");
     };
 
-    List(<Tuple(<String, DString>)>) cleaned_values;
+    List(<TupleDString>) cleaned_values;
 
     assert(values.is_array());
     { // Gather
@@ -252,12 +254,14 @@ fn void output_structs(Object* json_obj, String output_path) {
   };
 }
 
+def TupleString = Tuple(<String, String>);
+
 fn void output_typedefs(Object* json_obj, String output_path) {
   io::printf("Outputting typedefs...\n");
   File output = file::open(output_path, "w")!!;
   defer (void)output.close();
 
-  List(<Tuple(<String, String>)>) typedefs;
+  List(<TupleString>) typedefs;
 
   // Gather
   json_obj.map.@each(; String name, Object* values) {
