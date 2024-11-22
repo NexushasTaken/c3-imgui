@@ -14,8 +14,8 @@ check() {
   fi
 
   if [[ -n $(git tag | grep "^${IMGUI_VERSION}$") ]]; then
-    popd
     git checkout "${IMGUI_VERSION}"
+    popd
     return 0
   fi
 
