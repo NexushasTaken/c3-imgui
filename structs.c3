@@ -76,7 +76,7 @@ struct ImGuiStyle {
 	bool anti_aliased_fill;
 	float curve_tessellation_tol;
 	float circle_tessellation_max_error;
-	ImVec4[(usz)(IM_GUI_COL_COUNT)] colors;
+	ImVec4[(usz)(COL_COUNT)] colors;
 	float hover_stationary_delay;
 	float hover_delay_short;
 	float hover_delay_normal;
@@ -347,7 +347,7 @@ struct ImGuiIO {
 	bool key_alt;
 	bool key_super;
 	ImGuiKeyChord key_mods;
-	ImGuiKeyData[(usz)(IM_GUI_KEY_NAMED_KEY_COUNT)] keys_data;
+	ImGuiKeyData[(usz)(KEY_NAMED_KEY_COUNT)] keys_data;
 	bool want_capture_mouse_unless_popup_close;
 	ImVec2 mouse_pos_prev;
 	ImVec2[(usz)(5)] mouse_clicked_pos;

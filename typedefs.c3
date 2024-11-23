@@ -20,4 +20,7 @@ def ImU32 = uint;
 def ImDrawIdx = ushort;
 def ImS8 = ichar;
 def ImS16 = short;
+def ImDrawListSharedData = void;
+def ImGuiContext = void;
+def ImFontBuilderIO = void;
 def ImWchar = ImWchar16;

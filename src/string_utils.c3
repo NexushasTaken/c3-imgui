@@ -13,6 +13,7 @@ HashMap(<String, int>) blacklist_typedefs;
 HashMap(<String, String>) distinct_enum_map;
 
 HashMap(<String, String>) typedef_names_map;
+List(<String>) opaque_types;
 
 HashMap(<String, String>) struct_map;
 HashMap(<String, String>) enum_map;
@@ -125,6 +126,12 @@ fn void init_type_map() @init {
   type_map.set("ImDrawListSharedData*", "void*");
 }
 
+fn void init_opaque_types() @init {
+  opaque_types.push("ImGuiContext");
+  opaque_types.push("ImFontBuilderIO");
+  opaque_types.push("ImDrawListSharedData");
+}
+
 fn void init_blacklist_typedefs() @init {
   blacklist_typedefs.set("iterator", 0);
   blacklist_typedefs.set("const_iterator", 0);
@@ -216,6 +223,18 @@ fn DString* clean_callback(DString* sb, String cb) {
   clean_params(sb, params);
   sb.appendf(")");
   return sb;
+}
+
+fn String clean_enum_value(String str) {
+  if (str.starts_with("Im")/*  && !str.starts_with("Image") */) {
+      String result = str[2..];
+      if (result.starts_with("Gui")) {
+          result = result[3..];
+      }
+      return result;
+  }
+
+  return str;
 }
 
 fn String clean_enum(String name) {

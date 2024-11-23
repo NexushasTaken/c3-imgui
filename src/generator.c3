@@ -51,7 +51,8 @@ fn void digest_types(Object* json_obj) {
   json_obj.get("enums")!!.map.@each(; String name, Object* values) {
     foreach (value : values.array) {
       DString value_name;
-      to_constant_case(&value_name, clean_imgui(value.get_string("name")!!));
+      to_constant_case(&value_name, clean_enum_value(value.get_string("name")!!));
+      io::printfn("%s", value_name);
       enum_value_map.set(value.get_string("name")!!, value_name.copy_str());
     }
   };
@@ -92,7 +93,6 @@ fn void output_enums(Object* json_obj, String output_path) {
             if (i != 0) {
               type_value.appendf(" | ");
             }
-            io::printfn("%s", v.trim());
             type_value.appendf("%s", enum_value_map.get(v.trim())!!);
           }
         } else {
@@ -103,7 +103,7 @@ fn void output_enums(Object* json_obj, String output_path) {
           } else if (type.get_string("value")!!.contains("-")) {
             type_value.appendf("%d", type.get_long("calc_value")!!);
           } else {
-            to_constant_case(&type_value, clean_imgui(type.get_string("value")!!));
+            to_constant_case(&type_value, clean_enum_value(type.get_string("value")!!));
           }
         }
 
@@ -278,6 +278,9 @@ fn void output_typedefs(Object* json_obj, String output_path) {
       }
     }
   };
+  foreach (type : opaque_types) {
+    typedefs.push({type, "void"});
+  }
 
   sort::quicksort(
     typedefs,
