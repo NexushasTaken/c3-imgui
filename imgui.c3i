@@ -1004,7 +1004,7 @@ extern fn void ImFontGlyphRangesBuilder.add_ranges(ImFontGlyphRangesBuilder* sel
 
 extern fn void ImFontGlyphRangesBuilder.add_text(ImFontGlyphRangesBuilder* self, ZString text, ZString text_end = null) @extern("ImFontGlyphRangesBuilder_AddText");
 
-extern fn void ImFontGlyphRangesBuilder.build_ranges(ImFontGlyphRangesBuilder* self, vector::Vector(<ImWchar>)* out_ranges) @extern("ImFontGlyphRangesBuilder_BuildRanges");
+extern fn void ImFontGlyphRangesBuilder.build_ranges(ImFontGlyphRangesBuilder* self, vector::ImVector(<ImWchar>)* out_ranges) @extern("ImFontGlyphRangesBuilder_BuildRanges");
 
 extern fn void ImFontGlyphRangesBuilder.clear(ImFontGlyphRangesBuilder* self) @extern("ImFontGlyphRangesBuilder_Clear");
 
@@ -1256,7 +1256,7 @@ extern fn void ImGuiTextRange.destroy(ImGuiTextRange* self) @extern("ImGuiTextRa
 
 extern fn bool ImGuiTextRange.empty(ImGuiTextRange* self) @extern("ImGuiTextRange_empty");
 
-extern fn void ImGuiTextRange.split(ImGuiTextRange* self, char separator, vector::Vector(<ImGuiTextRange>)* out) @extern("ImGuiTextRange_split");
+extern fn void ImGuiTextRange.split(ImGuiTextRange* self, char separator, vector::ImVector(<ImGuiTextRange>)* out) @extern("ImGuiTextRange_split");
 
 extern fn ImGuiViewport* new_im_gui_viewport() @extern("ImGuiViewport_ImGuiViewport");
 

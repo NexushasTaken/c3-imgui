@@ -9,7 +9,7 @@ struct ImGuiTableSortSpecs {
 
 // ImGuiStorage
 struct ImGuiStorage {
-	vector::Vector(<ImGuiStoragePair>) data;
+	vector::ImVector(<ImGuiStoragePair>) data;
 }
 
 // ImGuiKeyData
@@ -86,7 +86,7 @@ struct ImGuiStyle {
 
 // ImGuiMultiSelectIO
 struct ImGuiMultiSelectIO {
-	vector::Vector(<ImGuiSelectionRequest>) requests;
+	vector::ImVector(<ImGuiSelectionRequest>) requests;
 	ImGuiSelectionUserData range_src_item;
 	ImGuiSelectionUserData nav_id_item;
 	bool nav_id_selected;
@@ -128,7 +128,7 @@ struct ImDrawData {
 	int cmd_lists_count;
 	int total_idx_count;
 	int total_vtx_count;
-	vector::Vector(<ImDrawList*>) cmd_lists;
+	vector::ImVector(<ImDrawList*>) cmd_lists;
 	ImVec2 display_pos;
 	ImVec2 display_size;
 	ImVec2 framebuffer_scale;
@@ -172,11 +172,11 @@ struct ImFontGlyph {
 
 // ImFont
 struct ImFont {
-	vector::Vector(<float>) index_advance_x;
+	vector::ImVector(<float>) index_advance_x;
 	float fallback_advance_x;
 	float font_size;
-	vector::Vector(<ImWchar>) index_lookup;
-	vector::Vector(<ImFontGlyph>) glyphs;
+	vector::ImVector(<ImWchar>) index_lookup;
+	vector::ImVector(<ImFontGlyph>) glyphs;
 	ImFontGlyph* fallback_glyph;
 	ImFontAtlas* container_atlas;
 	ImFontConfig* config_data;
@@ -196,7 +196,7 @@ struct ImFont {
 
 // ImFontGlyphRangesBuilder
 struct ImFontGlyphRangesBuilder {
-	vector::Vector(<uint>) used_chars;
+	vector::ImVector(<uint>) used_chars;
 }
 
 // ImGuiOnceUponAFrame
@@ -206,8 +206,8 @@ struct ImGuiOnceUponAFrame {
 
 // ImDrawChannel
 struct ImDrawChannel {
-	vector::Vector(<ImDrawCmd>) _cmd_buffer;
-	vector::Vector(<ImDrawIdx>) _idx_buffer;
+	vector::ImVector(<ImDrawCmd>) _cmd_buffer;
+	vector::ImVector(<ImDrawIdx>) _idx_buffer;
 }
 
 // ImGuiSizeCallbackData
@@ -368,19 +368,19 @@ struct ImGuiIO {
 	bool app_focus_lost;
 	bool app_accepting_events;
 	ImWchar16 input_queue_surrogate;
-	vector::Vector(<ImWchar>) input_queue_characters;
+	vector::ImVector(<ImWchar>) input_queue_characters;
 }
 
 // ImDrawListSplitter
 struct ImDrawListSplitter {
 	int _current;
 	int _count;
-	vector::Vector(<ImDrawChannel>) _channels;
+	vector::ImVector(<ImDrawChannel>) _channels;
 }
 
 // ImGuiTextBuffer
 struct ImGuiTextBuffer {
-	vector::Vector(<char>) buf;
+	vector::ImVector(<char>) buf;
 }
 
 // ImFontAtlas
@@ -399,9 +399,9 @@ struct ImFontAtlas {
 	int tex_height;
 	ImVec2 tex_uv_scale;
 	ImVec2 tex_uv_white_pixel;
-	vector::Vector(<ImFont*>) fonts;
-	vector::Vector(<ImFontAtlasCustomRect>) custom_rects;
-	vector::Vector(<ImFontConfig>) config_data;
+	vector::ImVector(<ImFont*>) fonts;
+	vector::ImVector(<ImFontAtlasCustomRect>) custom_rects;
+	vector::ImVector(<ImFontConfig>) config_data;
 	ImVec4[(usz)((63)+1)] tex_uv_lines;
 	void* font_builder_io;
 	uint font_builder_flags;
@@ -483,20 +483,20 @@ struct ImGuiInputTextCallbackData {
 
 // ImDrawList
 struct ImDrawList {
-	vector::Vector(<ImDrawCmd>) cmd_buffer;
-	vector::Vector(<ImDrawIdx>) idx_buffer;
-	vector::Vector(<ImDrawVert>) vtx_buffer;
+	vector::ImVector(<ImDrawCmd>) cmd_buffer;
+	vector::ImVector(<ImDrawIdx>) idx_buffer;
+	vector::ImVector(<ImDrawVert>) vtx_buffer;
 	ImDrawListFlags flags;
 	uint _vtx_current_idx;
 	void* _data;
 	ImDrawVert* _vtx_write_ptr;
 	ImDrawIdx* _idx_write_ptr;
-	vector::Vector(<ImVec2>) _path;
+	vector::ImVector(<ImVec2>) _path;
 	ImDrawCmdHeader _cmd_header;
 	ImDrawListSplitter _splitter;
-	vector::Vector(<ImVec4>) _clip_rect_stack;
-	vector::Vector(<ImTextureID>) _texture_id_stack;
-	vector::Vector(<char>) _callbacks_data_buf;
+	vector::ImVector(<ImVec4>) _clip_rect_stack;
+	vector::ImVector(<ImTextureID>) _texture_id_stack;
+	vector::ImVector(<char>) _callbacks_data_buf;
 	float _fringe_scale;
 	ZString _owner_name;
 }
@@ -524,7 +524,7 @@ struct ImGuiTableColumnSortSpecs {
 // ImGuiTextFilter
 struct ImGuiTextFilter {
 	char[(usz)(256)] input_buf;
-	vector::Vector(<ImGuiTextRange>) filters;
+	vector::ImVector(<ImGuiTextRange>) filters;
 	int count_grep;
 }
 
