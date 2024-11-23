@@ -1,19 +1,19 @@
 module imgui;
 
 // ImGuiTableSortSpecs
-struct TableSortSpecs {
-	TableColumnSortSpecs* specs;
+struct ImGuiTableSortSpecs {
+	ImGuiTableColumnSortSpecs* specs;
 	int specs_count;
 	bool specs_dirty;
 }
 
 // ImGuiStorage
-struct Storage {
-	vector::Vector(<StoragePair>) data;
+struct ImGuiStorage {
+	vector::Vector(<ImGuiStoragePair>) data;
 }
 
 // ImGuiKeyData
-struct KeyData {
+struct ImGuiKeyData {
 	bool down;
 	float down_duration;
 	float down_duration_prev;
@@ -21,33 +21,33 @@ struct KeyData {
 }
 
 // ImGuiPlatformImeData
-struct PlatformImeData {
+struct ImGuiPlatformImeData {
 	bool want_visible;
-	Vec2 input_pos;
+	ImVec2 input_pos;
 	float input_line_height;
 }
 
 // ImGuiStyle
-struct Style {
+struct ImGuiStyle {
 	float alpha;
 	float disabled_alpha;
-	Vec2 window_padding;
+	ImVec2 window_padding;
 	float window_rounding;
 	float window_border_size;
-	Vec2 window_min_size;
-	Vec2 window_title_align;
-	Dir window_menu_button_position;
+	ImVec2 window_min_size;
+	ImVec2 window_title_align;
+	ImGuiDir window_menu_button_position;
 	float child_rounding;
 	float child_border_size;
 	float popup_rounding;
 	float popup_border_size;
-	Vec2 frame_padding;
+	ImVec2 frame_padding;
 	float frame_rounding;
 	float frame_border_size;
-	Vec2 item_spacing;
-	Vec2 item_inner_spacing;
-	Vec2 cell_padding;
-	Vec2 touch_extra_padding;
+	ImVec2 item_spacing;
+	ImVec2 item_inner_spacing;
+	ImVec2 cell_padding;
+	ImVec2 touch_extra_padding;
 	float indent_spacing;
 	float columns_min_spacing;
 	float scrollbar_size;
@@ -61,61 +61,61 @@ struct Style {
 	float tab_bar_border_size;
 	float tab_bar_overline_size;
 	float table_angled_headers_angle;
-	Vec2 table_angled_headers_text_align;
-	Dir color_button_position;
-	Vec2 button_text_align;
-	Vec2 selectable_text_align;
+	ImVec2 table_angled_headers_text_align;
+	ImGuiDir color_button_position;
+	ImVec2 button_text_align;
+	ImVec2 selectable_text_align;
 	float separator_text_border_size;
-	Vec2 separator_text_align;
-	Vec2 separator_text_padding;
-	Vec2 display_window_padding;
-	Vec2 display_safe_area_padding;
+	ImVec2 separator_text_align;
+	ImVec2 separator_text_padding;
+	ImVec2 display_window_padding;
+	ImVec2 display_safe_area_padding;
 	float mouse_cursor_scale;
 	bool anti_aliased_lines;
 	bool anti_aliased_lines_use_tex;
 	bool anti_aliased_fill;
 	float curve_tessellation_tol;
 	float circle_tessellation_max_error;
-	Vec4[(usz)(COL_COUNT)] colors;
+	ImVec4[(usz)(IM_GUI_COL_COUNT)] colors;
 	float hover_stationary_delay;
 	float hover_delay_short;
 	float hover_delay_normal;
-	HoveredFlags hover_flags_for_tooltip_mouse;
-	HoveredFlags hover_flags_for_tooltip_nav;
+	ImGuiHoveredFlags hover_flags_for_tooltip_mouse;
+	ImGuiHoveredFlags hover_flags_for_tooltip_nav;
 }
 
 // ImGuiMultiSelectIO
-struct MultiSelectIO {
-	vector::Vector(<SelectionRequest>) requests;
-	SelectionUserData range_src_item;
-	SelectionUserData nav_id_item;
+struct ImGuiMultiSelectIO {
+	vector::Vector(<ImGuiSelectionRequest>) requests;
+	ImGuiSelectionUserData range_src_item;
+	ImGuiSelectionUserData nav_id_item;
 	bool nav_id_selected;
 	bool range_src_reset;
 	int items_count;
 }
 
 // ImGuiSelectionRequest
-struct SelectionRequest {
-	SelectionRequestType type;
+struct ImGuiSelectionRequest {
+	ImGuiSelectionRequestType type;
 	bool selected;
 	ImU8 range_direction;
-	SelectionUserData range_first_item;
-	SelectionUserData range_last_item;
+	ImGuiSelectionUserData range_first_item;
+	ImGuiSelectionUserData range_last_item;
 }
 
 // ImColor
-struct Color {
-	Vec4 value;
+struct ImColor {
+	ImVec4 value;
 }
 
 // ImVec2
-struct Vec2 {
+struct ImVec2 {
 	float x;
 	float y;
 }
 
 // ImVec4
-struct Vec4 {
+struct ImVec4 {
 	float x;
 	float y;
 	float z;
@@ -123,20 +123,20 @@ struct Vec4 {
 }
 
 // ImDrawData
-struct DrawData {
+struct ImDrawData {
 	bool valid;
 	int cmd_lists_count;
 	int total_idx_count;
 	int total_vtx_count;
-	vector::Vector(<DrawList*>) cmd_lists;
-	Vec2 display_pos;
-	Vec2 display_size;
-	Vec2 framebuffer_scale;
-	Viewport* owner_viewport;
+	vector::Vector(<ImDrawList*>) cmd_lists;
+	ImVec2 display_pos;
+	ImVec2 display_size;
+	ImVec2 framebuffer_scale;
+	ImGuiViewport* owner_viewport;
 }
 
 // ImGuiPlatformIO
-struct PlatformIO {
+struct ImGuiPlatformIO {
 	PlatformGetClipboardTextFn_Func platform_get_clipboard_text_fn;
 	PlatformSetClipboardTextFn_Func platform_set_clipboard_text_fn;
 	void* platform_clipboard_user_data;
@@ -144,17 +144,17 @@ struct PlatformIO {
 	void* platform_open_in_shell_user_data;
 	PlatformSetImeDataFn_Func platform_set_ime_data_fn;
 	void* platform_ime_user_data;
-	Wchar platform_locale_decimal_point;
+	ImWchar platform_locale_decimal_point;
 	void* renderer_render_state;
 }
 
 def PlatformGetClipboardTextFn_Func = fn ZString(void* ctx);
 def PlatformSetClipboardTextFn_Func = fn void(void* ctx, ZString text);
 def PlatformOpenInShellFn_Func = fn bool(void* ctx, ZString path);
-def PlatformSetImeDataFn_Func = fn void(void* ctx, Viewport* viewport, PlatformImeData* data);
+def PlatformSetImeDataFn_Func = fn void(void* ctx, ImGuiViewport* viewport, ImGuiPlatformImeData* data);
 
 // ImFontGlyph
-struct FontGlyph {
+struct ImFontGlyph {
 	bitstruct : uint {
 		uint colored : 0..0;
 		uint visible : 1..1;
@@ -171,18 +171,18 @@ struct FontGlyph {
 }
 
 // ImFont
-struct Font {
+struct ImFont {
 	vector::Vector(<float>) index_advance_x;
 	float fallback_advance_x;
 	float font_size;
-	vector::Vector(<Wchar>) index_lookup;
-	vector::Vector(<FontGlyph>) glyphs;
-	FontGlyph* fallback_glyph;
-	FontAtlas* container_atlas;
-	FontConfig* config_data;
+	vector::Vector(<ImWchar>) index_lookup;
+	vector::Vector(<ImFontGlyph>) glyphs;
+	ImFontGlyph* fallback_glyph;
+	ImFontAtlas* container_atlas;
+	ImFontConfig* config_data;
 	short config_data_count;
-	Wchar fallback_char;
-	Wchar ellipsis_char;
+	ImWchar fallback_char;
+	ImWchar ellipsis_char;
 	short ellipsis_char_count;
 	float ellipsis_width;
 	float ellipsis_char_step;
@@ -195,59 +195,59 @@ struct Font {
 }
 
 // ImFontGlyphRangesBuilder
-struct FontGlyphRangesBuilder {
+struct ImFontGlyphRangesBuilder {
 	vector::Vector(<uint>) used_chars;
 }
 
 // ImGuiOnceUponAFrame
-struct OnceUponAFrame {
+struct ImGuiOnceUponAFrame {
 	int ref_frame;
 }
 
 // ImDrawChannel
-struct DrawChannel {
-	vector::Vector(<DrawCmd>) _cmd_buffer;
-	vector::Vector(<DrawIdx>) _idx_buffer;
+struct ImDrawChannel {
+	vector::Vector(<ImDrawCmd>) _cmd_buffer;
+	vector::Vector(<ImDrawIdx>) _idx_buffer;
 }
 
 // ImGuiSizeCallbackData
-struct SizeCallbackData {
+struct ImGuiSizeCallbackData {
 	void* user_data;
-	Vec2 pos;
-	Vec2 current_size;
-	Vec2 desired_size;
+	ImVec2 pos;
+	ImVec2 current_size;
+	ImVec2 desired_size;
 }
 
 // ImDrawCmdHeader
-struct DrawCmdHeader {
-	Vec4 clip_rect;
-	TextureID texture_id;
+struct ImDrawCmdHeader {
+	ImVec4 clip_rect;
+	ImTextureID texture_id;
 	uint vtx_offset;
 }
 
 // ImDrawCmd
-struct DrawCmd {
-	Vec4 clip_rect;
-	TextureID texture_id;
+struct ImDrawCmd {
+	ImVec4 clip_rect;
+	ImTextureID texture_id;
 	uint vtx_offset;
 	uint idx_offset;
 	uint elem_count;
-	DrawCallback user_callback;
+	ImDrawCallback user_callback;
 	void* user_callback_data;
 	int user_callback_data_size;
 	int user_callback_data_offset;
 }
 
 // ImGuiSelectionExternalStorage
-struct SelectionExternalStorage {
+struct ImGuiSelectionExternalStorage {
 	void* user_data;
 	AdapterSetItemSelected_Func adapter_set_item_selected;
 }
 
-def AdapterSetItemSelected_Func = fn void(SelectionExternalStorage* self, int idx, bool selected);
+def AdapterSetItemSelected_Func = fn void(ImGuiSelectionExternalStorage* self, int idx, bool selected);
 
 // ImFontConfig
-struct FontConfig {
+struct ImFontConfig {
 	void* font_data;
 	int font_data_size;
 	bool font_data_owned_by_atlas;
@@ -256,35 +256,35 @@ struct FontConfig {
 	int oversample_h;
 	int oversample_v;
 	bool pixel_snap_h;
-	Vec2 glyph_extra_spacing;
-	Vec2 glyph_offset;
-	Wchar* glyph_ranges;
+	ImVec2 glyph_extra_spacing;
+	ImVec2 glyph_offset;
+	ImWchar* glyph_ranges;
 	float glyph_min_advance_x;
 	float glyph_max_advance_x;
 	bool merge_mode;
 	uint font_builder_flags;
 	float rasterizer_multiply;
 	float rasterizer_density;
-	Wchar ellipsis_char;
+	ImWchar ellipsis_char;
 	char[(usz)(40)] name;
-	Font* dst_font;
+	ImFont* dst_font;
 }
 
 // ImGuiIO
 struct ImGuiIO {
-	ConfigFlags config_flags;
-	BackendFlags backend_flags;
-	Vec2 display_size;
+	ImGuiConfigFlags config_flags;
+	ImGuiBackendFlags backend_flags;
+	ImVec2 display_size;
 	float delta_time;
 	float ini_saving_rate;
 	ZString ini_filename;
 	ZString log_filename;
 	void* user_data;
-	FontAtlas* fonts;
+	ImFontAtlas* fonts;
 	float font_global_scale;
 	bool font_allow_user_scaling;
-	Font* font_default;
-	Vec2 display_framebuffer_scale;
+	ImFont* font_default;
+	ImVec2 display_framebuffer_scale;
 	bool config_nav_swap_gamepad_buttons;
 	bool config_nav_move_set_mouse_pos;
 	bool config_nav_capture_keyboard;
@@ -335,22 +335,22 @@ struct ImGuiIO {
 	int metrics_render_indices;
 	int metrics_render_windows;
 	int metrics_active_windows;
-	Vec2 mouse_delta;
+	ImVec2 mouse_delta;
 	void* ctx;
-	Vec2 mouse_pos;
+	ImVec2 mouse_pos;
 	bool[(usz)(5)] mouse_down;
 	float mouse_wheel;
 	float mouse_wheel_h;
-	MouseSource mouse_source;
+	ImGuiMouseSource mouse_source;
 	bool key_ctrl;
 	bool key_shift;
 	bool key_alt;
 	bool key_super;
-	KeyChord key_mods;
-	KeyData[(usz)(KEY_NAMED_KEY_COUNT)] keys_data;
+	ImGuiKeyChord key_mods;
+	ImGuiKeyData[(usz)(IM_GUI_KEY_NAMED_KEY_COUNT)] keys_data;
 	bool want_capture_mouse_unless_popup_close;
-	Vec2 mouse_pos_prev;
-	Vec2[(usz)(5)] mouse_clicked_pos;
+	ImVec2 mouse_pos_prev;
+	ImVec2[(usz)(5)] mouse_clicked_pos;
 	double[(usz)(5)] mouse_clicked_time;
 	bool[(usz)(5)] mouse_clicked;
 	bool[(usz)(5)] mouse_double_clicked;
@@ -367,26 +367,26 @@ struct ImGuiIO {
 	float pen_pressure;
 	bool app_focus_lost;
 	bool app_accepting_events;
-	Wchar16 input_queue_surrogate;
-	vector::Vector(<Wchar>) input_queue_characters;
+	ImWchar16 input_queue_surrogate;
+	vector::Vector(<ImWchar>) input_queue_characters;
 }
 
 // ImDrawListSplitter
-struct DrawListSplitter {
+struct ImDrawListSplitter {
 	int _current;
 	int _count;
-	vector::Vector(<DrawChannel>) _channels;
+	vector::Vector(<ImDrawChannel>) _channels;
 }
 
 // ImGuiTextBuffer
-struct TextBuffer {
+struct ImGuiTextBuffer {
 	vector::Vector(<char>) buf;
 }
 
 // ImFontAtlas
-struct FontAtlas {
-	FontAtlasFlags flags;
-	TextureID tex_id;
+struct ImFontAtlas {
+	ImFontAtlasFlags flags;
+	ImTextureID tex_id;
 	int tex_desired_width;
 	int tex_glyph_padding;
 	bool locked;
@@ -397,12 +397,12 @@ struct FontAtlas {
 	uint* tex_pixels_rgba32;
 	int tex_width;
 	int tex_height;
-	Vec2 tex_uv_scale;
-	Vec2 tex_uv_white_pixel;
-	vector::Vector(<Font*>) fonts;
-	vector::Vector(<FontAtlasCustomRect>) custom_rects;
-	vector::Vector(<FontConfig>) config_data;
-	Vec4[(usz)((63)+1)] tex_uv_lines;
+	ImVec2 tex_uv_scale;
+	ImVec2 tex_uv_white_pixel;
+	vector::Vector(<ImFont*>) fonts;
+	vector::Vector(<ImFontAtlasCustomRect>) custom_rects;
+	vector::Vector(<ImFontConfig>) config_data;
+	ImVec4[(usz)((63)+1)] tex_uv_lines;
 	void* font_builder_io;
 	uint font_builder_flags;
 	int pack_id_mouse_cursors;
@@ -410,31 +410,31 @@ struct FontAtlas {
 }
 
 // ImGuiStoragePair
-struct StoragePair {
+struct ImGuiStoragePair {
 	ImGuiID key;
 	union { int val_i; float val_f; void* val_p;}
 }
 
 // ImGuiTextRange
-struct TextRange {
+struct ImGuiTextRange {
 	ZString b;
 	ZString e;
 }
 
 // ImGuiSelectionBasicStorage
-struct SelectionBasicStorage {
+struct ImGuiSelectionBasicStorage {
 	int size;
 	bool preserve_order;
 	void* user_data;
 	AdapterIndexToStorageId_Func adapter_index_to_storage_id;
 	int _selection_order;
-	Storage _storage;
+	ImGuiStorage _storage;
 }
 
-def AdapterIndexToStorageId_Func = fn ImGuiID(SelectionBasicStorage* self, int idx);
+def AdapterIndexToStorageId_Func = fn ImGuiID(ImGuiSelectionBasicStorage* self, int idx);
 
 // ImGuiListClipper
-struct ListClipper {
+struct ImGuiListClipper {
 	void* ctx;
 	int display_start;
 	int display_end;
@@ -446,7 +446,7 @@ struct ListClipper {
 }
 
 // ImGuiPayload
-struct Payload {
+struct ImGuiPayload {
 	void* data;
 	int data_size;
 	ImGuiID source_id;
@@ -458,20 +458,20 @@ struct Payload {
 }
 
 // ImDrawVert
-struct DrawVert {
-	Vec2 pos;
-	Vec2 uv;
+struct ImDrawVert {
+	ImVec2 pos;
+	ImVec2 uv;
 	ImU32 col;
 }
 
 // ImGuiInputTextCallbackData
-struct InputTextCallbackData {
+struct ImGuiInputTextCallbackData {
 	void* ctx;
-	InputTextFlags event_flag;
-	InputTextFlags flags;
+	ImGuiInputTextFlags event_flag;
+	ImGuiInputTextFlags flags;
 	void* user_data;
-	Wchar event_char;
-	Key event_key;
+	ImWchar event_char;
+	ImGuiKey event_key;
 	char* buf;
 	int buf_text_len;
 	int buf_size;
@@ -482,54 +482,54 @@ struct InputTextCallbackData {
 }
 
 // ImDrawList
-struct DrawList {
-	vector::Vector(<DrawCmd>) cmd_buffer;
-	vector::Vector(<DrawIdx>) idx_buffer;
-	vector::Vector(<DrawVert>) vtx_buffer;
-	DrawListFlags flags;
+struct ImDrawList {
+	vector::Vector(<ImDrawCmd>) cmd_buffer;
+	vector::Vector(<ImDrawIdx>) idx_buffer;
+	vector::Vector(<ImDrawVert>) vtx_buffer;
+	ImDrawListFlags flags;
 	uint _vtx_current_idx;
 	void* _data;
-	DrawVert* _vtx_write_ptr;
-	DrawIdx* _idx_write_ptr;
-	vector::Vector(<Vec2>) _path;
-	DrawCmdHeader _cmd_header;
-	DrawListSplitter _splitter;
-	vector::Vector(<Vec4>) _clip_rect_stack;
-	vector::Vector(<TextureID>) _texture_id_stack;
+	ImDrawVert* _vtx_write_ptr;
+	ImDrawIdx* _idx_write_ptr;
+	vector::Vector(<ImVec2>) _path;
+	ImDrawCmdHeader _cmd_header;
+	ImDrawListSplitter _splitter;
+	vector::Vector(<ImVec4>) _clip_rect_stack;
+	vector::Vector(<ImTextureID>) _texture_id_stack;
 	vector::Vector(<char>) _callbacks_data_buf;
 	float _fringe_scale;
 	ZString _owner_name;
 }
 
 // ImGuiViewport
-struct Viewport {
+struct ImGuiViewport {
 	ImGuiID id;
-	ViewportFlags flags;
-	Vec2 pos;
-	Vec2 size;
-	Vec2 work_pos;
-	Vec2 work_size;
+	ImGuiViewportFlags flags;
+	ImVec2 pos;
+	ImVec2 size;
+	ImVec2 work_pos;
+	ImVec2 work_size;
 	void* platform_handle;
 	void* platform_handle_raw;
 }
 
 // ImGuiTableColumnSortSpecs
-struct TableColumnSortSpecs {
+struct ImGuiTableColumnSortSpecs {
 	ImGuiID column_user_id;
 	ImU16 column_index;
 	ImU16 sort_order;
-	SortDirection sort_direction;
+	ImGuiSortDirection sort_direction;
 }
 
 // ImGuiTextFilter
-struct TextFilter {
+struct ImGuiTextFilter {
 	char[(usz)(256)] input_buf;
-	vector::Vector(<TextRange>) filters;
+	vector::Vector(<ImGuiTextRange>) filters;
 	int count_grep;
 }
 
 // ImFontAtlasCustomRect
-struct FontAtlasCustomRect {
+struct ImFontAtlasCustomRect {
 	ushort width;
 	ushort height;
 	ushort x;
@@ -538,7 +538,7 @@ struct FontAtlasCustomRect {
 		uint glyph_id : 0..30;
 		uint glyph_colored : 31..31;
 	}
-	Vec2 glyph_offset;
-	Font* font;
+	ImVec2 glyph_offset;
+	ImFont* font;
 }
 

@@ -290,22 +290,24 @@ fn void output_typedefs(Object* json_obj, String output_path) {
 
   foreach (typedef : typedefs) {
     @start_string_builder(&output; DString* sb) {
+      if (try type = distinct_enum_map.get(typedef.first)) {
+        if (typedef.first == type) {
+          continue;
+        }
+      }
+
       sb.appendf("def ");
       if (try typedef.second.index_of("(*)")) {
         sb.appendf("%s = ", clean_imgui(typedef.first));
         clean_callback(sb, typedef.second);
       } else {
-        if (try type = distinct_enum_map.get(typedef.first)) {
-          sb.appendf("%s = %s", typedef.first, type);
+        sb.appendf("%s = ", typedef_names_map.get(typedef.first) ?? clean_imgui(typedef.first)); // type name
+        if (try value = typedef_names_map.get(typedef.second)) {
+          sb.appendf("%s", value);
+        } else if (try def_type = type_map.get(typedef.second)) {
+          sb.appendf("%s", def_type);
         } else {
-          sb.appendf("%s = ", typedef_names_map.get(typedef.first) ?? clean_imgui(typedef.first)); // type name
-          if (try value = typedef_names_map.get(typedef.second)) {
-            sb.appendf("%s", value);
-          } else if (try def_type = type_map.get(typedef.second)) {
-            sb.appendf("%s", def_type);
-          } else {
-            sb.appendf("%s", clean_imgui(typedef.second));
-          }
+          sb.appendf("%s", clean_imgui(typedef.second));
         }
       }
       sb.appendf(";\n");
